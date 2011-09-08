@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/760/branches/V3.0_C/Libraries/AQ_BatteryMonitor
+END
+BatteryMonitor_APM.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/!svn/ver/760/branches/V3.0_C/Libraries/AQ_BatteryMonitor/BatteryMonitor_APM.h
+END
+BatteryMonitor.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/!svn/ver/735/branches/V3.0_C/Libraries/AQ_BatteryMonitor/BatteryMonitor.h
+END
+BatteryMonitor_AQ.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/760/branches/V3.0_C/Libraries/AQ_BatteryMonitor/BatteryMonitor_AQ.h
+END

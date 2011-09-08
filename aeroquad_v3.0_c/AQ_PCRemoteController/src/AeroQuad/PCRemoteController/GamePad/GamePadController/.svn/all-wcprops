@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/GamePad/GamePadController
+END
+IGamePad.java
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/GamePad/GamePadController/IGamePad.java
+END
+XBox360Pad.java
+K 25
+svn:wc:ra_dav:version-url
+V 129
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/GamePad/GamePadController/XBox360Pad.java
+END
+GamePad.java
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/GamePad/GamePadController/GamePad.java
+END
+SaitecEvoFlightStick.java
+K 25
+svn:wc:ra_dav:version-url
+V 139
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/GamePad/GamePadController/SaitecEvoFlightStick.java
+END

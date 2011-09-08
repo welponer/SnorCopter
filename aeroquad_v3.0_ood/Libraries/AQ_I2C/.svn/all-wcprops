@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/666/branches/V3.0/Libraries/AQ_I2C
+END
+Device_I2C.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/666/branches/V3.0/Libraries/AQ_I2C/Device_I2C.h
+END
+Device_I2C.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/666/branches/V3.0/Libraries/AQ_I2C/Device_I2C.cpp
+END

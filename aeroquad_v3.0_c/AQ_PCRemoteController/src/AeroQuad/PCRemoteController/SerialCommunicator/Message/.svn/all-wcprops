@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/SerialCommunicator/Message
+END
+SerialMessage.java
+K 25
+svn:wc:ra_dav:version-url
+V 133
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/SerialCommunicator/Message/SerialMessage.java
+END
+IMessageFactory.java
+K 25
+svn:wc:ra_dav:version-url
+V 135
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/SerialCommunicator/Message/IMessageFactory.java
+END
+SensorsDataMessage.java
+K 25
+svn:wc:ra_dav:version-url
+V 138
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/SerialCommunicator/Message/SensorsDataMessage.java
+END
+FlightDataMessage.java
+K 25
+svn:wc:ra_dav:version-url
+V 137
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/SerialCommunicator/Message/FlightDataMessage.java
+END
+MessageFactory.java
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/SerialCommunicator/Message/MessageFactory.java
+END

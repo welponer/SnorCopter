@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/UI/GamePad
+END
+GamePadPanelController.java
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/UI/GamePad/GamePadPanelController.java
+END
+IGamePadPanel.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/UI/GamePad/IGamePadPanel.java
+END
+IGamePadPanelController.java
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/UI/GamePad/IGamePadPanelController.java
+END
+GamePadPanel.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/!svn/ver/711/branches/V3.0_C/AQ_PCRemoteController/src/AeroQuad/PCRemoteController/UI/GamePad/GamePadPanel.java
+END

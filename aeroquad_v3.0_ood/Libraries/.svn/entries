@@ -1,0 +1,76 @@
+10
+
+dir
+765
+http://aeroquad.googlecode.com/svn/branches/V3.0/Libraries
+http://aeroquad.googlecode.com/svn
+
+
+
+2011-08-30T01:26:56.605568Z
+752
+patricemainville@gmail.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+80d9e1a6-1c2b-11de-a108-cd2f117ce590
+
+AQ_Receiver
+dir
+
+AQ_Compass
+dir
+
+AQ_Gyroscope
+dir
+
+AQ_Accelerometer
+dir
+
+AQ_I2C
+dir
+
+AQ_Defines
+dir
+
+AQ_BarometricSensor
+dir
+
+AQ_CameraStabilizer
+dir
+
+AQ_Platform_APM
+dir
+
+AQ_BatteryMonitor
+dir
+
+AQ_Motors
+dir
+
+AQ_Kinematics
+dir
+
+AQ_Platform_CHR6DM
+dir
+
+AQ_Gps
+dir
+
+AQ_Math
+dir
+
+AQ_Platform_Wii
+dir
+

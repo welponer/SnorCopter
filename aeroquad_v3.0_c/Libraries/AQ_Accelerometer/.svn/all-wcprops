@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/764/branches/V3.0_C/Libraries/AQ_Accelerometer
+END
+Accelerometer.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/!svn/ver/764/branches/V3.0_C/Libraries/AQ_Accelerometer/Accelerometer.h
+END
+Accelerometer_CHR6DM.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/764/branches/V3.0_C/Libraries/AQ_Accelerometer/Accelerometer_CHR6DM.h
+END
+Accelerometer_ADXL345.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/764/branches/V3.0_C/Libraries/AQ_Accelerometer/Accelerometer_ADXL345.h
+END
+Accelerometer_BMA180.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/764/branches/V3.0_C/Libraries/AQ_Accelerometer/Accelerometer_BMA180.h
+END
+Accelerometer_WII.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/764/branches/V3.0_C/Libraries/AQ_Accelerometer/Accelerometer_WII.h
+END
+Accelerometer_ADXL500.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/764/branches/V3.0_C/Libraries/AQ_Accelerometer/Accelerometer_ADXL500.h
+END
+Accelerometer_APM.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/764/branches/V3.0_C/Libraries/AQ_Accelerometer/Accelerometer_APM.h
+END

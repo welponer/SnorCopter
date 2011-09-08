@@ -1,0 +1,125 @@
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/!svn/ver/762/branches/V3.0_C/AeroQuad
+END
+FlightControlOctoX.h
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/747/branches/V3.0_C/AeroQuad/FlightControlOctoX.h
+END
+FlightControlHexPlusMode.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/744/branches/V3.0_C/AeroQuad/FlightControlHexPlusMode.h
+END
+FlightCommand.pde
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/737/branches/V3.0_C/AeroQuad/FlightCommand.pde
+END
+DataStorage.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/760/branches/V3.0_C/AeroQuad/DataStorage.h
+END
+SerialCom.pde
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/747/branches/V3.0_C/AeroQuad/SerialCom.pde
+END
+FlightControl.pde
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/743/branches/V3.0_C/AeroQuad/FlightControl.pde
+END
+AeroQuad.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/762/branches/V3.0_C/AeroQuad/AeroQuad.h
+END
+FlightControlQuadPlusMode.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/743/branches/V3.0_C/AeroQuad/FlightControlQuadPlusMode.h
+END
+FlightControlTriMode.h
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/745/branches/V3.0_C/AeroQuad/FlightControlTriMode.h
+END
+FlightControlHexY6.h
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/744/branches/V3.0_C/AeroQuad/FlightControlHexY6.h
+END
+FlightControlQuadY4.h
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/744/branches/V3.0_C/AeroQuad/FlightControlQuadY4.h
+END
+gpl.txt
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/711/branches/V3.0_C/AeroQuad/gpl.txt
+END
+Template.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/711/branches/V3.0_C/AeroQuad/Template.h
+END
+MAX7456.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/736/branches/V3.0_C/AeroQuad/MAX7456.h
+END
+PID.h
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/711/branches/V3.0_C/AeroQuad/PID.h
+END
+FlightControlHexXMode.h
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/743/branches/V3.0_C/AeroQuad/FlightControlHexXMode.h
+END
+AeroQuad.pde
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/760/branches/V3.0_C/AeroQuad/AeroQuad.pde
+END
+FlightControlOctoX8.h
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/743/branches/V3.0_C/AeroQuad/FlightControlOctoX8.h
+END
+FlightControlQuadXMode.h
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/744/branches/V3.0_C/AeroQuad/FlightControlQuadXMode.h
+END
+README.markdown
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/711/branches/V3.0_C/AeroQuad/README.markdown
+END
