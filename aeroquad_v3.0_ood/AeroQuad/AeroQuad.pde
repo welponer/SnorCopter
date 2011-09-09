@@ -156,12 +156,14 @@
   #include <Device_I2C.h>
 
   // Gyroscope declaration
+  #define GYRO_ALTERNATE TRUE
   #include <Gyroscope.h>
   #include <Gyroscope_ITG3200.h>
   Gyroscope_ITG3200 gyroSpecific;
   Gyroscope *gyro = &gyroSpecific;
   
   // Accelerometer declaration
+  #define ACCEL_ALTERNATE TRUE
   #include <Accelerometer.h>
   #include <Accelerometer_BMA180.h>
   Accelerometer_BMA180 accelSpecific;
@@ -186,10 +188,10 @@
   
   // Battery monitor declaration
   #ifdef BattMonitor
-    #include <BatteryMonitor.h>
-    #include <BatteryMonitor_Atto.h>
-    BatteryMonitor_AQ batteryMonitorSpecific;
-    BatteryMonitor* batteryMonitor = &batteryMonitorSpecific;
+    #include <BatteryMonitor2.h>
+    //#include <BatteryMonitor_Atto.h>
+    BatterySensor batteryMonitorSpecific;
+    BatterySensor* batteryMonitor = &batteryMonitorSpecific;
   #endif
   
   /**
@@ -207,6 +209,11 @@
   void measureCriticalSensors() {
     gyro->measure();
     accel->measure();
+  }
+  void measureNormalSensors() {
+  }
+  void measureSlowSensors() {
+  
   }
 #endif
 
