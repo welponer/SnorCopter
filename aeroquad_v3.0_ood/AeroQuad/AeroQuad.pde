@@ -36,24 +36,26 @@
 //#define AeroQuad_Wii        // Arduino 2009 with Wii Sensors and AeroQuad Shield v1.x
 //#define AeroQuad_Paris_v3   // Define along with either AeroQuad_Wii to include specific changes for MultiWiiCopter Paris v3.0 board
 //#define AeroQuadMega_v1     // Arduino Mega with AeroQuad Shield v1.7 and below
-#define AeroQuadMega_v2     // Arduino Mega with AeroQuad Shield v2.x
+//#define AeroQuadMega_v2     // Arduino Mega with AeroQuad Shield v2.x
 //#define AeroQuadMega_Wii    // Arduino Mega with Wii Sensors and AeroQuad Shield v2.x
 //#define ArduCopter          // ArduPilot Mega (APM) with Oilpan Sensor Board
 //#define AeroQuadMega_CHR6DM // Clean Arduino Mega with CHR6DM as IMU/heading ref.
 //#define APM_OP_CHR6DM       // ArduPilot Mega with CHR6DM as IMU/heading ref., Oilpan for barometer (just uncomment AltitudeHold for baro), and voltage divider
+#define ArduCopter_AQ
+
 
 /****************************************************************************
  *********************** Define Flight Configuration ************************
  ****************************************************************************/
 // Use only one of the following definitions
-//#define quadXConfig
+#define quadXConfig
 //#define quadPlusConfig
 //#define hexPlusConfig
 //#define hexXConfig
 //#define triConfig
 //#define quadY4Config
 //#define hexY6Config
-#define octoX8Congig
+//#define octoX8Congig
 
 //
 // *******************************************************************************************************************************
@@ -74,8 +76,8 @@
 // If you only want DCM, then don't define either of the below
 // Use FlightAngleARG if you do not have a magnetometer, use DCM if you have a magnetometer installed
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//#define FlightAngleMARG // Experimental!  Fly at your own risk! Use this if you have a magnetometer installed and enabled HeadingMagHold above
-#define FlightAngleARG // Use this if you do not have a magnetometer installed
+#define FlightAngleMARG // Experimental!  Fly at your own risk! Use this if you have a magnetometer installed and enabled HeadingMagHold above
+//#define FlightAngleARG // Use this if you do not have a magnetometer installed
 //#define WirelessTelemetry  // Enables Wireless telemetry on Serial3  // Wireless telemetry enable
 //#define BinaryWrite // Enables fast binary transfer of flight data to Configurator
 //#define BinaryWritePID // Enables fast binary transfer of attitude PID data
@@ -148,6 +150,63 @@
 //********* PLATFORM SPECIFIC SECTION ********************
 //********************************************************
 //********************************************************
+#ifdef ArduCopter_AQ
+  #include <APM_RC.h>
+  #include <Device_I2C.h>
+
+  // Gyroscope declaration
+  #include <Gyroscope.h>
+  #include <Gyroscope_ITG3200.h>
+  Gyroscope_ITG3200 gyroSpecific;
+  Gyroscope *gyro = &gyroSpecific;
+  
+  // Accelerometer declaration
+  #include <Accelerometer.h>
+  #include <Accelerometer_BMA180.h>
+  Accelerometer_BMA180 accelSpecific;
+  Accelerometer *accel = &accelSpecific;
+
+
+  // Receiver Declaration
+  #define RECEIVER_APM
+  
+  // Motor Declaration
+  #define MOTOR_APM
+  
+  // heading mag hold declaration
+  #ifdef HeadingMagHold
+    #define HMC5843
+  #endif
+ 
+  // Altitude declaration
+  #ifdef AltitudeHold
+    #define BMP085
+  #endif
+  
+  // Battery monitor declaration
+  #ifdef BattMonitor
+    #define BATTERY_MONITOR_APM
+  #endif
+  
+  /**
+   * Put ArduCopter specific intialization need here
+   */
+  void initPlatform() {
+    initRC();
+    Wire.begin();
+    TWBR = 12;
+  }
+  
+  /**
+   * Measure critical sensors
+   */
+  void measureCriticalSensors() {
+    gyro->measure();
+    accel->measure();
+  }
+#endif
+
+
 #ifdef AeroQuad_v1
   // Gyroscope declaration
   #include <Gyroscope.h>
@@ -1009,7 +1068,7 @@ void setup() {
 
   // Setup receiver pins for pin change interrupts
   if (receiverLoop == ON) {
-    receiver->initialize(LASTCHANNEL);
+    receiver->initialize();
     initReceiverFromEEPROM();
   }
        
