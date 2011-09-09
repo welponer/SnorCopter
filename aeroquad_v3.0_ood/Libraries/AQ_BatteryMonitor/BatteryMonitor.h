@@ -23,7 +23,7 @@
 
 #include <WProgram.h>
 
-#define BATTERYPIN 0      // Ain 0 (universal to every Arduino), pin 55 on Mega (1280)
+#define BATTERYPIN A0      // Ain 0 (universal to every Arduino), pin 55 on Mega (1280)
 #define OK 0
 #define WARNING 1
 #define ALARM 2
