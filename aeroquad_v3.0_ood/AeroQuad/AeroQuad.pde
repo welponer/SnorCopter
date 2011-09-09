@@ -41,8 +41,8 @@
 //#define ArduCopter          // ArduPilot Mega (APM) with Oilpan Sensor Board
 //#define AeroQuadMega_CHR6DM // Clean Arduino Mega with CHR6DM as IMU/heading ref.
 //#define APM_OP_CHR6DM       // ArduPilot Mega with CHR6DM as IMU/heading ref., Oilpan for barometer (just uncomment AltitudeHold for baro), and voltage divider
-#define ArduCopter_AQ
-
+//#define ArduCopter_AQ
+#define ArduCopter_CSG
 
 /****************************************************************************
  *********************** Define Flight Configuration ************************
@@ -150,6 +150,65 @@
 //********* PLATFORM SPECIFIC SECTION ********************
 //********************************************************
 //********************************************************
+
+#ifdef ArduCopter_CSG
+  #include <APM_RC.h>
+  #include <Device_I2C.h>
+
+  // Gyroscope declaration
+  #include <Gyroscope.h>
+  #include <Gyroscope_ITG3200.h>
+  Gyroscope_ITG3200 gyroSpecific;
+  Gyroscope *gyro = &gyroSpecific;
+  
+  // Accelerometer declaration
+  #include <Accelerometer.h>
+  #include <Accelerometer_BMA180.h>
+  Accelerometer_BMA180 accelSpecific;
+  Accelerometer *accel = &accelSpecific;
+
+
+  // Receiver Declaration
+  #define RECEIVER_APM
+  
+  // Motor Declaration
+  #define MOTOR_APM
+  
+  // heading mag hold declaration
+  #ifdef HeadingMagHold
+    #define HMC5843
+  #endif
+ 
+  // Altitude declaration
+  #ifdef AltitudeHold
+    #define BMP085
+  #endif
+  
+  // Battery monitor declaration
+  #ifdef BattMonitor
+    #define BATTERY_MONITOR_APM
+  #endif
+  
+  /**
+   * Put ArduCopter specific intialization need here
+   */
+  void initPlatform() {
+    initRC();
+    Wire.begin();
+    TWBR = 12;
+  }
+  
+  /**
+   * Measure critical sensors
+   */
+  void measureCriticalSensors() {
+    gyro->measure();
+    accel->measure();
+  }
+#endif
+
+
+
 #ifdef ArduCopter_AQ
   #include <APM_RC.h>
   #include <Device_I2C.h>
