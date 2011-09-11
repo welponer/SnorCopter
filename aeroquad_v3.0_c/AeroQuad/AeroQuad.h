@@ -52,6 +52,8 @@
   #define LED3PIN 12
 #endif
 
+#define MINTHROTTLE 1100
+
 // PID Variables
 struct PIDdata {
   float P, I, D;
