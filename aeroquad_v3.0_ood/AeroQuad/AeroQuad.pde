@@ -247,8 +247,8 @@
     #define HMC5843
   #endif
 
-#undef AltitudeHold 
-#undef BattMonitor 
+  #undef AltitudeHold 
+  #undef BattMonitor 
  
   // Altitude declaration
   #ifdef AltitudeHold
