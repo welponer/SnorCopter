@@ -66,25 +66,16 @@ unsigned char ADCSPItransfer(unsigned char data)
 
 ISR (TIMER2_OVF_vect) 
 {
-  //uint8_t ch;
-  unsigned int adc_tmp;
-  
-  //bit_set(PORTL,6); // To test performance
   bit_clear(PORTC,4);             // Enable Chip Select (PIN PC4)
   ADCSPItransfer(adc_cmd[0]);       // Command to read the first channel
-  for (uint8_t ch = 0; ch < 8; ch++) {
-    if (adc_counter[ch] >= 16) {
-        adc_value[ch] /=2;
-        adc_counter[ch] /=2;
-    }
-    adc_tmp = ADCSPItransfer(0) << 8;    // Read first byte
-    adc_tmp |= ADCSPItransfer(adc_cmd[ch+1]);  // Read second byte and send next command
-    adc_value[ch] += adc_tmp >> 3;     // Shift to 12 bits
+  for (uint8_t ch = 0; ch < 6; ch++) {
+    adc_value[ch] += (ADCSPItransfer(0) << 8) | ADCSPItransfer(adc_cmd[ch+1]);
     adc_counter[ch]++;               // Number of samples
   }
   bit_set(PORTC,4);                // Disable Chip Select (PIN PC4)
-  //bit_clear(PORTL,6); // To test performance
-  TCNT2 = 104;        // 400 Hz
+
+  TCNT2 = 194; // 1.01kHz sampling //104 = 411Hz        // 411 Hz 8-bit clock, 104 of 256, 16MHz, 256-104 = 152, 152 ticks until overflow, 152*62.5ns = 
+//  TCNT2 = 104;        // 400 Hz
 }
 
 
@@ -105,6 +96,7 @@ void initializeADC()
   UCSR2B = (1<<RXEN2)|(1<<TXEN2);
   // Set Baud rate
   UBRR2 = 2; // SPI clock running at 2.6MHz
+
 
   // Enable Timer2 Overflow interrupt to capture ADC data
   TIMSK2 = 0;  // Disable interrupts 
@@ -127,7 +119,7 @@ int readADC(unsigned char ch_num)
   adc_value[ch_num] = 0;    // Initialize for next reading
   adc_counter[ch_num] = 0;
   sei();
-  return(result);
+  return(result >> 3);
 }
   
 
