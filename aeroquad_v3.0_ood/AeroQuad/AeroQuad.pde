@@ -41,8 +41,8 @@
 //#define ArduCopter          // ArduPilot Mega (APM) with Oilpan Sensor Board
 //#define AeroQuadMega_CHR6DM // Clean Arduino Mega with CHR6DM as IMU/heading ref.
 //#define APM_OP_CHR6DM       // ArduPilot Mega with CHR6DM as IMU/heading ref., Oilpan for barometer (just uncomment AltitudeHold for baro), and voltage divider
-#define ArduCopter_AQ
-//#define ArduCopter_CSG
+//#define ArduCopter_AQ
+#define ArduCopter_CSG
 
 /****************************************************************************
  *********************** Define Flight Configuration ************************
@@ -185,6 +185,10 @@
   #ifdef AltitudeHold
     #define BMP085
   #endif
+  
+  #include "StatusSignal.h"
+  StatusSignal statusSignalSpecific;
+  StatusSignal* statusSignal = &statusSignalSpecific;
   
   // Battery monitor declaration
   #ifdef BattMonitor
