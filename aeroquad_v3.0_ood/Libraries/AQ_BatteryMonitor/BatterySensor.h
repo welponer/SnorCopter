@@ -75,14 +75,14 @@ public:
     batteryCurrent = filterSmooth(analogRead(SENSOR_IPIN)*1000.0 / SENSOR_ISCALE, batteryCurrent, 0.5);
 
     batteryCharge += batteryCurrent * ((currentTime - previousTime) / 1000000.0) / 3.6; // mAh
-    
+/*    
     Serial.print("BatterySensor: ");
     Serial.print(batteryVoltage);
     Serial.print("; ");
     Serial.print(batteryCurrent);
     Serial.print("; ");
     Serial.println(batteryCharge);
-    
+ */   
     
     
  //   if (armed) {
