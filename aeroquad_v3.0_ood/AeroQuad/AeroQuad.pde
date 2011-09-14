@@ -206,6 +206,8 @@
     
     Wire.begin();
     TWBR = 12;
+    
+    statusSignal-> initialize();
   }
   
   /**
