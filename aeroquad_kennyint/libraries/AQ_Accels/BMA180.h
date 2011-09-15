@@ -8,7 +8,7 @@
 
 /******************************************************/
 
-void readAccel() {
+void readAccelAndSumForAverage() {
   twiMaster.start(ACCEL_ADDRESS | I2C_WRITE);
   twiMaster.write(0x02);
   twiMaster.start(ACCEL_ADDRESS | I2C_READ);
@@ -25,7 +25,7 @@ void readAccel() {
 void computeAccelBias() {
   cli();
   for (int samples = 0; samples < 800; samples++) {
-    readAccel();
+    readAccelAndSumForAverage();
     delayMicroseconds(2500);
   }
 

@@ -1,7 +1,7 @@
 // Choose processor type here
 
-//#define AeroQuad_Mini
-#define AeroQuadMega_v2
+#define AeroQuad_Mini
+//#define AeroQuadMega_v2
 
 #include <EEPROM.h>
 #include "TwiMaster.h"
@@ -13,8 +13,8 @@ TwiMaster twiMaster;
 
 // Choose accelerometer type here
 
-//Accel_AeroQuadMini accel;
-Accel_AeroQuadMega_v2 accel;
+Accel_AeroQuadMini accel;
+//Accel_AeroQuadMega_v2 accel;
 
 #include "DataStorage.h"
 

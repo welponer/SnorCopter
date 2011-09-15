@@ -17,15 +17,6 @@
 
 /******************************************************/
 
-void commandAllMotors(int _motorCommand) {                  // Sends commands to all motors
-  OCR2B = _motorCommand / 16 ;
-  OCR1A = _motorCommand / 16 ;
-  OCR1B = _motorCommand / 16 ;
-  OCR2A = _motorCommand / 16 ;
-}
-
-/******************************************************/
-
 void initializeMotors(void) {
   DDRB = DDRB | B00001110;                                  // Set ports to output PB1-3
   DDRD = DDRD | B00001000;                                  // Set port to output PD3
@@ -59,16 +50,3 @@ void writeMotors(void) {
 }
 
 /******************************************************/
-
-void pulseMotors(byte quantity) {
-  for (byte i = 0; i < quantity; i++) {
-  commandAllMotors(MINCOMMAND + 100);
-  delay(250);
-  commandAllMotors(MINCOMMAND);
-  delay(250);
-  }
-}
-
-/******************************************************/
-
-

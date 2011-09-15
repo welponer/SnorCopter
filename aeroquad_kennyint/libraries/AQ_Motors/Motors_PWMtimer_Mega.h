@@ -21,27 +21,6 @@
 
 /******************************************************/
 
-void commandAllMotors(int _motorCommand) {   // Sends commands to all motors
-  #if (LASTMOTOR >= 4)
-    OCR3B = _motorCommand * 2 ;
-    OCR3C = _motorCommand * 2 ;
-    OCR3A = _motorCommand * 2 ;
-    OCR4A = _motorCommand * 2 ;
-  #endif
-
-  #if (LASTMOTOR >= 6)
-    OCR4B = _motorCommand * 2 ;
-    OCR4C = _motorCommand * 2 ;
-  #endif
-
-  #if (LASTMOTOR == 8)
-    OCR1A = _motorCommand * 2 ;
-    OCR1B = _motorCommand * 2 ;
-  #endif
-}
-
-/******************************************************/
-
 void initializeMotors(void) {
   #if (LASTMOTOR >= 4)
     DDRE = DDRE | B00111000;                                  // Set PE4, PE5, and PE3 ports to output
@@ -58,18 +37,27 @@ void initializeMotors(void) {
 
   commandAllMotors(1000);                                     // Initialise motors to 1000us (stopped)
 
-  // Init PWM Timer 3                                         // WGMn1 WGMn2 WGMn3  = Mode 14 Fast PWM, TOP = ICRn ,Update of OCRnx at BOTTOM
-  TCCR3A = (1<<WGM31)|(1<<COM3A1)|(1<<COM3B1)|(1<<COM3C1);    // Clear OCnA/OCnB/OCnC on compare match, set OCnA/OCnB/OCnC at BOTTOM (non-inverting mode)
-  TCCR3B = (1<<WGM33)|(1<<WGM32)|(1<<CS31);                   // Prescaler set to 8, that gives us a resolution of 0.5us
-  ICR3 = PWM_COUNTER_PERIOD;                                  // Clock_speed / ( Prescaler * desired_PWM_Frequency) #defined above.
-  // Init PWM Timer 4
-  TCCR4A = (1<<WGM41)|(1<<COM4A1);
-  TCCR4B = (1<<WGM43)|(1<<WGM42)|(1<<CS41);
-  ICR4 = PWM_COUNTER_PERIOD;
+  #if (LASTMOTOR >= 4)
+    // Init PWM Timer 3                                         // WGMn1 WGMn2 WGMn3  = Mode 14 Fast PWM, TOP = ICRn ,Update of OCRnx at BOTTOM
+    TCCR3A = (1<<WGM31)|(1<<COM3A1)|(1<<COM3B1)|(1<<COM3C1);    // Clear OCnA/OCnB/OCnC on compare match, set OCnA/OCnB/OCnC at BOTTOM (non-inverting mode)
+    TCCR3B = (1<<WGM33)|(1<<WGM32)|(1<<CS31);                   // Prescaler set to 8, that gives us a resolution of 0.5us
+    ICR3 = PWM_COUNTER_PERIOD;                                  // Clock_speed / ( Prescaler * desired_PWM_Frequency) #defined above.
+    // Init PWM Timer 4
+    TCCR4A = (1<<WGM41)|(1<<COM4A1);
+    TCCR4B = (1<<WGM43)|(1<<WGM42)|(1<<CS41);
+    ICR4 = PWM_COUNTER_PERIOD;
+  #endif
+
+  #if (LASTMOTOR >= 6)
+    TCCR4A |= (1<<COM4B1)|(1<<COM4C1);
+  #endif
+
+  #if (LASTMOTOR == 8)
   // Init PWM Timer 1
-  TCCR1A = (1<<WGM11)|(1<<COM1A1)|(1<<COM1B1)|(1<<COM1C1);
-  TCCR1B = (1<<WGM13)|(1<<WGM12)|(1<<CS11);
-  ICR4 = PWM_COUNTER_PERIOD;
+    TCCR1A = (1<<WGM11)|(1<<COM1A1)|(1<<COM1B1);
+    TCCR1B = (1<<WGM13)|(1<<WGM12)|(1<<CS11);
+    ICR4 = PWM_COUNTER_PERIOD;
+  #endif
 }
 
 /******************************************************/
@@ -83,26 +71,15 @@ void writeMotors(void) {
   #endif
 
   #if (LASTMOTOR >= 6)
-      OCR4B = motorCommand[4] * 2 ;
-      OCR4C = motorCommand[5] * 2 ;
-    #endif
-
-    #if (LASTMOTOR == 8)
-      OCR1A = motorCommand[6] * 2 ;
-      OCR1B = motorCommand[7] * 2 ;
+    OCR4B = motorCommand[4] * 2 ;
+    OCR4C = motorCommand[5] * 2 ;
   #endif
 
-}
+  #if (LASTMOTOR == 8)
+    OCR1A = motorCommand[6] * 2 ;
+    OCR1B = motorCommand[7] * 2 ;
+  #endif
 
-/******************************************************/
-
-void pulseMotors(byte quantity) {
-  for (byte i = 0; i < quantity; i++) {
-  commandAllMotors(MINCOMMAND + 100);
-  delay(250);
-  commandAllMotors(MINCOMMAND);
-  delay(250);
-  }
 }
 
 /******************************************************/

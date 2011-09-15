@@ -30,7 +30,7 @@
 void calculateFlightError(void)
 {
   if (flightMode == ACRO) {
-    motorAxisCommand[ROLL]  = updatePID(receiverData[ROLL] * PWM2RAD,   gyro.value[ROLL],  dt, &PID[ROLL_RATE_PID]);
+    motorAxisCommand[ROLL]  = updatePID(receiverData[ROLL]  * PWM2RAD,  gyro.value[ROLL],  dt, &PID[ROLL_RATE_PID]);
     motorAxisCommand[PITCH] = updatePID(receiverData[PITCH] * PWM2RAD, -gyro.value[PITCH], dt, &PID[PITCH_RATE_PID]);
   }
   else {
@@ -46,13 +46,9 @@ void calculateFlightError(void)
 //////////////////////////////////////////////////////////////////////////////
 void processHeading(void)
 {
-  if (headingHoldConfig == ON) {
-
-    #if defined(HeadingMagHold) || defined(AeroQuadMega_CHR6DM) || defined(APM_OP_CHR6DM)
-      heading = degrees(flightAngle->getHeading(YAW));
-    #else
-      heading = degrees(angle.value[YAW]);
-    #endif
+  if (headingHoldConfig == ON)
+  {
+    heading = degrees(angle.value[YAW]);
 
     // Always center relative heading around absolute heading chosen during yaw command
     // This assumes that an incorrect yaw can't be forced on the AeroQuad >180 or <-180 degrees
@@ -60,8 +56,8 @@ void processHeading(void)
     // AKA - THERE IS A BUG HERE - if relative heading is greater than 180 degrees, the PID will swing from negative to positive
     // Doubt that will happen as it would have to be uncommanded.
     relativeHeading = heading - setHeading;
-    if (heading <= (setHeading - 180)) relativeHeading += 360;
-    if (heading >= (setHeading + 180)) relativeHeading -= 360;
+    if (heading <= (setHeading - 3.141593)) relativeHeading += 6.283185;
+    if (heading >= (setHeading + 3.141593)) relativeHeading -= 6.283185;
 
     // Apply heading hold only when throttle high enough to start flight
     if (receiverData[THROTTLE] > MINCHECK ) { 

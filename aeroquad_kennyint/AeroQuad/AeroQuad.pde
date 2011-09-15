@@ -28,9 +28,9 @@
  ****************************************************************************/
 // Select which hardware you wish to use with the AeroQuad Flight Software
 
-//#define AeroQuad_Mini_FFIMUV2  // AeroQuad Mini Shield, Arduino Pro Mini, FFIMUv2
-#define AeroQuad_v18           // Arduino 2009 with AeroQuad Shield v1.8 or greater
+#define AeroQuad_Mini_FFIMUV2  // AeroQuad Mini Shield, Arduino Pro Mini, FFIMUv2
 //#define AeroQuad_Mini          // Arduino Pro Mini with AeroQuad Mini Shield v1.0
+//#define AeroQuad_v18           // Arduino 2009 with AeroQuad Shield v1.8 or greater
 //#define AeroQuadMega_v2        // Arduino Mega with AeroQuad Shield v2.x
 
 /****************************************************************************
@@ -38,7 +38,7 @@
  ************************** 328p Processor Only *****************************
  ****************************************************************************/
  
-//#define isrSourceIsITG3200  // Experimental, requires shield modifications
+#define isrSourceIsITG3200  // Experimental, requires shield modifications
  
  /****************************************************************************
  *********************** Define Flight Configuration ************************
@@ -47,15 +47,15 @@
 //#define quadPlusConfig
 #define quadXConfig
 //#define y4Config
-//#define hexPlusConfig  // Only available for Mega Platforms or Platforms with I2C ESCs
-//#define hexXConfig     // Only available for Mega Platforms or Platforms with I2C ESCs
-//#define y6Config       // Only available for Mega Platforms or Platforms with I2C ESCs
+//#define hexPlusConfig  // Only available for Mega Platforms or 328p with ITG3200 Interrupt Source and Updated EICD
+//#define hexXConfig     // Only available for Mega Platforms or 328p with ITG3200 Interrupt Source and Updated EICD
+//#define y6Config       // Only available for Mega Platforms or 328p with ITG3200 Interrupt Source and Updated EICD
 
-// *******************************************************************************************************************************
-// Define how many channels that are connected from your R/C receiver
-// Please note that the flight software currently only supports 6 channels
-// *******************************************************************************************************************************
-#define LASTCHANNEL 6
+#if defined(isrSourceIsITG3200)
+  #define LASTCHANNEL 5
+#else
+  #define LASTCHANNEL 6
+#endif
 
 #include <EEPROM.h>
 
@@ -155,15 +155,13 @@ void setup() {
   Serial.println();
 
   twiMaster.init(false);         // Internal Pull Ups disabled
-  pinMode(LEDPIN, OUTPUT);
-  digitalWrite(LEDPIN, LOW);
-
-  #if defined(AeroQuad_v18) || defined(AeroQuadMega_v2) || defined(AeroQuad_Mini)
-    pinMode(LED2PIN, OUTPUT);
-    digitalWrite(LED2PIN, LOW);
-    pinMode(LED3PIN, OUTPUT);
-    digitalWrite(LED3PIN, LOW);
-  #endif
+  
+  pinMode(INITIALIZED_LED, OUTPUT);
+  digitalWrite(INITIALIZED_LED, OFF);
+  pinMode(ARMED_LED, OUTPUT);
+  digitalWrite(ARMED_LED, OFF);
+  pinMode(RATE_LED, OUTPUT);
+  digitalWrite(RATE_LED, OFF);
   
   // Read user values from EEPROM
   readEEPROM(); // defined in DataStorage.h
@@ -189,21 +187,12 @@ void setup() {
   zeroIntegralError();
 
   initializeAHRS();
-
-  #if defined(BinaryWrite) || defined(BinaryWritePID)
-    #ifdef OpenlogBinaryWrite
-      binaryPort = &Serial1;
-      binaryPort->begin(115200);
-      delay(1000);
-    #else
-     binaryPort = &Serial;
-    #endif 
-  #endif
   
-  digitalWrite(LEDPIN, HIGH);
   safetyCheck = 0;
 
   setupFourthOrder();
+  
+  digitalWrite(INITIALIZED_LED, ON);
   
   ////////////////////////////////////////////////////////////////////////////////
   
@@ -308,15 +297,19 @@ void loop () {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+      
 #if (defined(isrSourceIsITG3200) && defined (__AVR_ATmega328P__))
   ////////////////////////////////////////////////////////////////////////////////
   // Interrupt Service Routine - INT0
   ////////////////////////////////////////////////////////////////////////////////
   ISR(INT0_vect, ISR_NOBLOCK)
   {  
-    readAccel();
+    readAccelAndSumForAverage();
     
-    readGyro();
+    readGyroAndSumForAverage();
     
     #if defined(HMC5843) | defined(HMC5883)
       if ((isrFrameCounter % COMPASS_COUNT) == 0) {
@@ -334,22 +327,19 @@ void loop () {
       }
     #endif
     
-    isrFrameCounter++;
-    if (isrFrameCounter > ISR_FRAME_COUNT) isrFrameCounter = 1;
-    
     #if defined(I2C_ESC)
-      // If using I2C ESCs, check for updated motor commands and
-      //   write them out if present.
-      if (sendMotorCommands == 1)
+      if (((isrFrameCounter - 1) % I2C_ESC_COUNT) == 0)
       {
         for (byte motor = FIRSTMOTOR; motor < LASTMOTOR; motor++)
         {
-          twiMaster.start(MOTORBASE + motor | I2C_WRITE);
+          twiMaster.start((MOTORBASE + (motor * 2)) | I2C_WRITE);
           twiMaster.write(motorCommandI2C[motor]);
         }
-        sendMotorCommands == 0;
       }
     #endif
+    
+    isrFrameCounter++;
+    if (isrFrameCounter > ISR_FRAME_COUNT) isrFrameCounter = 1;
   }
 #else
   ////////////////////////////////////////////////////////////////////////////////
@@ -367,31 +357,16 @@ void loop () {
     if (timer0countIndex == 0)        // If 1st count complete
     {
       OCR0A = TCNT0 + TIMER0_COUNT1;  // Load 2nd count
-      timer0countIndex = 1;           // Indicate 2nd count active
-      
-      #if defined(I2C_ESC)
-        // If using I2C ESCs, check for updated motor commands and
-        //   write them out if present.
-        if (sendMotorCommands == 1)
-        {
-          for (byte motor = FIRSTMOTOR; motor < LASTMOTOR; motor++)
-          {
-            twiMaster.start(MOTORBASE + motor | I2C_WRITE);
-            twiMaster.write(motorCommandI2C[motor]);
-          }
-          sendMotorCommands == 0;
-        }
-      #endif
-      
+      timer0countIndex = 1;           // Indicate 2nd count active      
       return;                         // And return from ISR
     }
     else {                            // Else 2nd count complete
       OCR0A = TCNT0 + TIMER0_COUNT0;  // Load 1st count
       timer0countIndex = 0;           // Indicate 1st count active
                                       // And execute sensor reads
-      readAccel();
+      readAccelAndSumForAverage();
       
-      readGyro();
+      readGyroAndSumForAverage();
       
       #if defined(HMC5843) | defined(HMC5883)
         if ((isrFrameCounter % COMPASS_COUNT) == 0) {
@@ -405,6 +380,17 @@ void loop () {
           if (isrFrameCounter == (PRESSURE_COUNT-1))  readTemperatureRequestPressure();
           else if (isrFrameCounter == (ISR_FRAME_COUNT-1)) readPressureRequestTemperature();
           else readPressureRequestPressure();
+        }
+      #endif
+      
+      #if defined(I2C_ESC)
+      if (((isrFrameCounter - 1) % I2C_ESC_COUNT) == 0)
+        {
+          for (byte motor = FIRSTMOTOR; motor < LASTMOTOR; motor++)
+          {
+            twiMaster.start((MOTORBASE + (motor * 2)) | I2C_WRITE);
+            twiMaster.write(motorCommandI2C[motor]);
+          }
         }
       #endif
       

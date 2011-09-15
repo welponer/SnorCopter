@@ -7,27 +7,28 @@
 /******************************************************/
 
 byte motorCommandI2C[LASTMOTOR];
-byte sendMotorCommands = 0;
 
 /******************************************************/
 
-#define MOTORBASE 0x29
+#define MOTORBASE 0x52
 
-/******************************************************/
-
-void commandAllMotors(int motorCommand) {
-  byte temp = constrain((motorCommand - 1000) / 4, 0, 250);
-  for (byte motor = FIRSTMOTOR; motor < LASTMOTOR; motor++)
-	motorCommandI2C[motor] = temp;
-  sendMotorCommands = 1;
-}
+/*  Motor  I2C Address (7 Bit, PhiFun I2C Controller)
+    0       0x52
+    1       0x54
+    2       0x56
+    3       0x58
+    4       0x5A
+    5       0x5C
+*/
 
 /******************************************************/
 
 void initializeMotors(void) {
-   for (byte motor = FIRSTMOTOR; motor < LASTMOTOR; motor++)
- 	motorCommandI2C[motor] = 0;
-  sendMotorCommands = 1;
+  for (byte motor = FIRSTMOTOR; motor < LASTMOTOR; motor++)
+  {
+     twiMaster.start((MOTORBASE + (motor * 2)) | I2C_WRITE);
+     twiMaster.write(0);
+  }
 }
 
 /******************************************************/
@@ -35,18 +36,6 @@ void initializeMotors(void) {
 void writeMotors(void) {
   for (byte motor = FIRSTMOTOR; motor < LASTMOTOR; motor++)
 	motorCommandI2C[motor] = constrain((motorCommand[motor] - 1000) / 4, 0, 250);
-  sendMotorCommands = 1;
-}
-
-/******************************************************/
-
-void pulseMotors(byte quantity) {
-  for (byte i = 0; i < quantity; i++) {
-  commandAllMotors(MINCOMMAND + 100);
-  delay(250);
-  commandAllMotors(MINCOMMAND);
-  delay(250);
-  }
 }
 
 /******************************************************/

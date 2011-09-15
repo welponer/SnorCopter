@@ -15,7 +15,7 @@
 
 /******************************************************/
 
-void readGyro() {
+void readGyroAndSumForAverage() {
   twiMaster.start(GYRO_ADDRESS | I2C_WRITE);
   twiMaster.write(0x1D);
   twiMaster.start(GYRO_ADDRESS | I2C_READ);
@@ -32,7 +32,7 @@ void readGyro() {
 void computeGyroBias() {
   cli();
   for (int samples = 0; samples < 800; samples++) {
-    readGyro();
+    readGyroAndSumForAverage();
     delayMicroseconds(2500);
   }
 

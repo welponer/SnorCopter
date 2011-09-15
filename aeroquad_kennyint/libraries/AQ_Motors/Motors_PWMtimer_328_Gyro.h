@@ -26,22 +26,6 @@
 
 /******************************************************/
 
-void commandAllMotors(int _motorCommand) {                  // Sends commands to all motors
-  OCR2B = _motorCommand / 16 ;
-  OCR1A = _motorCommand / 16 ;
-  OCR1B = _motorCommand / 16 ;
-  OCR2A = _motorCommand / 16 ;
-
-  #if (LASTMOTOR == 6)
-    PWM_MOTOR4PIN_highState = _motorCommand / 8;
-    PWM_MOTOR4PIN_lowState  = 255 - PWM_MOTOR4PIN_highState;
-    PWM_MOTOR5PIN_highState = _motorCommand / 8;
-    PWM_MOTOR5PIN_lowState  = 255 - PWM_MOTOR5PIN_highState;
-    #endif
-}
-
-/******************************************************/
-
 void initializeMotors(void) {
   DDRB |= B00001110;                                  // Set ports to output PB1-3
   DDRD |= B00001000;                                  // Set port to output PD3
@@ -76,24 +60,12 @@ void writeMotors(void) {
   OCR1B = motorCommand[2] / 16;
   OCR2A = motorCommand[3] / 16;
   #if (LASTMOTOR == 6)
-    PWM_MOTOR4PIN_highState = motorCommand[4] / 8;
+    PWM_MOTOR4PIN_highState = int(motorCommand[4] / 8) * 2;
 	PWM_MOTOR4PIN_lowState  = 255 - PWM_MOTOR4PIN_highState;
-	PWM_MOTOR5PIN_highState = motorCommand[5] / 8;
+	PWM_MOTOR5PIN_highState = int(motorCommand[5] / 8) * 2;
     PWM_MOTOR5PIN_lowState  = 255 - PWM_MOTOR5PIN_highState;
   #endif
 }
-
-/******************************************************/
-
-void pulseMotors(byte quantity) {
-  for (byte i = 0; i < quantity; i++) {
-  commandAllMotors(MINCOMMAND + 100);
-  delay(250);
-  commandAllMotors(MINCOMMAND);
-  delay(250);
-  }
-}
-
 
 /******************************************************/
 

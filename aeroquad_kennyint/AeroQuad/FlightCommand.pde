@@ -24,13 +24,15 @@
 void readPilotCommands() {
   readReceiver();
   // Read quad configuration commands from transmitter when throttle down
-  if (receiverData[THROTTLE] < MINCHECK) {
+  if (receiverData[THROTTLE] < MINCHECK)
+  {
     zeroIntegralError();
     // Disarm motors (left stick lower left corner)
-    if (receiverData[YAW] < (MINCHECK - MIDCOMMAND) && armed == ON) {
+    if (receiverData[YAW] < (MINCHECK - MIDCOMMAND) && armed == ON)
+    {
       armed = OFF;
-      for (byte motor = FIRSTMOTOR; motor < LASTMOTOR; motor++)
-        commandAllMotors(MINCOMMAND);
+      digitalWrite(ARMED_LED, OFF);
+      commandAllMotors(MINCOMMAND);
     }    
     // Zero Gyro and Accel sensors (left stick lower left, right stick lower right corner)
     if ((receiverData[YAW]   < MINCHECK - MIDCOMMAND) && 
@@ -43,9 +45,11 @@ void readPilotCommands() {
       pulseMotors(3);
     }   
     // Arm motors (left stick lower right corner)
-    if (receiverData[YAW] > (MAXCHECK - MIDCOMMAND) && armed == OFF && safetyCheck == ON) {
+    if (receiverData[YAW] > (MAXCHECK - MIDCOMMAND) && armed == OFF && safetyCheck == ON && escsCalibrating == OFF)
+    {
       zeroIntegralError();
       armed = ON;
+      digitalWrite(ARMED_LED, ON);
       for (byte motor = FIRSTMOTOR; motor < LASTMOTOR; motor++)
         minCommand[motor] = MINTHROTTLE;
     }
@@ -56,27 +60,17 @@ void readPilotCommands() {
     }
   }
   
-  #ifdef RateModeOnly
+  // Check Mode switch for Acro or Stable
+  if (receiverData[MODE] > MIDCOMMAND)
+  {
+    digitalWrite(RATE_LED, OFF);
+    flightMode = STABLE;
+  }
+  else
+  {
+    digitalWrite(RATE_LED, ON);
     flightMode = ACRO;
-  #else
-    // Check Mode switch for Acro or Stable
-    if (receiverData[MODE] > MIDCOMMAND) {
-      if (flightMode == ACRO) {
-        #if defined(AeroQuad_v18) || defined(AeroQuadMega_v2) || defined(AeroQuadMega_Wii)
-          digitalWrite(LED2PIN, HIGH);
-        #endif
-        zeroIntegralError();
-      }
-      flightMode = STABLE;
-   }
-    else {
-      #if defined(AeroQuad_v18) || defined(AeroQuadMega_v2)
-        if (flightMode == STABLE)
-          digitalWrite(LED2PIN, LOW);
-      #endif
-      flightMode = ACRO;
-    }
-  #endif
+  }
 }
 
 

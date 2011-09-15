@@ -52,7 +52,6 @@ void readSerialPID(unsigned char PIDid) {
 void readSerialCommand() {
   // Check for serial message
   if (SERIAL_AVAILABLE()) {
-    digitalWrite(LEDPIN, LOW);
     queryType = SERIAL_READ();
     switch (queryType) {
     
@@ -126,35 +125,35 @@ void readSerialCommand() {
         if (validateCalibrateCommand())
         {
           SERIAL_PRINTLN("Setting Test Command");
-          commandAllMotors(constrain(readFloatSerial(), MINCOMMAND, MINCOMMAND + 200));
+          commandAllMotors(constrain(readFloatSerial(), MINCOMMAND, MIDCOMMAND));
         }
         break;
       #endif
            
-    case '4': // Turn off ESC calibration
+    case '4': // Turn off ESC Calibration/Individual Motor Commands
       if (validateCalibrateCommand())
       {
-	  SERIAL_PRINTLN("ESC Calibration Off");
+       SERIAL_PRINTLN("ESC Calibration Off");
        escsCalibrating = OFF;
       }
       break;
       
-    case '5': // Send individual motor commands (motor, command)
+    case '5': // Send individual motor commands 
       if (validateCalibrateCommand())
       {
+        SERIAL_PRINTLN("Sending Individual Motor Cmds");
         escsCalibrating = ON;
         
         for (byte motor = FIRSTMOTOR; motor < LASTMOTOR; motor++)
           remoteMotorCommand[motor] = readFloatSerial();
         
         for (byte motor = FIRSTMOTOR; motor < LASTMOTOR; motor++)
-          motorCommand[motor] = constrain(remoteMotorCommand[motor], 1000, 1200);
+          motorCommand[motor] = constrain(remoteMotorCommand[motor], MINCOMMAND, MIDCOMMAND);
           
         writeMotors();
       }
       break;
     }
-    digitalWrite(LEDPIN, HIGH);
   }
 }
 
@@ -261,53 +260,51 @@ void sendSerialTelemetry() {
     break;
   #endif
   
-  case 'm': // Send Motor Commands 1 thru 4
+  case 'm': // Send Software Motor Commands 
+    for (byte motor = FIRSTMOTOR; motor < (LASTMOTOR - 1); motor++)
+      PrintValueComma(motorCommand[motor]);
+        
+    SERIAL_PRINTLN(motorCommand[LASTMOTOR - 1]);
+    break;
+  
+  case 'n': // Send Hardware Motor Commands
     #if defined(__AVR_ATmega328P__) && !defined(I2C_ESC)
       #if (LASTMOTOR == 4)
         PrintValueComma(int(OCR2B)*16);
         PrintValueComma(int(OCR1A)*16);
         PrintValueComma(int(OCR1B)*16);
-        SERIAL_PRINTLN(int(OCR2A)*16);
+        SERIAL_PRINTLN (int(OCR2A)*16);
       #elif (LASTMOTOR == 6)
         PrintValueComma(int(OCR2B)*16);
         PrintValueComma(int(OCR1A)*16);
         PrintValueComma(int(OCR1B)*16);
         PrintValueComma(int(OCR2A)*16);
         PrintValueComma(int(PWM_MOTOR4PIN_highState)*8);
-        SERIAL_PRINTLN(int(PWM_MOTOR5PIN_highState)*8);
+        SERIAL_PRINTLN (int(PWM_MOTOR5PIN_highState)*8);
       #endif
     #elif (defined (__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)) && !defined(I2C_ESC)
       #if (LASTMOTOR == 4)
         PrintValueComma(int(OCR3B)/2);
         PrintValueComma(int(OCR3C)/2);
         PrintValueComma(int(OCR3A)/2);
-        SERIAL_PRINTLN(int(OCR4A)/2);
+        SERIAL_PRINTLN (int(OCR4A)/2);
       #elif (LASTMOTOR == 6)
         PrintValueComma(int(OCR3B)/2);
         PrintValueComma(int(OCR3C)/2);
         PrintValueComma(int(OCR3A)/2);
         PrintValueComma(int(OCR4A)/2);
         PrintValueComma(int(OCR4B)/2);
-        SERIAL_PRINTLN(int(OCR4C)/2);
-      #elif (LASTMOTOR ==8)
-        PrintValueComma(int(OCR3B)/2);
-        PrintValueComma(int(OCR3C)/2);
-        PrintValueComma(int(OCR3A)/2);
-        PrintValueComma(int(OCR4A)/2);
-        PrintValueComma(int(OCR4B)/2);
-        PrintValueComma(int(OCR4C)/2);
-        PrintValueComma(int(OCR1A)/2);
-        SERIAL_PRINTLN(int(OCR1B)/2);
+        SERIAL_PRINTLN (int(OCR4C)/2);
       #endif
     #elif defined(I2C_ESC)
-      for (byte motor = FIRSTMOTOR; motor < LASTMOTOR -1; motor++)
-        PrintValueComma(motorCommandI2C[motor] * 4 + 1000);
+      for (byte motor = FIRSTMOTOR; motor < (LASTMOTOR - 1); motor++)
+        PrintValueComma(int(motorCommandI2C[motor]) * 4 + 1000);
         
-      SERIAL_PRINTLN(motorCommandI2C[LASTMOTOR] * 4 + 1000);
+      SERIAL_PRINTLN(int(motorCommandI2C[LASTMOTOR - 1]) * 4 + 1000);
     #endif
     break;
-  
-  case 'n': // Send Motor Axis Commands
+    
+    case 'o': // Send Motor Axis Commands
     PrintValueComma(motorAxisCommand[ROLL]);
     PrintValueComma(motorAxisCommand[PITCH]);
     SERIAL_PRINTLN(motorAxisCommand[YAW]);
@@ -323,7 +320,7 @@ void sendSerialTelemetry() {
   case 'x': // Stop sending messages
     break;
 
-  case 'z': // Send flight software version
+  case 'z': // Send flight software configuration
     SERIAL_PRINTLN(VERSION, 1);
     #if defined(AeroQuad_v18)
       SERIAL_PRINTLN("V18");
@@ -348,24 +345,54 @@ void sendSerialTelemetry() {
     queryType = 'X';
     break;
     
-  #if !defined(I2C_ESC)
+  case '!': // Send flight software version
+    SERIAL_PRINTLN(VERSION, 1);
+    queryType = 'X';
+    break;
+    
+  case '#': // Send software configuration
+    // Determine which hardware is used to define max/min sensor values for Configurator plots
+    #if defined(AeroQuad_Mini_FFIMUV2)
+      PrintValueComma(2);
+    #elif defined(AeroQuad_Mini)
+      PrintValueComma(2);
+    #elif defined(AeroQuad_v18)
+      PrintValueComma(2);
+    #elif defined(AeroQuadMega_v2)
+      PrintValueComma(3);
+    #endif
+    // Determine which motor flight configuration for Configurator GUI
+    #if defined(quadPlusConfig)
+      PrintValueComma('0');
+    #elif defined(quadXConfig)
+      PrintValueComma('1');
+    #elif defined(hexPlusConfig)
+      PrintValueComma('2');
+    #elif defined(hexXConfig)
+      PrintValueComma('3');
+    #endif
+    PrintValueComma(LASTCHANNEL);
+    SERIAL_PRINT(LASTMOTOR);
+    SERIAL_PRINTLN();
+    queryType = 'X';
+    break;
+    
     case '6': // Report remote commands
-      #if (LASTMOTOR == 4)
-        PrintValueComma(remoteMotorCommand[0]);
-        PrintValueComma(remoteMotorCommand[1]);
-        PrintValueComma(remoteMotorCommand[2]);
-        SERIAL_PRINTLN(remoteMotorCommand[3]);
-      #else
-        PrintValueComma(remoteMotorCommand[0]);
-        PrintValueComma(remoteMotorCommand[1]);
-        PrintValueComma(remoteMotorCommand[2]);
-        PrintValueComma(remoteMotorCommand[3]);
-        PrintValueComma(remoteMotorCommand[4]);
-        SERIAL_PRINTLN(remoteMotorCommand[5]);
-      #endif
-      queryType = 'X';
-      break;
-  #endif
+    #if (LASTMOTOR == 4)
+      PrintValueComma(remoteMotorCommand[0]);
+      PrintValueComma(remoteMotorCommand[1]);
+      PrintValueComma(remoteMotorCommand[2]);
+      SERIAL_PRINTLN (remoteMotorCommand[3]);
+    #else
+      PrintValueComma(remoteMotorCommand[0]);
+      PrintValueComma(remoteMotorCommand[1]);
+      PrintValueComma(remoteMotorCommand[2]);
+      PrintValueComma(remoteMotorCommand[3]);
+      PrintValueComma(remoteMotorCommand[4]);
+      SERIAL_PRINTLN (remoteMotorCommand[5]);
+    #endif
+    queryType = 'X';
+    break;
     
   case '=': // Send Free Form Debug
     // What are you looking at?  And why?

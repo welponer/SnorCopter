@@ -76,3 +76,27 @@ int maxCommand[LASTMOTOR];
 int remoteMotorCommand[LASTMOTOR];
 
 /******************************************************/
+
+void writeMotors(void);
+
+/******************************************************/
+
+void commandAllMotors(int _motorCommand) {   // Sends commands to all motors
+  for (byte motor = FIRSTMOTOR; motor < LASTMOTOR; motor++)
+    motorCommand[motor] = _motorCommand;
+
+  writeMotors();
+}
+
+/******************************************************/
+
+void pulseMotors(byte quantity) {
+  for (byte i = 0; i < quantity; i++) {
+  commandAllMotors(MINCOMMAND + 100);
+  delay(250);
+  commandAllMotors(MINCOMMAND);
+  delay(250);
+  }
+}
+
+/******************************************************/

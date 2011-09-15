@@ -29,6 +29,7 @@
 #define ISR_FRAME_COUNT        500
 #define SUM_COUNT              5.0   // Sum of 5 for average
 #define BACKGROUND_COUNT       5     // Number of 500 Hz frames for 100 Hz
+#define I2C_ESC_COUNT          5     // Number of 500 Hz frames for 100 Hz
 #define COMPASS_COUNT          10    // Number of 500 Hz frames for 50 Hz
 #define PRESSURE_COUNT         10    // Number of 500 Hz frames for 50 Hz
 #define RECEIVER_COUNT         10    // Number of 500 Hz frames for 50 Hz
@@ -39,16 +40,29 @@
 
 #define dt 0.01       // dt for 100 Hz loop
 
-#define LEDPIN 13
 #define ON 1
 #define OFF 0
 
+#if ((defined AeroQuad_Mini_FFIMUV2 && defined isrSourceIsITG3200) || \
+     (defined AeroQuad_Mini         && defined isrSourceIsITG3200) || \
+     (defined AeroQuad_v18          && defined isrSourceIsITG3200))
+  #define INITIALIZED_LED 13
+  #define ARMED_LED        4
+  #define RATE_LED         7 
+#endif
+
+#if ((defined AeroQuad_Mini_FFIMUV2 && !defined isrSourceIsITG3200) || \
+     (defined AeroQuad_Mini         && !defined isrSourceIsITG3200) || \
+     (defined AeroQuad_v18          && !defined isrSourceIsITG3200))
+  #define INITIALIZED_LED 13
+  #define ARMED_LED       12
+  #define RATE_LED        12 
+#endif
+
 #ifdef AeroQuadMega_v2
-  #define LED2PIN 4
-  #define LED3PIN 31
-#else
-  #define LED2PIN 12
-  #define LED3PIN 12
+  #define INITIALIZED_LED 13
+  #define ARMED_LED        4
+  #define RATE_LED        31
 #endif
 
 // Basic axis definitions
