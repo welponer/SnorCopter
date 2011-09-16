@@ -174,6 +174,7 @@ HardwareSerial *binaryPort;
 /**************************************************************/
 /******************* Loop timing parameters *******************/
 /**************************************************************/
+/*
 #define RECEIVERLOOPTIME 100000  // 100ms, 10Hz
 #define COMPASSLOOPTIME 103000   // 103ms, ~10Hz
 #define ALTITUDELOOPTIME 50000   // 50ms x 2, 10Hz (alternates between temperature and pressure measurements)
@@ -181,6 +182,7 @@ HardwareSerial *binaryPort;
 #define CAMERALOOPTIME 20000     // 20ms, 50Hz
 #define FASTTELEMETRYTIME 10000  // 10ms, 100Hz
 #define TELEMETRYLOOPTIME 100000 // 100ms, 10Hz for slower computers/cables (more rough Configurator values)
+*/
 
 float G_Dt = 0.002;
 // Offset starting times so that events don't happen at the same time
@@ -189,11 +191,13 @@ unsigned long previousTime = 0;
 unsigned long currentTime = 0;
 unsigned long deltaTime = 0;
 // sub loop times
+
 unsigned long oneHZpreviousTime;
 unsigned long tenHZpreviousTime;
 unsigned long twentyFiveHZpreviousTime;
 unsigned long fiftyHZpreviousTime;
-unsigned long hundredHZpreviousTime;
+unsigned long hundredHZpreviousTime; 
+
 // old times.
 //unsigned long receiverTime = 0;
 //unsigned long compassTime = 5000;
@@ -236,6 +240,7 @@ unsigned long fastTelemetryTime = 0;
 /**************************************************************/
 // Enable/disable control loops for debug
 //#define DEBUG
+/*
 byte receiverLoop = ON;
 byte telemetryLoop = ON;
 byte sensorLoop = ON;
@@ -243,6 +248,7 @@ byte controlLoop = ON;
 #ifdef CameraControl
 byte cameraLoop = ON; // Note: stabilization camera software is still under development, moved to Arduino Mega
 #endif
+*/
 byte fastTransfer = OFF; // Used for troubleshooting
 byte testSignal = LOW;
 

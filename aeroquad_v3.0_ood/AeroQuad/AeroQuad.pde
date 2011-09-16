@@ -65,8 +65,8 @@
 // You must define one of the next 3 attitude stabilization modes or the software will not build
 // *******************************************************************************************************************************
 #define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
-#define AltitudeHold // Enables BMP085 Barometer (experimental, use at your own risk)
-#define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
+//#define AltitudeHold // Enables BMP085 Barometer (experimental, use at your own risk)
+//#define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
 //#define RateModeOnly // Use this if you only have a gyro sensor, this will disable any attitude modes.
 //#define RemotePCReceiver // EXPERIMENTAL Use PC as transmitter via serial communicator with XBEE
 
@@ -1146,10 +1146,9 @@ void setup() {
 
 
   // Setup receiver pins for pin change interrupts
-  if (receiverLoop == ON) {
-    receiver->initialize();
-    initReceiverFromEEPROM();
-  }
+  receiver->initialize();
+  initReceiverFromEEPROM();
+
        
   // Initialize sensors
   // If sensors have a common initialization routine
@@ -1266,67 +1265,66 @@ void loop () {
       G_Dt = (currentTime - hundredHZpreviousTime) / 1000000.0;
       hundredHZpreviousTime = currentTime;
       
-      if (sensorLoop == ON) {
-        measureCriticalSensors();
-        
-        // ****************** Calculate Absolute Angle *****************
-        #if defined HeadingMagHold && defined FlightAngleMARG
-          kinematics->calculate(gyro->getRadPerSec(ROLL),                       
-                                 gyro->getRadPerSec(PITCH),                      
-                                 gyro->getRadPerSec(YAW),                        
-                                 accel->getMeterPerSec(XAXIS),                   
-                                 accel->getMeterPerSec(YAXIS),                   
-                                 accel->getMeterPerSec(ZAXIS),                   
-                                 compass->getRawData(XAXIS),                      
-                                 compass->getRawData(YAXIS),                     
-                                 compass->getRawData(ZAXIS),
-                                 G_Dt);
-        #endif
+      measureCriticalSensors();
       
-        #if defined FlightAngleARG
-          kinematics->calculate(gyro->getRadPerSec(ROLL),                       
-                                 gyro->getRadPerSec(PITCH),                      
-                                 gyro->getRadPerSec(YAW),                        
-                                 accel->getMeterPerSec(XAXIS),                   
-                                 accel->getMeterPerSec(YAXIS),                   
-                                 accel->getMeterPerSec(ZAXIS),                   
-                                 0.0,                                            
-                                 0.0,                                            
-                                 0.0,
-                                 G_Dt);
-        #endif
+      // ****************** Calculate Absolute Angle *****************
+      #if defined HeadingMagHold && defined FlightAngleMARG
+        kinematics->calculate(gyro->getRadPerSec(ROLL),                       
+                               gyro->getRadPerSec(PITCH),                      
+                               gyro->getRadPerSec(YAW),                        
+                               accel->getMeterPerSec(XAXIS),                   
+                               accel->getMeterPerSec(YAXIS),                   
+                               accel->getMeterPerSec(ZAXIS),                   
+                               compass->getRawData(XAXIS),                      
+                               compass->getRawData(YAXIS),                     
+                               compass->getRawData(ZAXIS),
+                               G_Dt);
+      #endif
+    
+      #if defined FlightAngleARG
+        kinematics->calculate(gyro->getRadPerSec(ROLL),                       
+                               gyro->getRadPerSec(PITCH),                      
+                               gyro->getRadPerSec(YAW),                        
+                               accel->getMeterPerSec(XAXIS),                   
+                               accel->getMeterPerSec(YAXIS),                   
+                               accel->getMeterPerSec(ZAXIS),                   
+                               0.0,                                            
+                               0.0,                                            
+                               0.0,
+                               G_Dt);
+      #endif
 
-        #if defined HeadingMagHold && !defined FlightAngleMARG && !defined FlightAngleARG
-          kinematics->calculate(gyro->getRadPerSec(ROLL),                       
-                                 gyro->getRadPerSec(PITCH),                      
-                                 gyro->getRadPerSec(YAW),                        
-                                 accel->getMeterPerSec(XAXIS),                   
-                                 accel->getMeterPerSec(YAXIS),                   
-                                 accel->getMeterPerSec(ZAXIS),                   
-                                 accel->getOneG(),                              
-                                 compass->getHdgXY(XAXIS),                        
-                                 compass->getHdgXY(YAXIS),
-                                 G_Dt);
-        #endif
-        
-        #if !defined HeadingMagHold && !defined FlightAngleMARG && !defined FlightAngleARG
-          kinematics->calculate(gyro->getRadPerSec(ROLL),                        
-                                 gyro->getRadPerSec(PITCH),                       
-                                 gyro->getRadPerSec(YAW),                         
-                                 accel->getMeterPerSec(XAXIS),                    
-                                 accel->getMeterPerSec(YAXIS),                    
-                                 accel->getMeterPerSec(ZAXIS),                    
-                                 accel->getOneG(),                               
-                                 0.0,                                             
-                                 0.0,
-                                 G_Dt);
-        #endif
-      }
+      #if defined HeadingMagHold && !defined FlightAngleMARG && !defined FlightAngleARG
+        kinematics->calculate(gyro->getRadPerSec(ROLL),                       
+                               gyro->getRadPerSec(PITCH),                      
+                               gyro->getRadPerSec(YAW),                        
+                               accel->getMeterPerSec(XAXIS),                   
+                               accel->getMeterPerSec(YAXIS),                   
+                               accel->getMeterPerSec(ZAXIS),                   
+                               accel->getOneG(),                              
+                               compass->getHdgXY(XAXIS),                        
+                               compass->getHdgXY(YAXIS),
+                               G_Dt);
+      #endif
+      
+      #if !defined HeadingMagHold && !defined FlightAngleMARG && !defined FlightAngleARG
+        kinematics->calculate(gyro->getRadPerSec(ROLL),                        
+                               gyro->getRadPerSec(PITCH),                       
+                               gyro->getRadPerSec(YAW),                         
+                               accel->getMeterPerSec(XAXIS),                    
+                               accel->getMeterPerSec(YAXIS),                    
+                               accel->getMeterPerSec(ZAXIS),                    
+                               accel->getOneG(),                               
+                               0.0,                                             
+                               0.0,
+                               G_Dt);
+      #endif
+      
       
       // Combines external pilot commands and measured sensor data to generate motor commands
-      if (controlLoop == ON) {
+
         processFlightControl();
-      } 
+
 
       #ifdef BinaryWrite
         if (fastTransfer == ON) {
@@ -1352,9 +1350,8 @@ void loop () {
       fiftyHZpreviousTime = currentTime;
       
       // Reads external pilot commands and performs functions based on stick configuration
-      if (receiverLoop == ON) { 
         readPilotCommands(); // defined in FlightCommand.pde
-      }
+
       
       #ifdef AltitudeHold
         if (sensorLoop == ON) {
@@ -1378,11 +1375,10 @@ void loop () {
       G_Dt = (currentTime - twentyFiveHZpreviousTime) / 1000000.0;
       twentyFiveHZpreviousTime = currentTime;
       
-      if (sensorLoop == ON) {
-        #if defined(AltitudeHold)
-          barometricSensor->measure(); // defined in altitude.h
-        #endif
-      }
+      #if defined(AltitudeHold)
+        barometricSensor->measure(); // defined in altitude.h
+      #endif
+     
       
       #ifdef DEBUG_LOOP
         digitalWrite(9, LOW);
@@ -1400,7 +1396,7 @@ void loop () {
       G_Dt = (currentTime - tenHZpreviousTime) / 1000000.0;
       tenHZpreviousTime = currentTime;
 
-      if (sensorLoop == ON) {
+
         #if defined(HeadingMagHold)
           compass->measure(kinematics->getData(ROLL), kinematics->getData(PITCH));
         #endif
@@ -1408,12 +1404,12 @@ void loop () {
           batteryMonitor->measure(armed);
         #endif
         processAltitudeHold();
-      }
+
       // Listen for configuration commands and reports telemetry
-      if (telemetryLoop == ON) {
+
         readSerialCommand(); // defined in SerialCom.pde
         sendSerialTelemetry(); // defined in SerialCom.pde
-      }
+
       
       #ifdef MAX7456_OSD
         osd.update();
@@ -1428,6 +1424,7 @@ void loop () {
 
     previousTime = currentTime;
   }
+  
   if (frameCounter >= 100) {
       frameCounter = 0;
   }      
