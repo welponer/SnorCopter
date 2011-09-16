@@ -14,17 +14,25 @@
 #define BUZZERPIN 0
 #define BUZZERGND 0
 
+#define LASTSTATUS 1
 
 
 class StatusSignal {
 private:
-  byte pinStatus[5];
-
-
+  boolean statusStatus[LASTSTATUS];
+  byte statusHighTime[LASTSTATUS];
+  byte statusLowTime[LASTSTATUS];
+  byte statusTime[LASTSTATUS];
+  byte  statusPin[LASTSTATUS];
+  
 public:
   StatusSignal( void) {
-    for (byte i = 0; i<4; i++) ledStatus[i] = 0;
-    buzzerStatus = 0;
+    for (byte i = 0; i < LASTSTATUS; i++) {
+      statusStatus[i] = true;
+      statusLowTime[i] = 10;
+      statusHighTime[i] = 50;
+      statusTime[i] = 0;
+    }
   }
 
   void initialize( void) {
@@ -32,20 +40,40 @@ public:
   }
 
   void update( void) {
-    
+     for (byte i = 0; i < LASTSTATUS; i++) {
+       statusTime[i]++;
+       statusStatus[i] = true;
+       if (statusStatus[i]) {
+         if (statusTime[i] > statusHighTime[i]) {
+         statusStatus[i] = false;
+         statusTime[i] = 0;
+         Serial.println("0");
+         }
+       } else {
+         if (statusTime[i] > statusLowTime[i]) {
+         statusStatus[i] = true;
+         statusTime[i] = 0;
+         Serial.println("1");
+         }
+       }
+     }
   }
   
-  void setTiming(byte source, long on, long off) {
-  
+  void setPin(byte index, byte pin) {
+    statusPin[index] = pin;
   }
   
-  void setStatus(byte source, byte status = 1) {
-    if (status > 1) status = HIGH;
+  void setTiming(byte index, byte lowTime, byte highTime) {
+    statusLowTime[index] = lowTime;
+    statusHighTime[index] = highTime;
+    statusStatus[index] = false;
+  }
+  
+  void setStatus(byte index, boolean status = false) {
+    setTiming(index, -1, -1);
+    statusStatus[index] = status;
     Serial.println(status, DEC);
   }
 
-  void setLow(byte source) { 
-    setStatus(source, 255);
-  }
 
 };

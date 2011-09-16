@@ -208,6 +208,7 @@
     TWBR = 12;
     
     statusSignal-> initialize();
+    //statusSignal->setTiming(0, 10, 50);
   }
   
   /**
@@ -1418,7 +1419,8 @@ void loop () {
         osd.update();
       #endif
 
-      
+      statusSignal->update();
+
       #ifdef DEBUG_LOOP
         digitalWrite(8, LOW);
       #endif
@@ -1428,7 +1430,7 @@ void loop () {
   }
   if (frameCounter >= 100) {
       frameCounter = 0;
-  }
+  }      
 }
 
 
