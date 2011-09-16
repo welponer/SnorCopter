@@ -42,7 +42,6 @@ public:
   void update( void) {
      for (byte i = 0; i < LASTSTATUS; i++) {
        statusTime[i]++;
-       statusStatus[i] = true;
        if (statusStatus[i]) {
          if (statusTime[i] > statusHighTime[i]) {
          statusStatus[i] = false;
