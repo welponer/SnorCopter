@@ -112,6 +112,8 @@
 //#define YAW_DIRECTION -1
 
 
+#define STATUSMONITOR
+
 /****************************************************************************
  ********************* End of User Definition Section ***********************
  ****************************************************************************/
@@ -186,9 +188,11 @@
     #define BMP085
   #endif
   
+  #ifdef STATUSMONITOR
   #include "StatusSignal.h"
   StatusSignal statusSignalSpecific;
   StatusSignal* statusSignal = &statusSignalSpecific;
+  #endif
   
   // Battery monitor declaration
   #ifdef BattMonitor
@@ -206,8 +210,9 @@
     
     Wire.begin();
     TWBR = 12;
-    
+    #ifdef STATUSMONITOR
     statusSignal-> initialize();
+    #endif
     //statusSignal->setTiming(0, 10, 50);
   }
   
@@ -1414,9 +1419,11 @@ void loop () {
       #ifdef MAX7456_OSD
         osd.update();
       #endif
-
+      
+      #ifdef STATUSMONITOR
       statusSignal->update();
-
+      #endif
+      
       #ifdef DEBUG_LOOP
         digitalWrite(8, LOW);
       #endif
