@@ -74,5 +74,8 @@ public:
     Serial.println(status, DEC);
   }
 
+  boolean getStatus(byte index) {
+    return statusStatus[index];
+  }
 
 };
