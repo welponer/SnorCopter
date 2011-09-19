@@ -146,6 +146,7 @@
 #include "PID.h"
 #include <AQMath.h>
 
+#include "Copter.h"
 
 //********************************************************
 //********************************************************
@@ -201,6 +202,9 @@
     BatterySensor batteryMonitorSpecific;
     BatterySensor* batteryMonitor = &batteryMonitorSpecific;
   #endif
+  
+  Copter copterSpecific;
+  Copter* copter = &copterSpecific; 
   
   /**
    * Put ArduCopter specific intialization need here

@@ -141,6 +141,7 @@ void initializeEEPROM(void) {
   smoothHeading = 1.0;
   flightMode = ACRO;
   headingHoldConfig = OFF;
+
   minAcro = 1300;
   aref = 5.0; // Use 3.0 if using a v1.7 shield or use 2.8 for an AeroQuad Shield < v1.7
   

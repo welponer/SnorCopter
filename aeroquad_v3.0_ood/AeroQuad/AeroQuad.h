@@ -121,7 +121,7 @@ float levelAdjust[2] = {0.0,0.0};
 #endif
 
 // Heading hold
-byte headingHoldConfig;
+byte headingHoldConfig = ON;
 //float headingScaleFactor;
 float commandedYaw = 0;
 float headingHold = 0; // calculated adjustment for quad to go to heading (PID output)

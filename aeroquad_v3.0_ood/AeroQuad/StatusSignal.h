@@ -14,7 +14,7 @@
 #define BUZZERPIN 0
 #define BUZZERGND 0
 
-#define LASTSTATUS 1
+#define LASTSTATUS 5
 
 
 class StatusSignal {
