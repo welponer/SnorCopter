@@ -31,11 +31,11 @@
 //#define AeroQuad_v1         // Arduino 2009 with AeroQuad Shield v1.7 and below
 //#define AeroQuad_v1_IDG     // Arduino 2009 with AeroQuad Shield v1.7 and below using IDG yaw gyro
 //#define AeroQuad_v18        // Arduino 2009 with AeroQuad Shield v1.8 or greater
-//#define AeroQuad_Mini       // Arduino Pro Mini with AeroQuad Mini Shield v1.0
+#define AeroQuad_Mini       // Arduino Pro Mini with AeroQuad Mini Shield v1.0
 //#define AeroQuad_Wii        // Arduino 2009 with Wii Sensors and AeroQuad Shield v1.x
 //#define AeroQuad_Paris_v3   // Define along with either AeroQuad_Wii to include specific changes for MultiWiiCopter Paris v3.0 board
 //#define AeroQuadMega_v1     // Arduino Mega with AeroQuad Shield v1.7 and below
-#define AeroQuadMega_v2     // Arduino Mega with AeroQuad Shield v2.x
+//#define AeroQuadMega_v2     // Arduino Mega with AeroQuad Shield v2.x
 //#define AeroQuadMega_Wii    // Arduino Mega with Wii Sensors and AeroQuad Shield v2.x
 //#define ArduCopter          // ArduPilot Mega (APM) with Oilpan Sensor Board
 //#define AeroQuadMega_CHR6DM // Clean Arduino Mega with CHR6DM as IMU/heading ref.
@@ -45,11 +45,11 @@
  *********************** Define Flight Configuration ************************
  ****************************************************************************/
 // Use only one of the following definitions
-#define quadXConfig
+//#define quadXConfig
 //#define quadPlusConfig
 //#define hexPlusConfig
 //#define hexXConfig      // not flight tested, take real care
-//#define triConfig
+#define triConfig
 //#define quadY4Config
 //#define hexY6Config
 //#define octoX8Congig
@@ -63,8 +63,8 @@
 // *******************************************************************************************************************************
 // You must define one of the next 3 attitude stabilization modes or the software will not build
 // *******************************************************************************************************************************
-#define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
-#define AltitudeHold // Enables BMP085 Barometer (experimental, use at your own risk)
+//#define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
+//#define AltitudeHold // Enables BMP085 Barometer (experimental, use at your own risk)
 #define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
 //#define RateModeOnly // Use this if you only have a gyro sensor, this will disable any attitude modes.
 //#define RemotePCReceiver // EXPERIMENTAL Use PC as transmitter via serial communicator with XBEE
@@ -284,7 +284,6 @@
   
   /**
    * Measure critical sensors
-   * Sample as fast as we can
    */
   void measureCriticalSensors() {
     measureGyro();
@@ -295,6 +294,7 @@
     }
     sampleCount++;
   }
+
 #endif
 
 #ifdef AeroQuad_Mini
@@ -336,9 +336,9 @@
     TWBR = 12;
   }
   
+  
   /**
    * Measure critical sensors
-   * Sample as fast as we can
    */
   void measureCriticalSensors() {
     measureGyro();
@@ -349,7 +349,6 @@
     }
     sampleCount++;
   }
-
 #endif
 
 #ifdef AeroQuadMega_v1
@@ -457,11 +456,8 @@
     TWBR = 12;
   }
   
-  #define DELAY_BETWEEN_READING 1000
-  
   /**
    * Measure critical sensors
-   * Sample as fast as we can
    */
   void measureCriticalSensors() {
     measureGyro();
@@ -472,6 +468,7 @@
     }
     sampleCount++;
   }
+
 #endif
 
 #ifdef ArduCopter
@@ -860,9 +857,9 @@
 //********************************************************
 //********************** MOTORS DECLARATION **************
 //********************************************************
-//#if defined triConfig 
-//  #include <Motors_PWM_Tri.h>
-#if defined MOTOR_PWM
+#if defined triConfig 
+  #include <Motors_Tri.h>
+#elif defined MOTOR_PWM
   #include <Motors_PWM.h>
 #elif defined MOTOR_PWM_Timer
   #include <Motors_PWM_Timer.h>
@@ -972,8 +969,8 @@ void setup() {
   initPlatform();
   
   // Configure motors
-  #if defined(quadXConfig) || defined(quadPlusConfig) || defined(quadY4Config)
-     initializeMotors(); 
+  #if defined(quadXConfig) || defined(quadPlusConfig) || defined(quadY4Config) || defined(triConfig)
+     initializeMotors(FOUR_Motors); 
   #elif defined(hexPlusConfig) || defined(hexXConfig) || defined (hexY6Config)
      initializeMotors(SIX_Motors); 
   #elif defined (octoX8Congig) || defined (octoXCongig) || defined (octoXPlusCongig)
@@ -1192,21 +1189,7 @@ void loop () {
       #endif
     }
 
-    // ================================================================
-    // 25hz task loop
-    // ================================================================
-    if (frameCounter %   4 == 0) {  //  25 Hz tasks
-      #ifdef DEBUG_LOOP    
-        digitalWrite(9, HIGH);
-      #endif
-      
-      G_Dt = (currentTime - twentyFiveHZpreviousTime) / 1000000.0;
-      twentyFiveHZpreviousTime = currentTime;
-      
-      #ifdef DEBUG_LOOP
-        digitalWrite(9, LOW);
-      #endif
-    }
+    
     
     // ================================================================
     // 10hz task loop
@@ -1225,8 +1208,8 @@ void loop () {
       #if defined(BattMonitor)
         measureBatteryVoltage(armed);
       #endif
-      
       processAltitudeHold();
+
       // Listen for configuration commands and reports telemetry
       readSerialCommand(); // defined in SerialCom.pde
       sendSerialTelemetry(); // defined in SerialCom.pde

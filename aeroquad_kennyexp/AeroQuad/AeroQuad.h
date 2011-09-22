@@ -230,9 +230,6 @@ unsigned long fastTelemetryTime = 0;
 /**************************************************************/
 // Enable/disable control loops for debug
 //#define DEBUG
-#ifdef CameraControl
-  byte cameraLoop = ON; // Note: stabilization camera software is still under development, moved to Arduino Mega
-#endif
 byte fastTransfer = OFF; // Used for troubleshooting
 byte testSignal = LOW;
 
