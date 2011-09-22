@@ -52,8 +52,6 @@
   #define LED3PIN 12
 #endif
 
-#define MINTHROTTLE 1100
-
 // PID Variables
 struct PIDdata {
   float P, I, D;
@@ -175,13 +173,13 @@ HardwareSerial *binaryPort;
 /**************************************************************/
 /******************* Loop timing parameters *******************/
 /**************************************************************/
-/*#define RECEIVERLOOPTIME 100000  // 100ms, 10Hz
+#define RECEIVERLOOPTIME 100000  // 100ms, 10Hz
 #define COMPASSLOOPTIME 103000   // 103ms, ~10Hz
 #define ALTITUDELOOPTIME 50000   // 50ms x 2, 10Hz (alternates between temperature and pressure measurements)
 #define BATTERYLOOPTIME 100000   // 100ms, 10Hz
 #define CAMERALOOPTIME 20000     // 20ms, 50Hz
 #define FASTTELEMETRYTIME 10000  // 10ms, 100Hz
-#define TELEMETRYLOOPTIME 100000 // 100ms, 10Hz for slower computers/cables (more rough Configurator values) */
+#define TELEMETRYLOOPTIME 100000 // 100ms, 10Hz for slower computers/cables (more rough Configurator values)
 
 float G_Dt = 0.002;
 // Offset starting times so that events don't happen at the same time
@@ -232,13 +230,6 @@ unsigned long fastTelemetryTime = 0;
 /**************************************************************/
 // Enable/disable control loops for debug
 //#define DEBUG
-byte receiverLoop = ON;
-byte telemetryLoop = ON;
-byte sensorLoop = ON;
-byte controlLoop = ON;
-#ifdef CameraControl
-  byte cameraLoop = ON; // Note: stabilization camera software is still under development, moved to Arduino Mega
-#endif
 byte fastTransfer = OFF; // Used for troubleshooting
 byte testSignal = LOW;
 
