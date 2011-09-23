@@ -184,7 +184,7 @@
   #endif
   
   /**
-   * Put ArduCopter specific intialization need here
+   * Put ArduCopter_CSG specific intialization need here
    */
   void initPlatform() {
     initRC();
