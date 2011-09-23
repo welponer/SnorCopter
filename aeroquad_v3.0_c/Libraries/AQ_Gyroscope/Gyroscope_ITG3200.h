@@ -23,7 +23,11 @@
 
 #include <Gyroscope.h>
 
+#ifndef GYRO_ALTERNATE
 #define ITG3200_ADDRESS					0x69
+#else
+#define ITG3200_ADDRESS					0x68
+#endif
 #define ITG3200_MEMORY_ADDRESS			0x1D
 #define ITG3200_BUFFER_SIZE				6
 #define ITG3200_RESET_ADDRESS			0x3E

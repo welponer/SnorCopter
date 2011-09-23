@@ -24,7 +24,11 @@
 #include <Accelerometer.h>
 #include <Device_I2C.h>
 
+#ifndef ACCEL_ALTERNATE
 #define ACCEL_ADDRESS 0x40
+#else
+#define ACCEL_ADDRESS 0x41
+#endif
 #define ACCEL_IDENTITY 0x03
 #define ACCEL_RESET_REGISTER 0x10
 #define ACCEL_TRIGER_RESET_VALUE 0xB6
