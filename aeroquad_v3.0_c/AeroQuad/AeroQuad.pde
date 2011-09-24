@@ -89,8 +89,8 @@
 // Please note that the flight software currently only supports 6 channels, additional channels will be supported in the future
 // Additionally 8 receiver channels are only available when not using the Arduino Uno
 // *******************************************************************************************************************************
-#define LASTCHANNEL 6
-//#define LASTCHANNEL 8
+//#define LASTCHANNEL 6
+#define LASTCHANNEL 8
 
 //
 // *******************************************************************************************************************************
@@ -166,7 +166,7 @@
   #include <Receiver_APM.h>
   
   // Motor Declaration
-  #define MOTOR_APM
+  #include <Motors_APM.h>
   
   // heading mag hold declaration
   #ifdef HeadingMagHold
@@ -175,7 +175,7 @@
  
   // Altitude declaration
   #ifdef AltitudeHold
-    #define BMP085
+    #include <BarometricSensor_BMP085.h>
   #endif
   
   // Battery monitor declaration
