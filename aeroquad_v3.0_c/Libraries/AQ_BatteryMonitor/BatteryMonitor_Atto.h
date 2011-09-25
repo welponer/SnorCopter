@@ -77,15 +77,17 @@ void lowBatteryEvent(byte level) {  // <- this logic by Jose Julio
     if (level == WARNING) freq = 40;  //4 seconds wait
     else freq = 5; //0.5 second wait
     
-    if (batteryCounter < 2) 
-      {}  //ledsOFF();  //indicate with led's everytime autoDescent kicks in
+    if (batteryCounter < 2) {
+    
+    }  //ledsOFF();  //indicate with led's everytime autoDescent kicks in
     #if defined(AltitudeHold)
       if (throttle > 1400) holdAltitude -= 0.2; //-0.2m in 2 fixed rates, one where battery < 10.8V and one where battery < 10.2V, only done if in altitude hold mode
     #else
       if (throttle > 1400) autoDescent -= 2; //will remove 2µs throttle every time led's blink in two speeds (10.8 and 10.2V) as long as there is throttle to lower
     #endif
-    else if (batteryCounter < freq) 
-      {} //ledsON();
+    else if (batteryCounter < freq) {
+    
+    } //ledsON();
     else batteryCounter = 0;
   }
 }

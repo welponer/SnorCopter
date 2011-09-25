@@ -42,10 +42,8 @@ void initializeReceiver(int nbChannel = 6) {
   receiverPin[THROTTLE] = 2;
   receiverPin[MODE] = 4;
   receiverPin[AUX] = 5;
-  #if LASTCHANNEL > 6
   receiverPin[AUX+1] = 6;
   receiverPin[AUX+2] = 7;
-  #endif
 }
 
 void readReceiver() {
