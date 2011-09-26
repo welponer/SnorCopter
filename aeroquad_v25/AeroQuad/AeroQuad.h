@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "WProgram.h"
-#include "pins_arduino.h"
+//#include "pins_arduino.h"
 
 // Flight Software Version
 #define VERSION 2.5
