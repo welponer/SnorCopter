@@ -45,7 +45,7 @@ float filterSmoothWithTime(float currentData, float previousData, float smoothFa
 // ***********************************************************************
 // Median filter currently not used, but kept if needed for the future
 // To declare use: MedianFilter filterSomething;
-
+/*
 MedianFilter::MedianFilter() {}
 
 void MedianFilter::initialize() 
@@ -90,7 +90,7 @@ const float MedianFilter::filter(float newData)
   }
   return data[(DATASIZE)>>1]; // return data value in middle of sorted array
 } 
-
+*/
 ////////////////////////////////////////////////////////////////////////////////
 //  Vector Dot Product
 //  Return the Dot product of vectors a and b with length m

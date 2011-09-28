@@ -26,6 +26,8 @@
 // Includes re-write / fixes from Aadamson and ala42, special thanks to those guys!
 // http://aeroquad.com/showthread.php?1461-We-have-some-hidden-warnings&p=14618&viewfull=1#post14618
 
+#ifdef SERIALCMD
+
 //***************************************************************************************************
 //********************************** Serial Commands ************************************************
 //***************************************************************************************************
@@ -611,3 +613,4 @@ void fastTelemetry(void)
 }
 #endif   
 
+#endif
