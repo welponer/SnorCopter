@@ -124,7 +124,7 @@ float filterSmooth(float currentData, float previousData, float smoothFactor) {
 // ***********************************************************************
 // Median filter currently not used, but kept if needed for the future
 // To declare use: MedianFilter filterSomething;
-
+/*
 #define DATASIZE 25
 
 class MedianFilter {
@@ -167,7 +167,7 @@ public:
     return data[(DATASIZE)>>1]; // return data value in middle of sorted array
   } 
 };
-
+*/
 ////////////////////////////////////////////////////////////////////////////////
 //  Vector Dot Product
 //  Return the Dot product of vectors a and b with length m
