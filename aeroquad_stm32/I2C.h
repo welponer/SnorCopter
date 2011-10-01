@@ -31,26 +31,29 @@ byte readByteI2C(int deviceAddress) {
     return Wire.receive();
 }
 
-int readWordI2C(int deviceAddress) {
-  Wire.requestFrom(deviceAddress, 2);
+int readWordI2C()  __attribute__ ((noinline));
+int readWordI2C() {
   return (Wire.receive() << 8) | Wire.receive();
 }
 
-int readWordWaitI2C(int deviceAddress) {
-  unsigned char msb, lsb;
-  Wire.requestFrom(deviceAddress, 2); // request two bytes
-  while(!Wire.available()); // wait until data available
-  msb = Wire.receive();
-  while(!Wire.available()); // wait until data available
-  lsb = Wire.receive();
-  return (((int)msb<<8) | ((int)lsb));
+int readShortI2C()  __attribute__ ((noinline));
+int readShortI2C() {
+  return (signed short)readWordI2C();
 }
 
-int readReverseWordI2C(int deviceAddress) {
-  byte lowerByte;
+int readShortI2C(int deviceAddress) {
   Wire.requestFrom(deviceAddress, 2);
-  lowerByte = Wire.receive();
-  return (Wire.receive() << 8) | lowerByte;
+  return readShortI2C();
+}
+
+int readReverseShortI2C()  __attribute__ ((noinline));
+int readReverseShortI2C() {
+  return (signed short)( Wire.receive() | (Wire.receive() << 8));
+}
+
+int readReverseShortI2C(int deviceAddress) {
+  Wire.requestFrom(deviceAddress, 2);
+  return readReverseShortI2C();
 }
 
 byte readWhoI2C(int deviceAddress) {
@@ -68,6 +71,11 @@ void updateRegisterI2C(int deviceAddress, byte dataAddress, byte dataValue) {
   Wire.send(dataAddress);
   Wire.send(dataValue);
   Wire.endTransmission();
-}  
+}
 
-
+void updateRegisterI2C(int deviceAddress, byte dataAddress, byte dataValue) {
+  Wire.beginTransmission(deviceAddress);
+  Wire.send(dataAddress);
+  Wire.send(dataValue);
+  Wire.endTransmission();
+}
