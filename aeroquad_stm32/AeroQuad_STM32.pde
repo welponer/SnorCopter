@@ -126,10 +126,10 @@
 
 // Create objects defined from Configuration Section above
 #ifdef AeroMaple_CSG
-  Gyro_ArduCopter gyro;
-  Accel_ArduCopter accel;
-  Receiver_ArduCopter receiver;
-  Motors_ArduCopter motors;
+  Gyro_ITG3200 gyro;
+  Accel_BMP180 accel;
+  Receiver_Maple receiver;
+  Motors_Maple motors;
   #include "FlightAngle.h"
   #ifdef FlightAngleARG
     FlightAngle_ARG tempFlightAngle;
