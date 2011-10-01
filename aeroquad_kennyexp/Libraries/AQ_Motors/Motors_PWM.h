@@ -100,7 +100,6 @@ void initializeMotors(NB_Motors numbers) {
     }
   #endif
     
-  numberOfMotors = numbers;
   commandAllMotors(1000);
 }
 

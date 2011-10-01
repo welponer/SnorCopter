@@ -54,7 +54,7 @@ public:
   
     if (readWhoI2C(ACCEL_ADDRESS) != ACCEL_IDENTITY) // page 52 of datasheet
       Serial.println("Accelerometer not found!");
-	
+
     updateRegisterI2C(ACCEL_ADDRESS, ACCEL_RESET_REGISTER, ACCEL_TRIGER_RESET_VALUE); 					//reset device
     delay(10);  																							//sleep 10 ms after reset (page 25)
 

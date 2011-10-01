@@ -18,9 +18,8 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>. 
 */
 
-#include <APM_ADC.h>          // Arduino IDE bug, needed because that the APM use it
-#include <Platform_CHR6DM.h>  // Arduino IDE bug, needed because that the CHR6DM use
-
+#define Serial SerialUSB
+#define ACCEL_ALTERNATE TRUE
 #include <Wire.h>
 #include <Device_I2C.h>
 #include <Axis.h>
@@ -30,29 +29,41 @@
 unsigned long timer;
 Accelerometer_BMA180 accel;
 
+
+
 void setup() {
   
-  Serial.begin(115200);
+  Serial.begin();
   Serial.println("Accelerometer library test (BMA180)");
 
-  Wire.begin();
-  
+  Wire.begin( 0, PORTI2C2, I2C_FAST_MODE);
+ 
   accel.initialize();  
   accel.calibrate();
+  delay(100);
 }
 
 void loop() {
-  
-  if((millis() - timer) > 10) // 100Hz
+  /*
+  for( int i = 0; i < 127; i++) {
+    Serial.print(i, HEX);
+    Serial.print(" - ");
+    Serial.println(readWhoI2C(i));
+    delay(20);
+  }
+  delay(10000);
+*/
+  if((millis() - timer) > 100) // 100Hz
   {
     timer = millis();
+    Serial.print("BMP180: ");
     accel.measure();
     
     Serial.print("Roll: ");
     Serial.print(accel.getMeterPerSec(XAXIS));
     Serial.print(" Pitch: ");
     Serial.print(accel.getMeterPerSec(YAXIS));
-    Serial.print(" Yaw: ");
+    Serial.print(" Zaxis: ");
     Serial.print(accel.getMeterPerSec(ZAXIS));
     Serial.println();
   }

@@ -141,9 +141,11 @@
  * @TODO : REMOVE DRIFT CORRECTION TEST FROM AGR WHEN ALAN AND JOHN HAVE FIX IT!
  */
  
-#include <EEPROM.h>
-#include <Wire.h>
 #include "AeroQuad.h"
+//#include <EEPROM.h>
+
+#include <Wire.h>
+
 #include <Axis.h>
 #include "PID.h"
 #include <AQMath.h>
@@ -157,8 +159,9 @@
 //********************************************************
 
 #ifdef AeroMaple_CSG
+  #define Serial SerialUSB
   #include <Device_I2C.h>
-
+  
   // Gyroscope declaration
   #define GYRO_ALTERNATE TRUE
   #include <Gyroscope.h>
@@ -175,10 +178,16 @@
 
 
   // Receiver Declaration
-  #define RECEIVER_APM
+  #include <Receiver.h>
+  //#include <Receiver_PPM.h>
+  Receiver receiverSpecific;
+  Receiver *receiver = &receiverSpecific;
   
   // Motor Declaration
-  #define MOTOR_APM
+  #include <Motors.h>
+ // #include <Motors_PWM.h>
+  Motors motorsSpecific;
+  Motors *motors = &motorsSpecific;
   
   // heading mag hold declaration
   #ifdef HeadingMagHold
@@ -212,8 +221,7 @@
    */
   void initPlatform() {
     
-    Wire.begin();
- //   TWBR = 12;
+    Wire.begin( 0, PORTI2C2, I2C_FAST_MODE);
     #ifdef STATUSMONITOR
     statusSignal-> initialize();
     #endif
@@ -1198,13 +1206,13 @@ Kinematics *kinematics = &tempKinematics;
 
 
 // Include this last as it contains objects from above declarations
-#include "DataStorage.h"
+//#include "DataStorage.h"
 
 // ************************************************************
 // ********************** Setup AeroQuad **********************
 // ************************************************************
 void setup() {
-  SERIAL_BEGIN(BAUD);
+  //SERIAL_BEGIN(BAUD);
   pinMode(LEDPIN, OUTPUT);
   digitalWrite(LEDPIN, LOW);
 
@@ -1222,7 +1230,7 @@ void setup() {
 #endif    
 
   // Read user values from EEPROM
-  readEEPROM(); // defined in DataStorage.h
+  //readEEPROM(); // defined in DataStorage.h
   
   initPlatform();
   
@@ -1238,13 +1246,13 @@ void setup() {
 
   // Setup receiver pins for pin change interrupts
   receiver->initialize();
-  initReceiverFromEEPROM();
+  //initReceiverFromEEPROM();
 
        
   // Initialize sensors
   // If sensors have a common initialization routine
   // insert it into the gyro class because it executes first
-  initSensorsZeroFromEEPROM();
+  //initSensorsZeroFromEEPROM();
   gyro->initialize(); // defined in Gyro.h
   accel->initialize(); // defined in Accel.h
   

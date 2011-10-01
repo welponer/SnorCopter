@@ -297,7 +297,7 @@ void initSensorsZeroFromEEPROM(void) {
   gyroZero[PITCH] = readFloat(GYRO_PITCH_ZERO_ADR);
   gyroZero[YAW] = readFloat(GYRO_YAW_ZERO_ADR);
   gyroSmoothFactor = readFloat(GYROSMOOTH_ADR);
-  
+ 
   // Accel initialization from EEPROM
   accelOneG = readFloat(ACCEL_1G_ADR);
   accelZero[XAXIS] = readFloat(ACCEL_XAXIS_ZERO_ADR);

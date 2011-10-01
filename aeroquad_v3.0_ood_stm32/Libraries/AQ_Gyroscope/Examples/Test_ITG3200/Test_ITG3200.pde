@@ -21,7 +21,7 @@
 #include <Wire.h>
 #include <APM_ADC.h>          // @see Kenny, Arduino IDE compiliation bug
 #include <Platform_CHR6DM.h>  // @see Kenny, Arduino IDE compiliation bug
-
+#define GYRO_ALTERNATE TRUE
 #include <AQMath.h>
 #include <Device_I2C.h>
 #include <Gyroscope_ITG3200.h>
@@ -33,8 +33,8 @@ Gyroscope_ITG3200 gyro;
 
 void setup()
 {
-  Serial.begin(115200);
-  Serial.println("Gyroscope library test (ITG3200)");
+  SerialUSB.begin();
+  SerialUSB.println("Gyroscope library test (ITG3200)");
 
   Wire.begin();
 
@@ -45,20 +45,20 @@ void setup()
 
 void loop(void) 
 {
-  if((millis() - timer) > 10) // 100Hz
+  if((millis() - timer) > 100) // 100Hz
   {
     timer = millis();
     gyro.measure();
     
-    Serial.print("Roll: ");
-    Serial.print(degrees(gyro.getRadPerSec(ROLL)));
-    Serial.print(" Pitch: ");
-    Serial.print(degrees(gyro.getRadPerSec(PITCH)));
-    Serial.print(" Yaw: ");
-    Serial.print(degrees(gyro.getRadPerSec(YAW)));
-    Serial.print(" Heading: ");
-    Serial.print(degrees(gyro.getHeading()));
-    Serial.println();
+    SerialUSB.print("Roll: ");
+    SerialUSB.print(degrees(gyro.getRadPerSec(ROLL)));
+    SerialUSB.print(" Pitch: ");
+    SerialUSB.print(degrees(gyro.getRadPerSec(PITCH)));
+    SerialUSB.print(" Yaw: ");
+    SerialUSB.print(degrees(gyro.getRadPerSec(YAW)));
+    SerialUSB.print(" Heading: ");
+    SerialUSB.print(degrees(gyro.getHeading()));
+    SerialUSB.println();
   }
 }
 

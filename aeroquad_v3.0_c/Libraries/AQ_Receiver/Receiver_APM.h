@@ -32,7 +32,7 @@
 #include <APM_RC.h>
 
 
-int receiverPin[6] = {0,0,0,0,0,0};
+int receiverPin[8] = {0,0,0,0,0,0,0,0};
   
 void initializeReceiver(int nbChannel = 6) {
   initializeReceiverParam(nbChannel);
@@ -42,6 +42,8 @@ void initializeReceiver(int nbChannel = 6) {
   receiverPin[THROTTLE] = 2;
   receiverPin[MODE] = 4;
   receiverPin[AUX] = 5;
+  receiverPin[AUX+1] = 6;
+  receiverPin[AUX+2] = 7;
 }
 
 void readReceiver() {
