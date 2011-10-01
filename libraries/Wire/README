@@ -1,0 +1,2 @@
+Currently this Wire Library is incomplete, however will work with most examples
+for Arduino calling library. By default it uses the I2C1 pins.
