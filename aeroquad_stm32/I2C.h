@@ -73,9 +73,3 @@ void updateRegisterI2C(int deviceAddress, byte dataAddress, byte dataValue) {
   Wire.endTransmission();
 }
 
-void updateRegisterI2C(int deviceAddress, byte dataAddress, byte dataValue) {
-  Wire.beginTransmission(deviceAddress);
-  Wire.send(dataAddress);
-  Wire.send(dataValue);
-  Wire.endTransmission();
-}
