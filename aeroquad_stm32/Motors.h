@@ -41,7 +41,7 @@ public:
   float bMotorCommand;
 
 
-  Motors(void){
+  Motors(void) {
     throttle = 0;
     motorAxisCommand[ROLL] = 0;
     motorAxisCommand[PITCH] = 0;
@@ -128,6 +128,32 @@ public:
   }
   const float getThrottle() {
     return throttle;
+  }
+};
+
+
+class Motors_AeroMaple : public Motors {
+private:
+  
+  int minCommand;
+  byte pin;
+
+ public:
+  Motors_AeroMaple() : Motors(){
+   // Analog write supports commands from 0-255 => 0 - 100% duty cycle
+   // Using 125-250 for motor setting 1000-2000
+  }
+
+  void initialize(void) {
+    commandAllMotors(1000);
+  }
+
+  void write(void) {
+    
+  }
+  
+  void commandAllMotors(int _motorCommand) {   // Sends commands to all motors
+
   }
 };
 

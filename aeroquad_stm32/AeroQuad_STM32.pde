@@ -112,6 +112,8 @@
 #undef MAX7456_OSD
 #endif
 
+#define Serial SerialUSB
+
 #include "AeroQuad.h"
 #include <EEPROM.h>
 #include <Wire.h>
@@ -126,23 +128,27 @@
 
 // Create objects defined from Configuration Section above
 #ifdef AeroMaple_CSG
-  Gyro_ITG3200 gyro;
-  Accel_BMP180 accel;
-  Receiver_Maple receiver;
-  Motors_Maple motors;
+  //Accel_AeroQuadMega_v2 accel;
+  Accel accel;
+  Gyro gyro;
+  Receiver receiver;
+  Motors_AeroMaple motors;
   #include "FlightAngle.h"
+  FlightAngle tempFlightAngle;
+/*  
   #ifdef FlightAngleARG
     FlightAngle_ARG tempFlightAngle;
   #elif defined FlightAngleMARG
     FlightAngle_MARG tempFlightAngle;
   #else
     FlightAngle_DCM tempFlightAngle;
-  #endif
+  #endif */
   FlightAngle *flightAngle = &tempFlightAngle;
   #ifdef HeadingMagHold
     #include "Compass.h"
     Magnetometer_HMC5843 compass;
   #endif
+
   #ifdef AltitudeHold
     #include "Altitude.h"
     Altitude_AeroQuad_v2 altitude;
@@ -475,7 +481,7 @@
 // ********************** Setup AeroQuad **********************
 // ************************************************************
 void setup() {
-  SERIAL_BEGIN(BAUD);
+  SERIAL_BEGIN();
   pinMode(LEDPIN, OUTPUT);
   digitalWrite(LEDPIN, LOW);
 

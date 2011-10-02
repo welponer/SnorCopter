@@ -22,6 +22,43 @@
 // http://aeroquad.com/showthread.php?1369-The-big-enhancement-addition-to-2.0-code&p=13359&viewfull=1#post13359
 
 // Utilities for writing and reading from the EEPROM
+
+
+float nvrReadFloat(int address) {
+  union floatStore {
+    byte floatByte[4];
+    unsigned short floatUShort[2];
+    float floatVal;
+  } floatOut;
+
+#ifdef EEPROM_USES_16BIT_WORDS
+  for (int i = 0; i < 2; i++)
+    floatOut.floatUShort[i] = EEPROM.read(address + 2*i);
+#else
+  for (int i = 0; i < 4; i++)
+    floatOut.floatByte[i] = EEPROM.read(address + i);
+#endif
+  return floatOut.floatVal;
+}
+
+void nvrWriteFloat(float value, int address) {
+  union floatStore {
+    byte floatByte[4];
+    unsigned short floatUShort[2];
+    float floatVal;
+  } floatIn;
+
+  floatIn.floatVal = value;
+#ifdef EEPROM_USES_16BIT_WORDS
+  for (int i = 0; i < 2; i++)
+    EEPROM.write(address + 2*i, floatIn.floatUShort[i]);
+#else
+  for (int i = 0; i < 4; i++)
+    EEPROM.write(address + i, floatIn.floatByte[i]);
+#endif
+}
+
+/*
 float nvrReadFloat(int address) {
   union floatStore {
     byte floatByte[4];
@@ -43,6 +80,7 @@ void nvrWriteFloat(float value, int address) {
   for (int i = 0; i < 4; i++)
     EEPROM.write(address + i, floatIn.floatByte[i]);
 }
+*/
 
 void nvrReadPID(unsigned char IDPid, unsigned int IDEeprom) {
   struct PIDdata* pid = &PID[IDPid];
@@ -226,7 +264,8 @@ void readEEPROM(void) {
 }
 
 void writeEEPROM(void){
-  cli(); // Needed so that APM sensor data doesn't overflow
+  // welponer
+  //  cli(); // Needed so that APM sensor data doesn't overflow
   writePID(ROLL, ROLL_PID_GAIN_ADR);
   writePID(PITCH, PITCH_PID_GAIN_ADR);
   writePID(LEVELROLL, LEVELROLL_PID_GAIN_ADR);
@@ -294,5 +333,6 @@ void writeEEPROM(void){
   writeFloat(servoMaxYaw, SERVOMAXYAW_ADR);
   #endif*/
   
-  sei(); // Restart interrupts
+  // welponer
+  // sei(); // Restart interrupts
 }

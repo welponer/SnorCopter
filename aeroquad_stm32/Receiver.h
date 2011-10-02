@@ -151,6 +151,34 @@ public:
   }
 };
 
+
+
+class Receiver_ArduMaple : public Receiver {
+private:
+  int receiverPin[6];
+
+public:
+  Receiver_ArduMaple() :
+  Receiver() {
+    receiverPin[ROLL] = 0;
+    receiverPin[PITCH] = 1;
+    receiverPin[YAW] = 3;
+    receiverPin[THROTTLE] = 2;
+    receiverPin[MODE] = 4;
+    receiverPin[AUX] = 5;
+  }
+
+  void initialize(void) {
+    //this->_initialize(); // load in calibration and xmitFactor from EEPROM
+    
+  }
+
+  void read(void) {
+    
+  }
+};
+
+
 /*************************************************/
 /*************** AeroQuad PCINT ******************/
 /*************************************************/

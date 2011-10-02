@@ -180,7 +180,7 @@ public:
 /******************************************************/
 /********* AeroQuad Mega v2 Accelerometer *************/
 /******************************************************/
-#if defined(AeroQuad_v18) || defined(AeroQuadMega_v2)
+#if defined(AeroQuad_v18) || defined(AeroQuadMega_v2) || defined(AeroMaple_CSG)
 class Accel_AeroQuadMega_v2 : public Accel {
 private:
   int accelAddress;
