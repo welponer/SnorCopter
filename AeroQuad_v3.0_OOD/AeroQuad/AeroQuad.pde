@@ -42,7 +42,8 @@
 //#define AeroQuadMega_CHR6DM // Clean Arduino Mega with CHR6DM as IMU/heading ref.
 //#define APM_OP_CHR6DM       // ArduPilot Mega with CHR6DM as IMU/heading ref., Oilpan for barometer (just uncomment AltitudeHold for baro), and voltage divider
 //#define ArduCopter_AQ
-#define ArduCopter_CSG
+//#define ArduCopter_CSG
+#define ArduMaple_CSG
 
 /****************************************************************************
  *********************** Define Flight Configuration ************************
@@ -139,9 +140,9 @@
  * @TODO : REMOVE DRIFT CORRECTION TEST FROM AGR WHEN ALAN AND JOHN HAVE FIX IT!
  */
  
+#include "AeroQuad.h"
 #include <EEPROM.h>
 #include <Wire.h>
-#include "AeroQuad.h"
 #include <Axis.h>
 #include "PID.h"
 #include <AQMath.h>
@@ -153,6 +154,90 @@
 //********* PLATFORM SPECIFIC SECTION ********************
 //********************************************************
 //********************************************************
+
+
+#ifdef ArduMaple_CSG
+  #include <APM_RC.h>
+  #include <Device_I2C.h>
+
+  // Gyroscope declaration
+  #define GYRO_ALTERNATE TRUE
+  #include <Gyroscope.h>
+  #include <Gyroscope_ITG3200.h>
+  Gyroscope_ITG3200 gyroSpecific;
+  Gyroscope *gyro = &gyroSpecific;
+  
+  // Accelerometer declaration
+  #define ACCEL_ALTERNATE TRUE
+  #include <Accelerometer.h>
+  #include <Accelerometer_BMA180.h>
+  Accelerometer_BMA180 accelSpecific;
+  Accelerometer *accel = &accelSpecific;
+
+
+  // Receiver Declaration
+  #define RECEIVER_APM
+  
+  // Motor Declaration
+  #define MOTOR_APM
+  
+  // heading mag hold declaration
+  #ifdef HeadingMagHold
+    #define HMC5843
+  #endif
+ 
+  // Altitude declaration
+  #ifdef AltitudeHold
+    #define BMP085
+  #endif
+  
+  #ifdef STATUSMONITOR
+  #include "StatusSignal.h"
+  StatusSignal statusSignalSpecific;
+  StatusSignal* statusSignal = &statusSignalSpecific;
+  #endif
+  
+  // Battery monitor declaration
+  #ifdef BattMonitor
+    #include <BatterySensor.h>
+    //#include <BatteryMonitor_APM.h>
+    BatterySensor batteryMonitorSpecific;
+    BatterySensor* batteryMonitor = &batteryMonitorSpecific;
+  #endif
+  
+  Copter copterSpecific;
+  Copter* copter = &copterSpecific; 
+  
+  /**
+   * Put ArduCopter specific intialization need here
+   */
+  void initPlatform() {
+    initRC();
+    
+    Wire.begin();
+    TWBR = 12;
+    #ifdef STATUSMONITOR
+    statusSignal-> initialize();
+    #endif
+    //statusSignal->setTiming(0, 10, 50);
+  }
+  
+  /**
+   * Measure critical sensors
+   */
+  void measureCriticalSensors() {
+    gyro->measure();
+    accel->measure();
+  }
+  void measureNormalSensors() {
+  }
+  void measureSlowSensors() {
+  
+  }
+#endif
+
+
+
 
 #ifdef ArduCopter_CSG
   #include <APM_RC.h>
