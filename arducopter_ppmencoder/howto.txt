@@ -1,3 +1,0 @@
-http://code.google.com/p/ardupilot-mega/wiki/BusPirate
-
-
