@@ -18,6 +18,7 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>. 
 */
 
+#if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 #ifndef _AEROQUAD_MOTORS_APM_H_
 #define _AEROQUAD_MOTORS_APM_H_
@@ -82,5 +83,7 @@ public:
   }
   
 };
+
+#endif
 
 #endif

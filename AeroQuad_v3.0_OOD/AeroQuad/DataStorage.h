@@ -251,7 +251,7 @@ void readEEPROM(void) {
 }
 
 void writeEEPROM(void){
-  cli(); // Needed so that APM sensor data doesn't overflow
+//  cli(); // Needed so that APM sensor data doesn't overflow
   writePID(ROLL, ROLL_PID_GAIN_ADR);
   writePID(PITCH, PITCH_PID_GAIN_ADR);
   writePID(LEVELROLL, LEVELROLL_PID_GAIN_ADR);
@@ -319,7 +319,7 @@ void writeEEPROM(void){
   writeFloat(servoMaxYaw, SERVOMAXYAW_ADR);
   #endif*/
   
-  sei(); // Restart interrupts
+//  sei(); // Restart interrupts
 }
 
 void initSensorsZeroFromEEPROM(void) {

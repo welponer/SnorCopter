@@ -113,7 +113,7 @@
 //#define YAW_DIRECTION -1
 
 
-#define STATUSMONITOR
+//#define STATUSMONITOR
 
 /****************************************************************************
  ********************* End of User Definition Section ***********************
@@ -156,8 +156,8 @@
 //********************************************************
 
 
-#ifdef ArduMaple_CSG
-  #include <APM_RC.h>
+#ifdef ArduMaple_CSG   // STM32
+  #define Serial SerialUSB
   #include <Device_I2C.h>
 
   // Gyroscope declaration
@@ -176,10 +176,16 @@
 
 
   // Receiver Declaration
-  #define RECEIVER_APM
+  #include <Receiver.h>
+  #include <Receiver_STM32.h>
+  Receiver_STM32 receiverSpecific;
+  Receiver *receiver = &receiverSpecific;
   
   // Motor Declaration
-  #define MOTOR_APM
+  #include <Motors.h>
+  #include <Motors_STM32.h>
+  Motors_STM32 motorsSpecific;
+  Motors *motors = &motorsSpecific;
   
   // heading mag hold declaration
   #ifdef HeadingMagHold
@@ -190,13 +196,7 @@
   #ifdef AltitudeHold
     #define BMP085
   #endif
-  
-  #ifdef STATUSMONITOR
-  #include "StatusSignal.h"
-  StatusSignal statusSignalSpecific;
-  StatusSignal* statusSignal = &statusSignalSpecific;
-  #endif
-  
+
   // Battery monitor declaration
   #ifdef BattMonitor
     #include <BatterySensor.h>
@@ -205,21 +205,11 @@
     BatterySensor* batteryMonitor = &batteryMonitorSpecific;
   #endif
   
-  Copter copterSpecific;
-  Copter* copter = &copterSpecific; 
-  
   /**
    * Put ArduCopter specific intialization need here
    */
   void initPlatform() {
-    initRC();
-    
-    Wire.begin();
-    TWBR = 12;
-    #ifdef STATUSMONITOR
-    statusSignal-> initialize();
-    #endif
-    //statusSignal->setTiming(0, 10, 50);
+    Wire.begin( 0, PORTI2C2, I2C_FAST_MODE);
   }
   
   /**
@@ -229,11 +219,7 @@
     gyro->measure();
     accel->measure();
   }
-  void measureNormalSensors() {
-  }
-  void measureSlowSensors() {
-  
-  }
+
 #endif
 
 
@@ -1207,7 +1193,8 @@ Kinematics *kinematics = &tempKinematics;
 // ********************** Setup AeroQuad **********************
 // ************************************************************
 void setup() {
-  SERIAL_BEGIN(BAUD);
+  //SERIAL_BEGIN(BAUD);
+  Serial.begin();
   pinMode(LEDPIN, OUTPUT);
   digitalWrite(LEDPIN, LOW);
 
