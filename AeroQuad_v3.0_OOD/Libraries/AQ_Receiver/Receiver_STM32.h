@@ -55,8 +55,8 @@ public:
 
   void initialize(void) {
  
-    for (byte channel = ROLL; channel < LASTCHANNEL; channel++)
-      pinData[receiverPin[channel]].edge = FALLING_EDGE;
+ //   for (byte channel = ROLL; channel < LASTCHANNEL; channel++)
+ //     pinData[receiverPin[channel]].edge = FALLING_EDGE;
   }
 
   void read(void) {
@@ -68,7 +68,7 @@ public:
  
  
       // Apply transmitter calibration adjustment
-      receiverData[channel] = (mTransmitter[channel] * lastGoodWidth) + bTransmitter[channel];
+  //    receiverData[channel] = (mTransmitter[channel] * lastGoodWidth) + bTransmitter[channel];
       // Smooth the flight control transmitter inputs
       transmitterCommandSmooth[channel] = filterSmooth(receiverData[channel], transmitterCommandSmooth[channel], transmitterSmooth[channel]);
     }
@@ -84,7 +84,6 @@ public:
 };
 #endif
 
-#endif
 
 
 
