@@ -50,8 +50,8 @@ public:
   // ******************************************************************
   // The following function calls must be defined in any new subclasses
   // ******************************************************************
-  virtual void initialize(void);
-  virtual void read(void);
+  /* virtual void initialize(void);
+  virtual void read(void); */
 
   // **************************************************************
   // The following functions are common between all Gyro subclasses
@@ -153,12 +153,12 @@ public:
 
 
 
-class Receiver_ArduMaple : public Receiver {
+class Receiver_AeroMaple : public Receiver {
 private:
   int receiverPin[6];
 
 public:
-  Receiver_ArduMaple() :
+  Receiver_AeroMaple() :
   Receiver() {
     receiverPin[ROLL] = 0;
     receiverPin[PITCH] = 1;
@@ -539,5 +539,6 @@ public:
   }
 };
 #endif
+
 
 

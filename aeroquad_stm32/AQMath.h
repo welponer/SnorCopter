@@ -451,3 +451,4 @@ int findMedian(int *data, int arraySize) {                  //Thanks ala42! Post
   
   return data[arraySize/2]; // return the median value
 }
+

@@ -32,8 +32,8 @@ void calculateFlightError(void)
   }
   else {
     
-  float rollAttitudeCmd = updatePID((receiver.getData(ROLL) - receiver.getZero(ROLL)) * ATTITUDE_SCALING, flightAngle->getData(ROLL), &PID[LEVELROLL]);
-  float pitchAttitudeCmd = updatePID((receiver.getData(PITCH) - receiver.getZero(PITCH)) * ATTITUDE_SCALING, -flightAngle->getData(PITCH), &PID[LEVELPITCH]);
+  float rollAttitudeCmd = updatePID((receiver.getData(ROLL) - receiver.getZero(ROLL)) * ATTITUDE_SCALING, flightAngle.getData(ROLL), &PID[LEVELROLL]);
+  float pitchAttitudeCmd = updatePID((receiver.getData(PITCH) - receiver.getZero(PITCH)) * ATTITUDE_SCALING, -flightAngle.getData(PITCH), &PID[LEVELPITCH]);
   motors.setMotorAxisCommand(ROLL, updatePID(rollAttitudeCmd, gyro.getData(ROLL), &PID[LEVELGYROROLL]));
   motors.setMotorAxisCommand(PITCH, updatePID(pitchAttitudeCmd, -gyro.getData(PITCH), &PID[LEVELGYROPITCH]));
   }
@@ -74,7 +74,7 @@ void processHeading(void)
   if (headingHoldConfig == ON) {
 
     #if defined(HeadingMagHold) || defined(AeroQuadMega_CHR6DM) || defined(APM_OP_CHR6DM)
-      heading = degrees(flightAngle->getHeading(YAW));
+      heading = degrees(flightAngle.getHeading(YAW));
     #else
       heading = degrees(gyro.getHeading());
     #endif
@@ -130,7 +130,7 @@ void processHeading(void)
   commandedYaw = constrain(receiver.getSIData(YAW) + radians(headingHold), -PI, PI);
   motors.setMotorAxisCommand(YAW, updatePID(commandedYaw, gyro.getData(YAW), &PID[YAW]));
   // uses flightAngle unbias rate
-  //motors.setMotorAxisCommand(YAW, updatePID(commandedYaw, flightAngle->getGyroUnbias(YAW), &PID[YAW]));
+  //motors.setMotorAxisCommand(YAW, updatePID(commandedYaw, flightAngle.getGyroUnbias(YAW), &PID[YAW]));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -372,4 +372,5 @@ void processFlightControlPlusMode(void) {
   }
 }
 #endif
+
 

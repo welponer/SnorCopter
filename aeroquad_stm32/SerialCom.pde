@@ -114,7 +114,7 @@ void readSerialCommand() {
       }
       break;
     case 'W': // Write all user configurable values to EEPROM
-      writeEEPROM(); // defined in DataStorage.h
+      // writeEEPROM(); // defined in DataStorage.h  @welponer
       zeroIntegralError();
       break;
     case 'Y': // Initialize EEPROM with default values
@@ -164,7 +164,7 @@ void readSerialCommand() {
     case 'c': // calibrate accels
       accel.calibrate();
 #if defined(AeroQuadMega_CHR6DM) || defined(APM_OP_CHR6DM)
-      flightAngle->calibrate();
+      flightAngle.calibrate();
       accel.setOneG(accel.getFlightData(ZAXIS));
 #endif
       break;
@@ -241,8 +241,8 @@ void sendSerialTelemetry() {
   update = 0;
   switch (queryType) {
   case '=': // Reserved debug command to view any variable from Serial Monitor
-    //PrintValueComma(flightAngle->getData(ROLL));
-    //SERIAL_PRINT(degrees(flightAngle->getData(YAW)));
+    //PrintValueComma(flightAngle.getData(ROLL));
+    //SERIAL_PRINT(degrees(flightAngle.getData(YAW)));
     //SERIAL_PRINTLN();
     //printFreeMemory();
     //queryType = 'X';
@@ -327,10 +327,10 @@ void sendSerialTelemetry() {
 #endif
     }
 
-    PrintValueComma(degrees(flightAngle->getData(ROLL)));
-    PrintValueComma(degrees(flightAngle->getData(PITCH)));
+    PrintValueComma(degrees(flightAngle.getData(ROLL)));
+    PrintValueComma(degrees(flightAngle.getData(PITCH)));
 #if defined(HeadingMagHold) || defined(AeroQuadMega_CHR6DM) || defined(APM_OP_CHR6DM)
-    SERIAL_PRINTLN((flightAngle->getDegreesHeading(YAW)));
+    SERIAL_PRINTLN((flightAngle.getDegreesHeading(YAW)));
 #else
     SERIAL_PRINTLN(degrees(gyro.getHeading()));
 #endif
@@ -360,7 +360,7 @@ void sendSerialTelemetry() {
     if (flightMode == ACRO)
       PrintValueComma(1000);
 #ifdef HeadingMagHold
-    PrintValueComma(flightAngle->getDegreesHeading(YAW));
+    PrintValueComma(flightAngle.getDegreesHeading(YAW));
 #else
     PrintValueComma(gyro.getHeading());
 #endif
@@ -590,7 +590,7 @@ void fastTelemetry(void)
          sendBinaryFloat(0.0);
 //          sendBinaryFloat(0.0);
        #endif
-//        for (byte axis = ROLL; axis < ZAXIS; axis++) sendBinaryFloat(flightAngle->getData(axis));
+//        for (byte axis = ROLL; axis < ZAXIS; axis++) sendBinaryFloat(flightAngle.getData(axis));
        printInt(32767); // Stop word of 0x7FFF
     #else
        printInt(21845); // Start word of 0x5555
@@ -602,8 +602,8 @@ void fastTelemetry(void)
        #else
          sendBinaryFloat(0);
        #endif
-       for (byte axis = ROLL; axis < LASTAXIS; axis++) sendBinaryFloat(flightAngle->getGyroUnbias(axis));
-       for (byte axis = ROLL; axis < LASTAXIS; axis++) sendBinaryFloat(flightAngle->getData(axis));
+       for (byte axis = ROLL; axis < LASTAXIS; axis++) sendBinaryFloat(flightAngle.getGyroUnbias(axis));
+       for (byte axis = ROLL; axis < LASTAXIS; axis++) sendBinaryFloat(flightAngle.getData(axis));
        printInt(32767); // Stop word of 0x7FFF
     #endif
   }

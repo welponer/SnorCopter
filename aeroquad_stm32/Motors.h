@@ -62,9 +62,11 @@ public:
   };
 
   // The following function calls must be defined in any new subclasses
-  virtual void initialize(void);
+  /*virtual void initialize(void);
   virtual void write (void);
   virtual void commandAllMotors(int motorCommand);
+*/
+  void commandAllMotors( int motorCommand) {}
 
   //Any number of optional methods can be configured as needed by the SubSystem to expose functionality externally
   void pulseMotors(byte quantity) {
@@ -138,7 +140,7 @@ private:
   int minCommand;
   byte pin;
 
- public:
+public:
   Motors_AeroMaple() : Motors(){
    // Analog write supports commands from 0-255 => 0 - 100% duty cycle
    // Using 125-250 for motor setting 1000-2000
@@ -152,7 +154,7 @@ private:
     
   }
   
-  void commandAllMotors(int _motorCommand) {   // Sends commands to all motors
+  void commandAllMotors(int motorCommand) {   // Sends commands to all motors
 
   }
 };
@@ -530,4 +532,5 @@ private:
     sendByteI2C(LEFTMOTORID,  constrain((motorCommand * mMotorCommand) + bMotorCommand, 0, 255));
   }
 };
+
 

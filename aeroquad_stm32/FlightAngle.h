@@ -38,14 +38,21 @@ public:
     gyroAngle[ROLL] = 0;
     gyroAngle[PITCH] = 0;
   }
-  
+  /*
   virtual void initialize(float hdgX, float hdgY);
   virtual void calculate(float rollRate,           float pitchRate,     float yawRate,       \
                          float longitudinalAccel,  float lateralAccel,  float verticalAccel, \
                          float oneG,               float magX,          float magY);
   virtual float getGyroUnbias(byte axis);
   virtual void calibrate();
- 
+ */
+  void initialize(float hdgX, float hdgY);
+  void calculate(float rollRate,           float pitchRate,     float yawRate,       \
+                         float longitudinalAccel,  float lateralAccel,  float verticalAccel, \
+                         float oneG,               float magX,          float magY);
+  float getGyroUnbias(byte axis);
+  void calibrate();
+  
   // returns the angle of a specific axis in SI units (radians)
   const float getData(byte axis) {
     return angle[axis];
@@ -771,3 +778,4 @@ public:
   
 };
 #endif
+

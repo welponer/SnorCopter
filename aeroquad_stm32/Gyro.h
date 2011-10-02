@@ -44,25 +44,25 @@ public:
   }
   
   // The following function calls must be defined in any new subclasses
-  virtual void initialize(void);
+//  virtual void initialize(void);
 //  virtual void initialize(byte rollChannel, byte pitchChannel, byte yawChannel) {
 //    this->_initialize(rollChannel, pitchChannel, yawChannel);
 //  }
-  virtual void measure(void);
+/*  virtual void measure(void);
   virtual void calibrate(void);
   virtual void autoZero(void);
   virtual const int getFlightData(byte);
-
+*/
   // The following functions are common between all Gyro subclasses
   void _initialize(byte rollChannel, byte pitchChannel, byte yawChannel) {
     gyroChannel[ROLL] = rollChannel;
     gyroChannel[PITCH] = pitchChannel;
     gyroChannel[ZAXIS] = yawChannel;
-    
+/*  @welponer    
     gyroZero[ROLL] = readFloat(GYRO_ROLL_ZERO_ADR);
     gyroZero[PITCH] = readFloat(GYRO_PITCH_ZERO_ADR);
     gyroZero[ZAXIS] = readFloat(GYRO_YAW_ZERO_ADR);
-    smoothFactor = readFloat(GYROSMOOTH_ADR);
+    smoothFactor = readFloat(GYROSMOOTH_ADR);  */
   }
 
   // returns the raw ADC value from the gyro, with sign change if needed, not smoothed or scaled to SI units    
@@ -210,11 +210,12 @@ public:
   
   void initialize(void) {
 //    this->_initialize(0,1,2);
+/* @welponer
     gyroZero[XAXIS] = readFloat(GYRO_ROLL_ZERO_ADR);
     gyroZero[YAXIS] = readFloat(GYRO_PITCH_ZERO_ADR);
     gyroZero[ZAXIS] = readFloat(GYRO_YAW_ZERO_ADR);
     smoothFactor = readFloat(GYROSMOOTH_ADR);
-    
+ */   
     //gyroLastData = 0.0;  // initalize for rawHeading, may be able to be removed in the future
     
     // Check if gyro is connected

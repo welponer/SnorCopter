@@ -45,14 +45,15 @@ public:
   // ******************************************************************
   // The following function calls must be defined in any new subclasses
   // ******************************************************************
-  virtual void initialize(void);
+//  virtual void initialize(void);
 //  virtual void initialize(void) {
 //    this->_initialize(rollChannel, pitchChannel, zAxisChannel);
 //  }
+/*
   virtual void measure(void);
   virtual void calibrate(void);
   virtual const int getFlightData(byte);
-
+*/
   // **************************************************************
   // The following functions are common between all Accel subclasses
   // **************************************************************
@@ -60,10 +61,10 @@ public:
     accelChannel[ROLL] = rollChannel;
     accelChannel[PITCH] = pitchChannel;
     accelChannel[ZAXIS] = zAxisChannel;
-    accelOneG        = readFloat(ACCEL1G_ADR);
+    accelOneG        = readFloat(ACCEL1G_ADR);  
     accelZero[XAXIS] = readFloat(LEVELPITCHCAL_ADR);
     accelZero[YAXIS] = readFloat(LEVELROLLCAL_ADR);
-    accelZero[ZAXIS] = readFloat(LEVELZCAL_ADR);
+    accelZero[ZAXIS] = readFloat(LEVELZCAL_ADR); 
   }
   
   // return the raw ADC value from the accel, with sign change if need, not smoothed or scaled to SI units
@@ -195,13 +196,13 @@ public:
     byte data;
     
 //    this->_initialize(0,1,2);  // AKA added for consistency
-  
+
     accelOneG        = readFloat(ACCEL1G_ADR);
     accelZero[XAXIS] = readFloat(LEVELPITCHCAL_ADR);
     accelZero[YAXIS] = readFloat(LEVELROLLCAL_ADR);
     accelZero[ZAXIS] = readFloat(LEVELZCAL_ADR);
     smoothFactor     = readFloat(ACCSMOOTH_ADR);
-    
+
     // Check if accel is connected
     if (readWhoI2C(accelAddress) != 0x03) // page 52 of datasheet
       Serial.println("Accelerometer not found!");
@@ -304,13 +305,13 @@ public:
 //    byte data;
     
 //    this->_initialize(0,1,2);  // AKA added for consistency
-  
+
     accelOneG        = readFloat(ACCEL1G_ADR);
     accelZero[XAXIS] = readFloat(LEVELPITCHCAL_ADR);
     accelZero[YAXIS] = readFloat(LEVELROLLCAL_ADR);
     accelZero[ZAXIS] = readFloat(LEVELZCAL_ADR);
     smoothFactor     = readFloat(ACCSMOOTH_ADR);
-    
+
     // Check if accel is connected
     
     if (readWhoI2C(accelAddress) !=  0xE5) // page 14 of datasheet
@@ -454,11 +455,12 @@ public:
   }
   
   void initialize(void) {
+
     accelOneG        = readFloat(ACCEL1G_ADR);
     accelZero[XAXIS] = readFloat(LEVELPITCHCAL_ADR);
     accelZero[YAXIS] = readFloat(LEVELROLLCAL_ADR);
     accelZero[ZAXIS] = readFloat(LEVELZCAL_ADR);
-    smoothFactor     = readFloat(ACCSMOOTH_ADR);
+    smoothFactor     = readFloat(ACCSMOOTH_ADR);  
   }
   
   void measure(void) {
@@ -520,11 +522,12 @@ public:
   }
 
   void initialize(void) {
+
     smoothFactor = readFloat(ACCSMOOTH_ADR);
     accelZero[ROLL] = readFloat(LEVELROLLCAL_ADR);
     accelZero[PITCH] = readFloat(LEVELPITCHCAL_ADR);
     accelZero[ZAXIS] = readFloat(LEVELZCAL_ADR);
-    accelOneG = readFloat(ACCEL1G_ADR);
+    accelOneG = readFloat(ACCEL1G_ADR);  
     calibrate();
   }
 

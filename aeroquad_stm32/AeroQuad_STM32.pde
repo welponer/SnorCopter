@@ -115,7 +115,7 @@
 #define Serial SerialUSB
 
 #include "AeroQuad.h"
-#include <EEPROM.h>
+//#include <EEPROM.h>
 #include <Wire.h>
 #include "I2C.h"
 #include "PID.h"
@@ -128,22 +128,21 @@
 
 // Create objects defined from Configuration Section above
 #ifdef AeroMaple_CSG
-  //Accel_AeroQuadMega_v2 accel;
-  Accel accel;
-  Gyro gyro;
-  Receiver receiver;
+  Accel_AeroQuadMega_v2 accel;
+  Gyro_AeroQuadMega_v2 gyro;
+  Receiver_AeroMaple receiver;
   Motors_AeroMaple motors;
+  
   #include "FlightAngle.h"
-  FlightAngle tempFlightAngle;
-/*  
   #ifdef FlightAngleARG
-    FlightAngle_ARG tempFlightAngle;
+    FlightAngle_ARG flightAngle;
   #elif defined FlightAngleMARG
-    FlightAngle_MARG tempFlightAngle;
+    FlightAngle_MARG flightAngle;
   #else
-    FlightAngle_DCM tempFlightAngle;
-  #endif */
-  FlightAngle *flightAngle = &tempFlightAngle;
+    FlightAngle_DCM flightAngle;
+  #endif 
+  //FlightAngle *flightAngle = &tempFlightAngle;
+  
   #ifdef HeadingMagHold
     #include "Compass.h"
     Magnetometer_HMC5843 compass;
@@ -538,9 +537,10 @@ void setup() {
   #endif
 
   // Read user values from EEPROM
-  readEEPROM(); // defined in DataStorage.h
+  // readEEPROM(); // defined in DataStorage.h   @welponer
   
   // Configure motors
+  
   motors.initialize(); // defined in Motors.h
 
   // Setup receiver pins for pin change interrupts
@@ -562,9 +562,9 @@ void setup() {
   #ifdef HeadingMagHold
     compass.initialize();
     //setHeading = compass.getHeading();
-    flightAngle->initialize(compass.getHdgXY(XAXIS), compass.getHdgXY(YAXIS));
+    flightAngle.initialize(compass.getHdgXY(XAXIS), compass.getHdgXY(YAXIS));
   #else
-    flightAngle->initialize(1.0, 0.0);  // with no compass, DCM matrix initalizes to a heading of 0 degrees
+    flightAngle.initialize(1.0, 0.0);  // with no compass, DCM matrix initalizes to a heading of 0 degrees
   #endif
   // Integral Limit for attitude mode
   // This overrides default set in readEEPROM()
@@ -715,7 +715,7 @@ void loop () {
         #endif
         
         #if !defined HeadingMagHold && !defined FlightAngleMARG && !defined FlightAngleARG
-          flightAngle->calculate(gyro.getData(ROLL),  \
+          flightAngle.calculate(gyro.getData(ROLL),  \
                                  gyro.getData(PITCH),                      \
                                  gyro.getData(YAW),                        \
                                  accel.getData(XAXIS),                     \

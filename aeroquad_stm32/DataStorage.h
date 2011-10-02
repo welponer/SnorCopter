@@ -23,9 +23,8 @@
 
 // Utilities for writing and reading from the EEPROM
 
-
 float nvrReadFloat(int address) {
-  union floatStore {
+/*  union floatStore {
     byte floatByte[4];
     unsigned short floatUShort[2];
     float floatVal;
@@ -38,11 +37,12 @@ float nvrReadFloat(int address) {
   for (int i = 0; i < 4; i++)
     floatOut.floatByte[i] = EEPROM.read(address + i);
 #endif
-  return floatOut.floatVal;
+  return floatOut.floatVal; */
+  return 0;
 }
 
 void nvrWriteFloat(float value, int address) {
-  union floatStore {
+ /* union floatStore {
     byte floatByte[4];
     unsigned short floatUShort[2];
     float floatVal;
@@ -55,7 +55,7 @@ void nvrWriteFloat(float value, int address) {
 #else
   for (int i = 0; i < 4; i++)
     EEPROM.write(address + i, floatIn.floatByte[i]);
-#endif
+#endif*/
 }
 
 /*
@@ -81,7 +81,7 @@ void nvrWriteFloat(float value, int address) {
     EEPROM.write(address + i, floatIn.floatByte[i]);
 }
 */
-
+/*
 void nvrReadPID(unsigned char IDPid, unsigned int IDEeprom) {
   struct PIDdata* pid = &PID[IDPid];
   pid->P = nvrReadFloat(IDEeprom);
@@ -103,6 +103,8 @@ void nvrWritePID(unsigned char IDPid, unsigned int IDEeprom) {
   nvrWriteFloat(pid->I, IDEeprom+4);
   nvrWriteFloat(pid->D, IDEeprom+8);
 }
+
+*/
 
 // contains all default values when re-writing EEPROM
 void initializeEEPROM(void) {
@@ -200,7 +202,9 @@ void initializeEEPROM(void) {
   #endif*/
 }
 
-void readEEPROM(void) {
+/*
+
+void readEEPROM2(void) {
   readPID(ROLL, ROLL_PID_GAIN_ADR);
   readPID(PITCH, PITCH_PID_GAIN_ADR);
   readPID(YAW, YAW_PID_GAIN_ADR);
@@ -261,9 +265,10 @@ void readEEPROM(void) {
   servoMaxRoll = readFloat(SERVOMAXROLL_ADR);
   servoMaxYaw = readFloat(SERVOMAXYAW_ADR);
   #endif*/
+/*
 }
 
-void writeEEPROM(void){
+void writeEEPROM2(void){
   // welponer
   //  cli(); // Needed so that APM sensor data doesn't overflow
   writePID(ROLL, ROLL_PID_GAIN_ADR);
@@ -335,4 +340,6 @@ void writeEEPROM(void){
   
   // welponer
   // sei(); // Restart interrupts
+  /*
 }
+*/
