@@ -65,7 +65,7 @@
 // *******************************************************************************************************************************
 // You must define one of the next 3 attitude stabilization modes or the software will not build
 // *******************************************************************************************************************************
-#define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
+//#define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
 //#define AltitudeHold // Enables BMP085 Barometer (experimental, use at your own risk)
 //#define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
 //#define RateModeOnly // Use this if you only have a gyro sensor, this will disable any attitude modes.
@@ -1027,17 +1027,17 @@
 //********************************************************
 //****************** KINEMATICS DECLARATION **************
 //********************************************************
-#include "Kinematics.h"
+#include <Kinematics.h>
 #if defined (AeroQuadMega_CHR6DM) || defined (APM_OP_CHR6DM)
   // CHR6DM have it's own kinematics, so, initialize in it's scope
 #elif defined FlightAngleARG
-  #include "Kinematics_ARG.h"
+  #include <Kinematics_ARG.h>
   Kinematics_ARG tempKinematics;
 #elif defined FlightAngleMARG
-  #include "Kinematics_MARG.h"
+  #include <Kinematics_MARG.h>
   Kinematics_MARG tempKinematics;
 #else
-  #include "Kinematics_DCM.h"
+  #include <Kinematics_DCM.h>
   Kinematics_DCM tempKinematics;
 #endif
 Kinematics *kinematics = &tempKinematics;
@@ -1398,7 +1398,7 @@ void loop () {
                                accel->getOneG(),                               
                                0.0,                                             
                                0.0,
-                               G_Dt);
+                               G_Dt);  
       #endif
       
       

@@ -23,25 +23,25 @@
 
 // Utilities for writing and reading from the EEPROM
 float nvrReadFloat(int address) {
-  union floatStore {
+/*  union floatStore {
     byte floatByte[4];
     float floatVal;
   } floatOut;
 
   for (int i = 0; i < 4; i++)
     floatOut.floatByte[i] = EEPROM.read(address + i);
-  return floatOut.floatVal;
+  return floatOut.floatVal; */
 }
 
 void nvrWriteFloat(float value, int address) {
-  union floatStore {
+/*  union floatStore {
     byte floatByte[4];
     float floatVal;
   } floatIn;
 
   floatIn.floatVal = value;
   for (int i = 0; i < 4; i++)
-    EEPROM.write(address + i, floatIn.floatByte[i]);
+    EEPROM.write(address + i, floatIn.floatByte[i]); */
 }
 
 void nvrReadPID(unsigned char IDPid, unsigned int IDEeprom) {
