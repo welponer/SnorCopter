@@ -33,7 +33,17 @@ protected:
   float zero[3];
   
 public:  
-  Accelerometer() {};
+  Accelerometer() {
+  /*
+    for (int i = 0; i < 3; i++) {
+      meterPerSec[i] = 0;
+      zero[i] = 0;
+    }
+    oneG = 9.9;
+    accelScaleFactor = 1.0;
+    smoothFactor = 1.0;
+  */
+  };
 
   virtual void initialize() {}
   virtual void calibrate() {}

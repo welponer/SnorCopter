@@ -46,7 +46,7 @@ public:
     gyroAngle[PITCH] = 0;
   }
   
-   virtual void initialize(float hdgX, float hdgY) {}
+   virtual void initialize(float hdgX, float hdgY) { }
    virtual void calculate(float rollRate,           float pitchRate,     float yawRate,       
                          float longitudinalAccel,  float lateralAccel,  float verticalAccel, 
                          float oneG,               float magX,          float magY,

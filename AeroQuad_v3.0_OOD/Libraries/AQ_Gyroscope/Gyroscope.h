@@ -35,13 +35,20 @@ protected:
   unsigned long lastMesuredTime;
   
 public:  
-  Gyroscope() {}
+  Gyroscope() {
+    for (int i = 0; i < 3; i++) {
+      rate[i] = 0.0;
+      zero[i] = 0.0;
+    }
+    gyroScaleFactor = 1.0;
+    scaleFactor = 1.0;
+    smoothFactor = 1.0;
+    heading = 0;
+  }
 
   virtual void initialize() {}
   virtual void measure() {}
   virtual void calibrate() {}
-
-
 
   void setZero(byte axis,float value) {
     zero[axis] = value;

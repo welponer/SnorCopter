@@ -22,6 +22,7 @@
 #define _AEROQUAD_GYROSCOPE_ITG3200_H_
 
 #include <Gyroscope.h>
+#include <Device_I2C.h>
 
 #ifndef GYRO_ALTERNATE
 #define ITG3200_ADDRESS					0x69
@@ -33,7 +34,7 @@
 #define ITG3200_RESET_ADDRESS			0x3E
 #define ITG3200_RESET_VALUE				0x80
 #define ITG3200_LOW_PASS_FILTER_ADDR	0x16
-#define ITG3200_LOW_PASS_FILTER_VALUE	0x1D	// 10Hz low pass filter
+#define ITG3200_LOW_PASS_FILTER_10HZ	0x1D	// 10Hz low pass filter
 #define ITG3200_OSCILLATOR_ADDR			0x3E
 #define ITG3200_OSCILLATOR_VALUE		0x01	// use X gyro oscillator
 #define ITG3200_SCALE_TO_RADIANS		823.626831 // 14.375 LSBs per °/sec, / Pi / 180
@@ -43,19 +44,27 @@ private:
   int gyroAddress;
   
 public:
-  Gyroscope_ITG3200(boolean useSeccondAddress = false) {
+  Gyroscope_ITG3200(boolean useSeccondAddress = false) : Gyroscope() {
     scaleFactor = radians(1.0 / 14.375);  //  ITG3200 14.375 LSBs per °/sec
+    smoothFactor = 1.0;
     gyroAddress = ITG3200_ADDRESS;
     if (useSeccondAddress)
 	  gyroAddress = ITG3200_ADDRESS-1;
   }
-  
-
-  void initialize(void) {
+/*  
+  Gyroscope_ITG3200(byte address = 0x69) {
+    scaleFactor = radians(1.0 / 14.375);  //  ITG3200 14.375 LSBs per °/sec
     smoothFactor = 1.0;
+    gyroAddress = ITG3200_ADDRESS;
+    if (useSeccondAddress)
+	  gyroAddress = ITG3200_ADDRESS-1;
+  }
+*/  
+  void initialize(void) {
     updateRegisterI2C(gyroAddress, ITG3200_RESET_ADDRESS, ITG3200_RESET_VALUE); // send a reset to the device
-    updateRegisterI2C(gyroAddress, ITG3200_LOW_PASS_FILTER_ADDR, ITG3200_MEMORY_ADDRESS); // 10Hz low pass filter
+    updateRegisterI2C(gyroAddress, ITG3200_LOW_PASS_FILTER_ADDR, ITG3200_LOW_PASS_FILTER_10HZ); // 10Hz low pass filter
     updateRegisterI2C(gyroAddress, ITG3200_RESET_ADDRESS, ITG3200_OSCILLATOR_VALUE); // use internal oscillator 
+    Serial.println("init Gyroscope_ITG3200: done"); 
   }
     
   void measure(void) {
@@ -67,9 +76,10 @@ public:
     // orientation.  See TBD for details.  If your shield is not installed in this
     // orientation, this is where you make the changes.
     int gyroADC[3];
-    gyroADC[ROLL]  = ((Wire.receive() << 8) | Wire.receive())  - zero[ROLL];
-    gyroADC[PITCH] = zero[PITCH] - ((Wire.receive() << 8) | Wire.receive());
-    gyroADC[YAW]   = zero[YAW] - ((Wire.receive() << 8) | Wire.receive());
+    
+    gyroADC[ROLL]  = readShortI2C() - zero[ROLL];
+    gyroADC[PITCH] = zero[PITCH] - readShortI2C();
+    gyroADC[YAW]   = zero[YAW] - readShortI2C(); 
 
     for (byte axis = 0; axis <= YAW; axis++) {
       rate[axis] = filterSmooth(gyroADC[axis] * scaleFactor, rate[axis], smoothFactor);
@@ -88,8 +98,9 @@ public:
     
     for (byte axis = 0; axis < 3; axis++) {
       for (int i=0; i<FINDZERO; i++) {
-	    sendByteI2C(gyroAddress, (axis * 2) + ITG3200_LOW_PASS_FILTER_VALUE);
-        findZero[i] = readWordI2C(gyroAddress);
+	    sendByteI2C(gyroAddress, (axis * 2) + ITG3200_MEMORY_ADDRESS);
+        findZero[i] = readShortI2C(gyroAddress);
+        Serial.println(findZero[i]);
         delay(10);
       }
       zero[axis] = findMedianInt(findZero, FINDZERO);

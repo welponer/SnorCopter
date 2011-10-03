@@ -40,6 +40,31 @@ int readWordI2C(int deviceAddress)
   return (Wire.receive() << 8) | Wire.receive();
 }
 
+int readWordI2C()  __attribute__ ((noinline));
+int readWordI2C() {
+  return (Wire.receive() << 8) | Wire.receive();
+}
+
+int readShortI2C()  __attribute__ ((noinline));
+int readShortI2C() {
+  return (signed short)readWordI2C();
+}
+
+int readShortI2C(int deviceAddress) {
+  Wire.requestFrom(deviceAddress, 2);
+  return readShortI2C();
+}
+
+int readReverseShortI2C()  __attribute__ ((noinline));
+int readReverseShortI2C() {
+  return (signed short)( Wire.receive() | (Wire.receive() << 8));
+}
+
+int readReverseShortI2C(int deviceAddress) {
+  Wire.requestFrom(deviceAddress, 2);
+  return readReverseShortI2C();
+}
+
 int readWordWaitI2C(int deviceAddress) 
 {
   unsigned char msb, lsb;

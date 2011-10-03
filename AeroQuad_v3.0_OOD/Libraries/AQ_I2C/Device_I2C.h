@@ -33,4 +33,11 @@ int readReverseWordI2C(int deviceAddress);
 byte readWhoI2C(int deviceAddress);
 void updateRegisterI2C(int deviceAddress, byte dataAddress, byte dataValue);
 
+
+int readWordI2C(void);
+int readShortI2C(void);
+int readShortI2C(int deviceAddress);
+int readReverseShortI2C(void);
+int readReverseShortI2C(int deviceAddress);
+
 #endif

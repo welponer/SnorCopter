@@ -45,40 +45,40 @@
 class Accelerometer_BMA180 : public Accelerometer {
 
 public:
-  Accelerometer_BMA180() : Accelerometer(){
+  Accelerometer_BMA180() : Accelerometer() {
     accelScaleFactor = G_2_MPS2(1.0/4096.0);  //  g per LSB @ +/- 2g range
     smoothFactor = 1.0;
   }
 
   void initialize(void) {
-  
-    if (readWhoI2C(ACCEL_ADDRESS) != ACCEL_IDENTITY) // page 52 of datasheet
-      Serial.println("Accelerometer not found!");
-	
-    updateRegisterI2C(ACCEL_ADDRESS, ACCEL_RESET_REGISTER, ACCEL_TRIGER_RESET_VALUE); 					//reset device
-    delay(10);  																							//sleep 10 ms after reset (page 25)
+    if (readWhoI2C(ACCEL_ADDRESS) == ACCEL_IDENTITY) {  // page 52 of datasheet
+      updateRegisterI2C(ACCEL_ADDRESS, ACCEL_RESET_REGISTER, ACCEL_TRIGER_RESET_VALUE); 					//reset device
+      delay(10);  																							//sleep 10 ms after reset (page 25)
 
-    // In datasheet, summary register map is page 21
-    // Low pass filter settings is page 27
-    // Range settings is page 28
-    updateRegisterI2C(ACCEL_ADDRESS, ACCEL_ENABLE_WRITE_CONTROL_REGISTER, ACCEL_CONTROL_REGISTER); 		//enable writing to control registers
-    sendByteI2C(ACCEL_ADDRESS, ACCEL_BW_TCS); 															// register bw_tcs (bits 4-7)
-    byte data = readByteI2C(ACCEL_ADDRESS); 																// get current register value
-    updateRegisterI2C(ACCEL_ADDRESS, ACCEL_LOW_PASS_FILTER_REGISTER, data & ACCEL_10HZ_LOW_PASS_FILTER_VALUE); 	// set low pass filter to 10Hz (value = 0000xxxx)
+      // In datasheet, summary register map is page 21
+      // Low pass filter settings is page 27
+      // Range settings is page 28
+      updateRegisterI2C(ACCEL_ADDRESS, ACCEL_ENABLE_WRITE_CONTROL_REGISTER, ACCEL_CONTROL_REGISTER); 		//enable writing to control registers
+      sendByteI2C(ACCEL_ADDRESS, ACCEL_BW_TCS); 															// register bw_tcs (bits 4-7)
+      byte data = readByteI2C(ACCEL_ADDRESS); 																// get current register value
+      updateRegisterI2C(ACCEL_ADDRESS, ACCEL_LOW_PASS_FILTER_REGISTER, data & ACCEL_10HZ_LOW_PASS_FILTER_VALUE); 	// set low pass filter to 10Hz (value = 0000xxxx)
 
-    // From page 27 of BMA180 Datasheet
-    //  1.0g = 0.13 mg/LSB
-    //  1.5g = 0.19 mg/LSB
-    //  2.0g = 0.25 mg/LSB
-    //  3.0g = 0.38 mg/LSB
-    //  4.0g = 0.50 mg/LSB
-    //  8.0g = 0.99 mg/LSB
-    // 16.0g = 1.98 mg/LSB
-    sendByteI2C(ACCEL_ADDRESS, ACCEL_OFFSET_REGISTER); 													// register offset_lsb1 (bits 1-3)
-    data = readByteI2C(ACCEL_ADDRESS);
-    data &= 0xF1;
-    data |= 0x04; // Set range select bits for +/-2g
-    updateRegisterI2C(ACCEL_ADDRESS, ACCEL_OFFSET_REGISTER, data);	
+      // From page 27 of BMA180 Datasheet
+      //  1.0g = 0.13 mg/LSB
+      //  1.5g = 0.19 mg/LSB
+      //  2.0g = 0.25 mg/LSB
+      //  3.0g = 0.38 mg/LSB
+      //  4.0g = 0.50 mg/LSB
+      //  8.0g = 0.99 mg/LSB
+      // 16.0g = 1.98 mg/LSB
+      sendByteI2C(ACCEL_ADDRESS, ACCEL_OFFSET_REGISTER); 													// register offset_lsb1 (bits 1-3)
+      data = readByteI2C(ACCEL_ADDRESS);
+      data &= 0xF1;
+      data |= 0x04; // Set range select bits for +/-2g
+      updateRegisterI2C(ACCEL_ADDRESS, ACCEL_OFFSET_REGISTER, data);	
+      Serial.println("init Accelerometer_BMA180: done"); 
+    } else
+      Serial.println("init Accelerometer_BMA180: failed");
   }
 
   
@@ -91,11 +91,18 @@ public:
     int accelADC;
     for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
       if (axis == XAXIS)
-        accelADC = ((Wire.receive()|(Wire.receive() << 8)) >> 2) - zero[axis];
+        accelADC = (readReverseShortI2C() >> 2) ;
       else
-        accelADC = zero[axis] - ((Wire.receive()|(Wire.receive() << 8)) >> 2);
+        accelADC =  (readReverseShortI2C() >> 2);
       meterPerSec[axis] = filterSmooth(accelADC * accelScaleFactor, meterPerSec[axis], smoothFactor);
     }  
+/*    for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
+      if (axis == XAXIS)
+        accelADC = (readReverseShortI2C() >> 2) - zero[axis];
+      else
+        accelADC = zero[axis] - (readReverseShortI2C() >> 2);
+      meterPerSec[axis] = filterSmooth(accelADC * accelScaleFactor, meterPerSec[axis], smoothFactor);
+    }  */
   }
 
   void calibrate(void) {

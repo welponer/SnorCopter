@@ -77,8 +77,8 @@
 // If you only want DCM, then don't define either of the below
 // Use FlightAngleARG if you do not have a magnetometer, use DCM if you have a magnetometer installed
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#define FlightAngleMARG // Experimental!  Fly at your own risk! Use this if you have a magnetometer installed and enabled HeadingMagHold above
-//#define FlightAngleARG // Use this if you do not have a magnetometer installed
+//#define FlightAngleMARG // Experimental!  Fly at your own risk! Use this if you have a magnetometer installed and enabled HeadingMagHold above
+#define FlightAngleARG // Use this if you do not have a magnetometer installed
 //#define WirelessTelemetry  // Enables Wireless telemetry on Serial3  // Wireless telemetry enable
 //#define BinaryWrite // Enables fast binary transfer of flight data to Configurator
 //#define BinaryWritePID // Enables fast binary transfer of attitude PID data
@@ -154,7 +154,6 @@
 //********* PLATFORM SPECIFIC SECTION ********************
 //********************************************************
 //********************************************************
-
 
 #ifdef ArduMaple_CSG   // STM32
   #define Serial SerialUSB
@@ -1195,9 +1194,12 @@ Kinematics *kinematics = &tempKinematics;
 void setup() {
   //SERIAL_BEGIN(BAUD);
   Serial.begin();
+  Serial.println("setup:");
   pinMode(LEDPIN, OUTPUT);
   digitalWrite(LEDPIN, LOW);
-
+  delay(5000);     
+  digitalWrite(LEDPIN, HIGH);
+  
 #ifdef DEBUG_LOOP
   pinMode(12, OUTPUT);
   pinMode(11, OUTPUT);
@@ -1212,8 +1214,9 @@ void setup() {
 #endif    
 
   // Read user values from EEPROM
-  readEEPROM(); // defined in DataStorage.h
+//  readEEPROM(); // defined in DataStorage.h
   
+  //initializeEEPROM();
   initPlatform();
   
   // Configure motors
@@ -1230,16 +1233,18 @@ void setup() {
   receiver->initialize();
   initReceiverFromEEPROM();
 
+
        
   // Initialize sensors
   // If sensors have a common initialization routine
   // insert it into the gyro class because it executes first
-  initSensorsZeroFromEEPROM();
+//  initSensorsZeroFromEEPROM();
   gyro->initialize(); // defined in Gyro.h
   accel->initialize(); // defined in Accel.h
   
   // Calibrate sensors
   gyro->calibrate(); // defined in Gyro.h
+  accel->calibrate();
   zeroIntegralError();
   levelAdjust[ROLL] = 0;
   levelAdjust[PITCH] = 0;

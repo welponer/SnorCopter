@@ -31,6 +31,21 @@ float nvrReadFloat(int address) {
   for (int i = 0; i < 4; i++)
     floatOut.floatByte[i] = EEPROM.read(address + i);
   return floatOut.floatVal; */
+  union floatStore {
+    byte floatByte[4];
+    unsigned short floatUShort[2];
+    float floatVal;
+  } floatOut;
+
+#ifdef EEPROM_USES_16BIT_WORDS
+  for (int i = 0; i < 2; i++)
+    floatOut.floatUShort[i] = EEPROM.read(address + 2*i);
+#else
+  for (int i = 0; i < 4; i++)
+    floatOut.floatByte[i] = EEPROM.read(address + i);
+#endif
+  return floatOut.floatVal; 
+//  return 0.0;
 }
 
 void nvrWriteFloat(float value, int address) {
@@ -42,6 +57,20 @@ void nvrWriteFloat(float value, int address) {
   floatIn.floatVal = value;
   for (int i = 0; i < 4; i++)
     EEPROM.write(address + i, floatIn.floatByte[i]); */
+  union floatStore {
+    byte floatByte[4];
+    unsigned short floatUShort[2];
+    float floatVal;
+  } floatIn;
+
+  floatIn.floatVal = value;
+#ifdef EEPROM_USES_16BIT_WORDS
+  for (int i = 0; i < 2; i++)
+    EEPROM.write(address + 2*i, floatIn.floatUShort[i]);
+#else
+  for (int i = 0; i < 4; i++)
+    EEPROM.write(address + i, floatIn.floatByte[i]);
+#endif
 }
 
 void nvrReadPID(unsigned char IDPid, unsigned int IDEeprom) {
