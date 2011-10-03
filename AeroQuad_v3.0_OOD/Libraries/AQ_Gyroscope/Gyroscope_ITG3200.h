@@ -100,7 +100,6 @@ public:
       for (int i=0; i<FINDZERO; i++) {
 	    sendByteI2C(gyroAddress, (axis * 2) + ITG3200_MEMORY_ADDRESS);
         findZero[i] = readShortI2C(gyroAddress);
-        Serial.println(findZero[i]);
         delay(10);
       }
       zero[axis] = findMedianInt(findZero, FINDZERO);

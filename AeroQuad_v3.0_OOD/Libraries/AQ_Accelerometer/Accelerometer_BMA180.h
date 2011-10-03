@@ -88,21 +88,14 @@ public:
     Wire.endTransmission();
     Wire.requestFrom(ACCEL_ADDRESS, 6);
   
-    int accelADC;
+    int accelADC; 
     for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
-      if (axis == XAXIS)
-        accelADC = (readReverseShortI2C() >> 2) ;
-      else
-        accelADC =  (readReverseShortI2C() >> 2);
-      meterPerSec[axis] = filterSmooth(accelADC * accelScaleFactor, meterPerSec[axis], smoothFactor);
-    }  
-/*    for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
       if (axis == XAXIS)
         accelADC = (readReverseShortI2C() >> 2) - zero[axis];
       else
         accelADC = zero[axis] - (readReverseShortI2C() >> 2);
       meterPerSec[axis] = filterSmooth(accelADC * accelScaleFactor, meterPerSec[axis], smoothFactor);
-    }  */
+    }  
   }
 
   void calibrate(void) {
@@ -115,7 +108,7 @@ public:
       if (calAxis == ZAXIS) dataAddress = ACCEL_READ_YAW_ADDRESS;
       for (int i=0; i<FINDZERO; i++) {
         sendByteI2C(ACCEL_ADDRESS, dataAddress);
-        findZero[i] = readReverseWordI2C(ACCEL_ADDRESS) >> 2; // last two bits are not part of measurement
+        findZero[i] = readReverseShortI2C(ACCEL_ADDRESS) >> 2; // last two bits are not part of measurement
         delay(10);
       }
       zero[calAxis] = findMedianInt(findZero, FINDZERO);

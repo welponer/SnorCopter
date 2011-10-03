@@ -1214,9 +1214,8 @@ void setup() {
 #endif    
 
   // Read user values from EEPROM
-//  readEEPROM(); // defined in DataStorage.h
+  readEEPROM(); // defined in DataStorage.h
   
-  //initializeEEPROM();
   initPlatform();
   
   // Configure motors
@@ -1232,23 +1231,21 @@ void setup() {
   // Setup receiver pins for pin change interrupts
   receiver->initialize();
   initReceiverFromEEPROM();
-
-
        
   // Initialize sensors
   // If sensors have a common initialization routine
   // insert it into the gyro class because it executes first
-//  initSensorsZeroFromEEPROM();
   gyro->initialize(); // defined in Gyro.h
   accel->initialize(); // defined in Accel.h
-  
+  initSensorsZeroFromEEPROM();
+    
   // Calibrate sensors
   gyro->calibrate(); // defined in Gyro.h
   accel->calibrate();
   zeroIntegralError();
   levelAdjust[ROLL] = 0;
   levelAdjust[PITCH] = 0;
-  
+
   // Flight angle estimation
   #ifdef HeadingMagHold
     compass->initialize();

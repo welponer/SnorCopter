@@ -116,6 +116,7 @@ void readSerialCommand() {
     case 'W': // Write all user configurable values to EEPROM
       writeEEPROM(); // defined in DataStorage.h
       zeroIntegralError();
+      storeSensorsZeroToEEPROM();
       break;
     case 'Y': // Initialize EEPROM with default values
       initializeEEPROM(); // defined in DataStorage.h

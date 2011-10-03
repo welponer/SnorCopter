@@ -364,6 +364,18 @@ void initSensorsZeroFromEEPROM(void) {
   accel->setZero(YAXIS,readFloat(ACCEL_YAXIS_ZERO_ADR));
   accel->setZero(ZAXIS,readFloat(ACCEL_ZAXIS_ZERO_ADR));
   accel->setSmoothFactor(readFloat(ACCSMOOTH_ADR));
+  
+  Serial.print("ACCELzero: ");
+  Serial.print(readFloat(ACCSMOOTH_ADR));
+  Serial.print("/");
+  Serial.print(readFloat(ACCEL_1G_ADR));
+  Serial.print("/");  
+  Serial.print(readFloat(ACCEL_XAXIS_ZERO_ADR));
+  Serial.print("/");
+  Serial.print(readFloat(ACCEL_YAXIS_ZERO_ADR));
+  Serial.print("/");
+  Serial.print(readFloat(ACCEL_ZAXIS_ZERO_ADR));
+  Serial.println("");
 }
 
 void storeSensorsZeroToEEPROM(void) {
