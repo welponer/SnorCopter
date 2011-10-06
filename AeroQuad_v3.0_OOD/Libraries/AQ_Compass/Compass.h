@@ -43,8 +43,8 @@ public:
 
   Compass() {}
   
-  virtual void initialize();
-  virtual void measure(float roll, float pitch);
+  virtual void initialize() {};
+  virtual void measure(float roll, float pitch) {};
   
   const float getHdgXY(byte axis) {
     if (axis == XAXIS) return hdgX;

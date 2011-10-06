@@ -28,13 +28,20 @@
 
 #define COMPASS_ADDRESS 0x1E
 #define COMPASS_EXPECTED_XY 1264.4f // xy - Gain 2 (0x20): 1090 LSB/Ga * 1.16 Ga - see HMC5883L specs
-#define COMPASS_EXPECTED_Z 1177.2f // z - Gain 2 (0x20): 1090 LSB/Ga * 1.08 Ga        
+#define COMPASS_EXPECTED_Z 1177.2f // z - Gain 2 (0x20): 1090 LSB/Ga * 1.08 Ga    
 
-float magCalibration[3] = {0.0,0.0,0.0};
+class Magnetometer_HMC5883L : public Compass {
+private:
+  float magCalibration[3];
   
+public:
+  Magnetometer_HMC5883L() : Compass() {
+    magCalibration[XAXIS] = 1.0;
+    magCalibration[YAXIS] = 1.0;
+    magCalibration[ZAXIS] = 1.0;
+  }
 
-void initializeMagnetometer() {
-
+  void initialize() {
   byte numAttempts = 0;
   bool success = false;
   delay(10);                             // Power up delay **
@@ -56,7 +63,7 @@ void initializeMagnetometer() {
     updateRegisterI2C(COMPASS_ADDRESS, 0x02, 0x01);  // Perform single conversion
     delay(10);
    
-    measureMagnetometer(0.0, 0.0);                    // Read calibration data
+    measure(0.0, 0.0);                    // Read calibration data
     delay(10);
 /*   
     if ( fabs(measuredMagX) > 500.0 && fabs(measuredMagX) < 1000.0 \
@@ -81,10 +88,10 @@ void initializeMagnetometer() {
     delay(50);                           // Mode change delay (1/Update Rate) **
   }
 
-  measureMagnetometer(0.0, 0.0);  // Assume 1st measurement at 0 degrees roll and 0 degrees pitch
+  measure(0.0, 0.0);  // Assume 1st measurement at 0 degrees roll and 0 degrees pitch
 }
 
-void measureMagnetometer(float roll, float pitch) {
+void measure(float roll, float pitch) {
   float magX;
   float magY;
   float tmp;
@@ -118,5 +125,5 @@ void measureMagnetometer(float roll, float pitch) {
   hdgX = magX / tmp;
   hdgY = -magY / tmp;
 }
-
+};
 #endif
