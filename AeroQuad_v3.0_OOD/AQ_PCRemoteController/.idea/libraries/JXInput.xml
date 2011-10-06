@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="JXInput">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/JXInput/jxinput.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="RxTxComm">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/SerialComm/RXTXcomm.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
