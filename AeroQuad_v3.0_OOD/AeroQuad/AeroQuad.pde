@@ -175,7 +175,7 @@
   #include <Accelerometer_BMA180.h>
   Accelerometer_BMA180 accelSpecific;
   Accelerometer *accel = &accelSpecific;
-‚
+
   // Receiver Declaration
   #include <Receiver.h>
   #include <Receiver_STM32.h>
