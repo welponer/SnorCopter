@@ -158,7 +158,10 @@
 #ifdef ArduMaple_CSG   // STM32
   #define Serial SerialUSB
   #include <Device_I2C.h>
-
+  
+  // EEPROM emulation
+  #define EEPROM_USES_16BIT_WORDS
+  
   // Gyroscope declaration
   #define GYRO_ALTERNATE TRUE
   #include <Gyroscope.h>
@@ -204,16 +207,12 @@
     BatterySensor* batteryMonitor = &batteryMonitorSpecific;
   #endif
   
-  /**
-   * Put ArduCopter specific intialization need here
-   */
+  // Put platform specific intialization need here
   void initPlatform() {
     Wire.begin( 0, PORTI2C2, I2C_FAST_MODE);
   }
   
-  /**
-   * Measure critical sensors
-   */
+  // Measure critical sensors
   void measureCriticalSensors() {
     gyro->measure();
     accel->measure();
@@ -1212,6 +1211,11 @@ void setup() {
   digitalWrite(9, LOW);
   digitalWrite(8, LOW);
 #endif    
+
+  Serial.print("EEPROM: write 1.23 -> read ");
+  EEPROM.format();
+  writeFloat(1.23, ALTITUDE_SMOOTH_ADR);
+  Serial.println(readFloat(ALTITUDE_SMOOTH_ADR));
 
   // Read user values from EEPROM
   readEEPROM(); // defined in DataStorage.h
