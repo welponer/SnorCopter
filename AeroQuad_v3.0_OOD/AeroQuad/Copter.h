@@ -3,17 +3,17 @@
 
 class Copter {
 public:
-  //byte flightMode;
-  //byte headingHoldConfig;
+  byte flightMode;
+  byte headingHoldConfig;
   
   Copter(void) {
-    //flightMode = STABLE;
-    //headingHoldConfig = ON;
+    flightMode = STABLE;
+    headingHoldConfig = ON;
   
   }
 
+  void initPlatform();
 
-
-
+  
 
 };

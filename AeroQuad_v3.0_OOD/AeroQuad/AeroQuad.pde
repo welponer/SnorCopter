@@ -161,19 +161,17 @@
   
   // EEPROM emulation
   #define EEPROM_USES_16BIT_WORDS
-  
+
   // Gyroscope declaration
-  #define GYRO_ALTERNATE TRUE
   #include <Gyroscope.h>
   #include <Gyroscope_ITG3200.h>
-  Gyroscope_ITG3200 gyroSpecific;
+  Gyroscope_ITG3200 gyroSpecific(true);
   Gyroscope *gyro = &gyroSpecific;
   
   // Accelerometer declaration
-  #define ACCEL_ALTERNATE TRUE
   #include <Accelerometer.h>
   #include <Accelerometer_BMA180.h>
-  Accelerometer_BMA180 accelSpecific;
+  Accelerometer_BMA180 accelSpecific(true);
   Accelerometer *accel = &accelSpecific;
 
   // Receiver Declaration
@@ -212,7 +210,7 @@
   Copter* copter = &copterSpecific; 
   
   // Put platform specific intialization need here
-  void initPlatform() {
+  void Copter::initPlatform() {
     Wire.begin( 0, PORTI2C2, I2C_FAST_MODE);
   }
   
@@ -223,8 +221,6 @@
   }
 
 #endif
-
-
 
 
 #ifdef ArduCopter_CSG
@@ -1195,7 +1191,6 @@ Kinematics *kinematics = &tempKinematics;
 // ********************** Setup AeroQuad **********************
 // ************************************************************
 void setup() {
-  //SERIAL_BEGIN(BAUD);
   Serial.begin();
   Serial.println("setup:");
   pinMode(LEDPIN, OUTPUT);
@@ -1216,15 +1211,10 @@ void setup() {
   digitalWrite(8, LOW);
 #endif    
 
-  Serial.print("EEPROM: write 1.23 -> read ");
-  EEPROM.format();
-  writeFloat(1.23, ALTITUDE_SMOOTH_ADR);
-  Serial.println(readFloat(ALTITUDE_SMOOTH_ADR));
-
   // Read user values from EEPROM
   readEEPROM(); // defined in DataStorage.h
   
-  initPlatform();
+  copter->initPlatform();
   
   // Configure motors
   #if defined(quadXConfig) || defined(quadPlusConfig) || defined(quadY4Config)
@@ -1514,7 +1504,7 @@ void loop () {
         digitalWrite(8, LOW);
       #endif
     }
-
+    
     previousTime = currentTime;
   }
   
