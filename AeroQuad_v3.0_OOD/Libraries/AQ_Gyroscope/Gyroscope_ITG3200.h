@@ -24,11 +24,8 @@
 #include <Gyroscope.h>
 #include <Device_I2C.h>
 
-#ifndef GYRO_ALTERNATE
 #define ITG3200_ADDRESS					0x69
-#else
-#define ITG3200_ADDRESS					0x68
-#endif
+#define ITG3200_ADDRESS_ALT				0x68
 #define ITG3200_MEMORY_ADDRESS			0x1D
 #define ITG3200_BUFFER_SIZE				6
 #define ITG3200_RESET_ADDRESS			0x3E
@@ -41,42 +38,40 @@
 
 class Gyroscope_ITG3200 : public Gyroscope {
 private:
-  int gyroAddress;
+  int deviceAddress;
   
 public:
   Gyroscope_ITG3200(boolean useSeccondAddress = false) : Gyroscope() {
     scaleFactor = radians(1.0 / 14.375);  //  ITG3200 14.375 LSBs per °/sec
     smoothFactor = 1.0;
-    gyroAddress = ITG3200_ADDRESS;
+    deviceAddress = ITG3200_ADDRESS;
     if (useSeccondAddress)
-	  gyroAddress = ITG3200_ADDRESS-1;
+	  deviceAddress = ITG3200_ADDRESS_ALT;
   }
 /*  
   Gyroscope_ITG3200(byte address = 0x69) {
     scaleFactor = radians(1.0 / 14.375);  //  ITG3200 14.375 LSBs per °/sec
     smoothFactor = 1.0;
-    gyroAddress = ITG3200_ADDRESS;
-    if (useSeccondAddress)
-	  gyroAddress = ITG3200_ADDRESS-1;
+    deviceAddress = address;
   }
 */  
   void initialize(void) {
-    updateRegisterI2C(gyroAddress, ITG3200_RESET_ADDRESS, ITG3200_RESET_VALUE); // send a reset to the device
-    updateRegisterI2C(gyroAddress, ITG3200_LOW_PASS_FILTER_ADDR, ITG3200_LOW_PASS_FILTER_10HZ); // 10Hz low pass filter
-    updateRegisterI2C(gyroAddress, ITG3200_RESET_ADDRESS, ITG3200_OSCILLATOR_VALUE); // use internal oscillator 
+    updateRegisterI2C(deviceAddress, ITG3200_RESET_ADDRESS, ITG3200_RESET_VALUE); // send a reset to the device
+    updateRegisterI2C(deviceAddress, ITG3200_LOW_PASS_FILTER_ADDR, ITG3200_LOW_PASS_FILTER_10HZ); // 10Hz low pass filter
+    updateRegisterI2C(deviceAddress, ITG3200_RESET_ADDRESS, ITG3200_OSCILLATOR_VALUE); // use internal oscillator 
     Serial.println("init Gyroscope_ITG3200: done"); 
   }
     
   void measure(void) {
-    sendByteI2C(gyroAddress, ITG3200_MEMORY_ADDRESS);
-    Wire.requestFrom(gyroAddress, ITG3200_BUFFER_SIZE);
+    int gyroADC[3];
+    
+    sendByteI2C(deviceAddress, ITG3200_MEMORY_ADDRESS);
+    Wire.requestFrom(deviceAddress, ITG3200_BUFFER_SIZE);
     
     // The following 3 lines read the gyro and assign it's data to gyroADC
     // in the correct order and phase to suit the standard shield installation
     // orientation.  See TBD for details.  If your shield is not installed in this
     // orientation, this is where you make the changes.
-    int gyroADC[3];
-    
     gyroADC[ROLL]  = readShortI2C() - zero[ROLL];
     gyroADC[PITCH] = zero[PITCH] - readShortI2C();
     gyroADC[YAW]   = zero[YAW] - readShortI2C(); 
@@ -98,8 +93,8 @@ public:
     
     for (byte axis = 0; axis < 3; axis++) {
       for (int i=0; i<FINDZERO; i++) {
-	    sendByteI2C(gyroAddress, (axis * 2) + ITG3200_MEMORY_ADDRESS);
-        findZero[i] = readShortI2C(gyroAddress);
+	    sendByteI2C(deviceAddress, (axis * 2) + ITG3200_MEMORY_ADDRESS);
+        findZero[i] = readShortI2C(deviceAddress);
         delay(10);
       }
       zero[axis] = findMedianInt(findZero, FINDZERO);

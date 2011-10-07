@@ -24,11 +24,8 @@
 #include <Accelerometer.h>
 #include <Device_I2C.h>
 
-#ifndef ACCEL_ALTERNATE
 #define ACCEL_ADDRESS 0x40
-#else
-#define ACCEL_ADDRESS 0x41
-#endif
+#define ACCEL_ADDRESS_ALT 0x41
 #define ACCEL_IDENTITY 0x03
 #define ACCEL_RESET_REGISTER 0x10
 #define ACCEL_TRIGER_RESET_VALUE 0xB6
@@ -43,25 +40,30 @@
 #define ACCEL_READ_YAW_ADDRESS 0x06
 
 class Accelerometer_BMA180 : public Accelerometer {
-
+private:
+  int deviceAddress;
+  
 public:
-  Accelerometer_BMA180() : Accelerometer() {
+  Accelerometer_BMA180(boolean useSeccondAddress = false) : Accelerometer() {
     accelScaleFactor = G_2_MPS2(1.0/4096.0);  //  g per LSB @ +/- 2g range
     smoothFactor = 1.0;
+    deviceAddress = ACCEL_ADDRESS;
+    if (useSeccondAddress)
+	  deviceAddress = ACCEL_ADDRESS_ALT;
   }
 
   void initialize(void) {
-    if (readWhoI2C(ACCEL_ADDRESS) == ACCEL_IDENTITY) {  // page 52 of datasheet
-      updateRegisterI2C(ACCEL_ADDRESS, ACCEL_RESET_REGISTER, ACCEL_TRIGER_RESET_VALUE); 					//reset device
+    if (readWhoI2C(deviceAddress) == ACCEL_IDENTITY) {  // page 52 of datasheet
+      updateRegisterI2C(deviceAddress, ACCEL_RESET_REGISTER, ACCEL_TRIGER_RESET_VALUE); 					//reset device
       delay(10);  																							//sleep 10 ms after reset (page 25)
 
       // In datasheet, summary register map is page 21
       // Low pass filter settings is page 27
       // Range settings is page 28
-      updateRegisterI2C(ACCEL_ADDRESS, ACCEL_ENABLE_WRITE_CONTROL_REGISTER, ACCEL_CONTROL_REGISTER); 		//enable writing to control registers
-      sendByteI2C(ACCEL_ADDRESS, ACCEL_BW_TCS); 															// register bw_tcs (bits 4-7)
-      byte data = readByteI2C(ACCEL_ADDRESS); 																// get current register value
-      updateRegisterI2C(ACCEL_ADDRESS, ACCEL_LOW_PASS_FILTER_REGISTER, data & ACCEL_10HZ_LOW_PASS_FILTER_VALUE); 	// set low pass filter to 10Hz (value = 0000xxxx)
+      updateRegisterI2C(deviceAddress, ACCEL_ENABLE_WRITE_CONTROL_REGISTER, ACCEL_CONTROL_REGISTER); 		//enable writing to control registers
+      sendByteI2C(deviceAddress, ACCEL_BW_TCS); 															// register bw_tcs (bits 4-7)
+      byte data = readByteI2C(deviceAddress); 																// get current register value
+      updateRegisterI2C(deviceAddress, ACCEL_LOW_PASS_FILTER_REGISTER, data & ACCEL_10HZ_LOW_PASS_FILTER_VALUE); 	// set low pass filter to 10Hz (value = 0000xxxx)
 
       // From page 27 of BMA180 Datasheet
       //  1.0g = 0.13 mg/LSB
@@ -71,11 +73,11 @@ public:
       //  4.0g = 0.50 mg/LSB
       //  8.0g = 0.99 mg/LSB
       // 16.0g = 1.98 mg/LSB
-      sendByteI2C(ACCEL_ADDRESS, ACCEL_OFFSET_REGISTER); 													// register offset_lsb1 (bits 1-3)
-      data = readByteI2C(ACCEL_ADDRESS);
+      sendByteI2C(deviceAddress, ACCEL_OFFSET_REGISTER); 													// register offset_lsb1 (bits 1-3)
+      data = readByteI2C(deviceAddress);
       data &= 0xF1;
       data |= 0x04; // Set range select bits for +/-2g
-      updateRegisterI2C(ACCEL_ADDRESS, ACCEL_OFFSET_REGISTER, data);	
+      updateRegisterI2C(deviceAddress, ACCEL_OFFSET_REGISTER, data);	
       Serial.println("init Accelerometer_BMA180: done"); 
     } else
       Serial.println("init Accelerometer_BMA180: failed");
@@ -83,10 +85,10 @@ public:
 
   
   void measure(void) {
-    Wire.beginTransmission(ACCEL_ADDRESS);
+    Wire.beginTransmission(deviceAddress);
     Wire.send(ACCEL_READ_ROLL_ADDRESS);
     Wire.endTransmission();
-    Wire.requestFrom(ACCEL_ADDRESS, 6);
+    Wire.requestFrom(deviceAddress, 6);
   
     int accelADC; 
     for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
@@ -107,8 +109,8 @@ public:
       if (calAxis == YAXIS) dataAddress = ACCEL_READ_PITCH_ADDRESS;
       if (calAxis == ZAXIS) dataAddress = ACCEL_READ_YAW_ADDRESS;
       for (int i=0; i<FINDZERO; i++) {
-        sendByteI2C(ACCEL_ADDRESS, dataAddress);
-        findZero[i] = readReverseShortI2C(ACCEL_ADDRESS) >> 2; // last two bits are not part of measurement
+        sendByteI2C(deviceAddress, dataAddress);
+        findZero[i] = readReverseShortI2C(deviceAddress) >> 2; // last two bits are not part of measurement
         delay(10);
       }
       zero[calAxis] = findMedianInt(findZero, FINDZERO);
