@@ -155,6 +155,11 @@
 //********************************************************
 //********************************************************
 
+// MultiCopter declaration  
+Copter copterSpecific;
+Copter* copter = &copterSpecific; 
+  
+
 #ifdef ArduMaple_CSG   // STM32
   #define Serial SerialUSB
   #include <Device_I2C.h>
@@ -205,10 +210,7 @@
     BatterySensor batteryMonitorSpecific;
     BatterySensor* batteryMonitor = &batteryMonitorSpecific;
   #endif
-  
-  Copter copterSpecific;
-  Copter* copter = &copterSpecific; 
-  
+
   // Put platform specific intialization need here
   void Copter::initPlatform() {
     Wire.begin( 0, PORTI2C2, I2C_FAST_MODE);
@@ -1403,9 +1405,7 @@ void loop () {
       
       
       // Combines external pilot commands and measured sensor data to generate motor commands
-
-        processFlightControl();
-
+      processFlightControl();
 
       #ifdef BinaryWrite
         if (fastTransfer == ON) {
@@ -1422,7 +1422,7 @@ void loop () {
     // ================================================================
     // 50hz task loop
     // ================================================================
-    if (frameCounter %   2 == 0) {  //  50 Hz tasks
+    if (frameCounter % 2 == 0) {  //  50 Hz tasks
       #ifdef DEBUG_LOOP
         digitalWrite(10, HIGH);
       #endif
@@ -1431,13 +1431,10 @@ void loop () {
       fiftyHZpreviousTime = currentTime;
       
       // Reads external pilot commands and performs functions based on stick configuration
-        readPilotCommands(); // defined in FlightCommand.pde
-
+      readPilotCommands(); // defined in FlightCommand.pde
       
       #ifdef AltitudeHold
-        if (sensorLoop == ON) {
-          barometricSensor->measure(); // defined in altitude.h
-        }
+        barometricSensor->measure(); // defined in altitude.h
       #endif
 
       #ifdef DEBUG_LOOP
@@ -1448,7 +1445,7 @@ void loop () {
     // ================================================================
     // 25hz task loop
     // ================================================================
-    if (frameCounter %   4 == 0) {  //  25 Hz tasks
+    if (frameCounter % 4 == 0) {  //  25 Hz tasks
       #ifdef DEBUG_LOOP    
         digitalWrite(9, HIGH);
       #endif
@@ -1459,7 +1456,6 @@ void loop () {
       #if defined(AltitudeHold)
         barometricSensor->measure(); // defined in altitude.h
       #endif
-     
       
       #ifdef DEBUG_LOOP
         digitalWrite(9, LOW);
@@ -1508,7 +1504,7 @@ void loop () {
     previousTime = currentTime;
   }
   
-  if (frameCounter >= 100) {
+  if (frameCounter >= 1000) {
       frameCounter = 0;
   }      
 }
