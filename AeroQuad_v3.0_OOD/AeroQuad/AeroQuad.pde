@@ -1496,14 +1496,17 @@ void loop () {
       statusSignal->update();
       #endif
       
+      testSignal ^= HIGH;
+      digitalWrite(LEDPIN, testSignal);
+      
       #ifdef DEBUG_LOOP
         digitalWrite(8, LOW);
       #endif
     }
-    
+  
     previousTime = currentTime;
   }
-  
+
   if (frameCounter >= 1000) {
       frameCounter = 0;
   }      

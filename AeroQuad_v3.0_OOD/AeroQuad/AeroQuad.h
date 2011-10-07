@@ -198,12 +198,6 @@ unsigned long twentyFiveHZpreviousTime;
 unsigned long fiftyHZpreviousTime;
 unsigned long hundredHZpreviousTime; 
 
-// old times.
-//unsigned long receiverTime = 0;
-//unsigned long compassTime = 5000;
-//unsigned long altitudeTime = 10000;
-//unsigned long batteryTime = 15000;
-//unsigned long autoZeroGyroTime = 0;
 #ifdef CameraControl
 unsigned long cameraTime = 10000;
 #endif
