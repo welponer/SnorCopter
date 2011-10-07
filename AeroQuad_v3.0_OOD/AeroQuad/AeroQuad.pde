@@ -184,7 +184,7 @@
   
   // Motor Declaration
   #include <Motors.h>
-  #include <Motors_STM32.h>
+  #include <Motors_MapleR5.h>
   Motors_PWM_MapleR5 motorsSpecific;
   Motors *motors = &motorsSpecific;
   
@@ -207,6 +207,9 @@
     BatterySensor batteryMonitorSpecific;
     BatterySensor* batteryMonitor = &batteryMonitorSpecific;
   #endif
+  
+  Copter copterSpecific;
+  Copter* copter = &copterSpecific; 
   
   // Put platform specific intialization need here
   void initPlatform() {
