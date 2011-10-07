@@ -185,12 +185,11 @@
   // Motor Declaration
   #include <Motors.h>
   #include <Motors_STM32.h>
-  Motors_STM32 motorsSpecific;
+  Motors_PWM_MapleR5 motorsSpecific;
   Motors *motors = &motorsSpecific;
   
-  // heading mag hold declaration
+  // Magnetometer heading hold declaration
   #ifdef HeadingMagHold
-    //#define HMC5843
     #include <Magnetometer_HMC5883L.h>
     Magnetometer_HMC5883L compassSpecific;
     Compass *compass = &compassSpecific;
