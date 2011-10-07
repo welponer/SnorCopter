@@ -74,6 +74,8 @@ public:
       delay(50);                           // Mode change delay (1/Update Rate) **
     }
     measure(0.0, 0.0);  // Assume 1st measurement at 0 degrees roll and 0 degrees pitch
+    if (success) Serial.println("init Magnetometer_HMC5883L: done"); 
+    else Serial.println("init Magnetometer_HMC5883L: failed"); 
   }
 
   void measure(float roll, float pitch) {
@@ -83,10 +85,10 @@ public:
     
     sendByteI2C(COMPASS_ADDRESS, 0x03);
     Wire.requestFrom(COMPASS_ADDRESS, 6);
-    measuredMagX =  ((Wire.receive() << 8) | Wire.receive()) * magCalibration[XAXIS];
+    measuredMagX =  readShortI2C() * magCalibration[XAXIS];
     // xchange Y and Z
-    measuredMagZ = -((Wire.receive() << 8) | Wire.receive()) * magCalibration[ZAXIS];
-    measuredMagY = -((Wire.receive() << 8) | Wire.receive()) * magCalibration[YAXIS];
+    measuredMagZ = -readShortI2C() * magCalibration[ZAXIS];
+    measuredMagY = -readShortI2C() * magCalibration[YAXIS];
     Wire.endTransmission();
 
     float cosRoll =  cos(roll);
