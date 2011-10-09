@@ -40,7 +40,8 @@ void readPilotCommands() {
     if ((receiver->getData(YAW) < MINCHECK) && (receiver->getData(ROLL) > MAXCHECK) && (receiver->getData(PITCH) < MINCHECK)) {
       gyro->calibrate(); // defined in Gyro.h
       accel->calibrate(); // defined in Accel.h
-      storeSensorsZeroToEEPROM();
+      //storeSensorsZeroToEEPROM();
+      storage->storeSensorsZero();
       //accel.setOneG(accel.getFlightData(ZAXIS));
       kinematics->calibrate();
       zeroIntegralError();

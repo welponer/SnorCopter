@@ -244,89 +244,11 @@ byte cameraLoop = ON; // Note: stabilization camera software is still under deve
 #endif
 */
 byte fastTransfer = OFF; // Used for troubleshooting
+#ifdef DEBUG_LOOP
 byte testSignal = LOW;
-
-// **************************************************************
-// *************************** EEPROM ***************************
-// **************************************************************
-// EEPROM storage addresses
+#endif
 
 
-typedef struct {
-  float p;
-  float i;
-  float d;
-} t_NVR_PID;
-
-typedef struct {
-  float slope;
-  float offset;
-  float smooth_factor;
-} t_NVR_Receiver;
-
-typedef struct {    
-  t_NVR_PID ROLL_PID_GAIN_ADR;
-  t_NVR_PID LEVELROLL_PID_GAIN_ADR;
-  t_NVR_PID YAW_PID_GAIN_ADR;
-  t_NVR_PID PITCH_PID_GAIN_ADR;
-  t_NVR_PID LEVELPITCH_PID_GAIN_ADR;
-  t_NVR_PID HEADING_PID_GAIN_ADR;
-  t_NVR_PID LEVEL_GYRO_ROLL_PID_GAIN_ADR;
-  t_NVR_PID LEVEL_GYRO_PITCH_PID_GAIN_ADR;
-  t_NVR_PID ALTITUDE_PID_GAIN_ADR;
-  t_NVR_PID ZDAMP_PID_GAIN_ADR;
-  t_NVR_Receiver RECEIVER_DATA[LASTCHANNEL];
-  
-  float WINDUPGUARD_ADR;
-  float XMITFACTOR_ADR;
-  float GYROSMOOTH_ADR;
-  float ACCSMOOTH_ADR;
-  float ACCEL_XAXIS_ZERO_ADR;
-  float ACCEL_YAXIS_ZERO_ADR;
-  float ACCEL_ZAXIS_ZERO_ADR;
-  float FILTERTERM_ADR;
-  float HEADINGSMOOTH_ADR;
-  float AREF_ADR;
-  float FLIGHTMODE_ADR;
-  float HEADINGHOLD_ADR;
-  float MINACRO_ADR;
-  float ACCEL_1G_ADR;
-//  float ALTITUDE_PGAIN_ADR;
-  float ALTITUDE_MAX_THROTTLE_ADR;
-  float ALTITUDE_MIN_THROTTLE_ADR;
-  float ALTITUDE_SMOOTH_ADR;
-//  float ZDAMP_PGAIN_ADR;
-  float ALTITUDE_WINDUP_ADR;
-  float MAGXMAX_ADR;
-  float MAGXMIN_ADR;
-  float MAGYMAX_ADR;
-  float MAGYMIN_ADR;
-  float MAGZMAX_ADR;
-  float MAGZMIN_ADR;
-  float SERVOMINPITCH_ADR;
-  float SERVOMINROLL_ADR;
-  float GYRO_ROLL_ZERO_ADR;
-  float GYRO_PITCH_ZERO_ADR;
-  float GYRO_YAW_ZERO_ADR;
-} t_NVR_Data;  
-
-
-float nvrReadFloat(int address); // defined in DataStorage.h
-void nvrWriteFloat(float value, int address); // defined in DataStorage.h
-void nvrReadPID(unsigned char IDPid, unsigned int IDEeprom);
-void nvrWritePID(unsigned char IDPid, unsigned int IDEeprom);
-
-#define GET_NVR_OFFSET(param) ((int)&(((t_NVR_Data*) 0)->param))
-#define readFloat(addr) nvrReadFloat(GET_NVR_OFFSET(addr))
-#define writeFloat(value, addr) nvrWriteFloat(value, GET_NVR_OFFSET(addr))
-#define readPID(IDPid, addr) nvrReadPID(IDPid, GET_NVR_OFFSET(addr))
-#define writePID(IDPid, addr) nvrWritePID(IDPid, GET_NVR_OFFSET(addr))
-
-// defined in DataStorage.h
-void readEEPROM(void); 
-void initSensorsZeroFromEEPROM(void);
-void storeSensorsZeroToEEPROM(void);
-void initReceiverFromEEPROM(void);
 //////////////////////////////////////////////////////
 
 // defined in FlightCommand.pde

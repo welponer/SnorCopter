@@ -21,18 +21,103 @@
 // Special thanks for 1k space optimization update from Ala42
 // http://aeroquad.com/showthread.php?1369-The-big-enhancement-addition-to-2.0-code&p=13359&viewfull=1#post13359
 
-class Storage {
-private:
+#ifndef _AQ_STORAGE_H_
+#define _AQ_STORAGE_H_
+
+// EEPROM storage addresses
 
 
+typedef struct {
+  float p;
+  float i;
+  float d;
+} t_NVR_PID;
 
-public:
-  Storage() {
+typedef struct {
+  float slope;
+  float offset;
+  float smooth_factor;
+} t_NVR_Receiver;
+
+typedef struct {    
+  t_NVR_PID ROLL_PID_GAIN_ADR;
+  t_NVR_PID LEVELROLL_PID_GAIN_ADR;
+  t_NVR_PID YAW_PID_GAIN_ADR;
+  t_NVR_PID PITCH_PID_GAIN_ADR;
+  t_NVR_PID LEVELPITCH_PID_GAIN_ADR;
+  t_NVR_PID HEADING_PID_GAIN_ADR;
+  t_NVR_PID LEVEL_GYRO_ROLL_PID_GAIN_ADR;
+  t_NVR_PID LEVEL_GYRO_PITCH_PID_GAIN_ADR;
+  t_NVR_PID ALTITUDE_PID_GAIN_ADR;
+  t_NVR_PID ZDAMP_PID_GAIN_ADR;
+  t_NVR_Receiver RECEIVER_DATA[LASTCHANNEL];
   
-  }
+
+  float GYRO_SMOOTH_ADR;
+  float GYRO_ROLL_ZERO_ADR;
+  float GYRO_PITCH_ZERO_ADR;
+  float GYRO_YAW_ZERO_ADR;
+  float ACCEL_SMOOTH_ADR;
+  float ACCEL_XAXIS_ZERO_ADR;
+  float ACCEL_YAXIS_ZERO_ADR;
+  float ACCEL_ZAXIS_ZERO_ADR;
+  float ACCEL_1G_ADR;
+  
+  
+  float WINDUPGUARD_ADR;
+  float XMITFACTOR_ADR;
+  float FILTERTERM_ADR;
+  float HEADINGSMOOTH_ADR;
+  float AREF_ADR;
+  float FLIGHTMODE_ADR;
+  float HEADINGHOLD_ADR;
+  float MINACRO_ADR;
+//  float ALTITUDE_PGAIN_ADR;
+  float ALTITUDE_MAX_THROTTLE_ADR;
+  float ALTITUDE_MIN_THROTTLE_ADR;
+  float ALTITUDE_SMOOTH_ADR;
+//  float ZDAMP_PGAIN_ADR;
+  float ALTITUDE_WINDUP_ADR;
+  float MAGXMAX_ADR;
+  float MAGXMIN_ADR;
+  float MAGYMAX_ADR;
+  float MAGYMIN_ADR;
+  float MAGZMAX_ADR;
+  float MAGZMIN_ADR;
+  float SERVOMINPITCH_ADR;
+  float SERVOMINROLL_ADR;
+} t_NVR_Data;  
 
 
-};
+
+
+// **************************************************************
+// *************************** EEPROM ***************************
+// **************************************************************
+
+
+
+
+float nvrReadFloat(int address); // defined in DataStorage.h
+void nvrWriteFloat(float value, int address); // defined in DataStorage.h
+void nvrReadPID(unsigned char IDPid, unsigned int IDEeprom);
+void nvrWritePID(unsigned char IDPid, unsigned int IDEeprom);
+
+
+
+#define GET_NVR_OFFSET(param) ((int)&(((t_NVR_Data*) 0)->param))
+#define readFloat(addr) nvrReadFloat(GET_NVR_OFFSET(addr))
+#define writeFloat(value, addr) nvrWriteFloat(value, GET_NVR_OFFSET(addr))
+#define readPID(IDPid, addr) nvrReadPID(IDPid, GET_NVR_OFFSET(addr))
+#define writePID(IDPid, addr) nvrWritePID(IDPid, GET_NVR_OFFSET(addr))
+
+
+
+// defined in DataStorage.h
+void readEEPROM(void); 
+void initSensorsZeroFromEEPROM(void);
+void storeSensorsZeroToEEPROM(void);
+void initReceiverFromEEPROM(void);
 
 
 // Utilities for writing and reading from the EEPROM
@@ -109,6 +194,18 @@ void nvrWritePID(unsigned char IDPid, unsigned int IDEeprom) {
   nvrWriteFloat(pid->D, IDEeprom+8);
 }
 
+class Storage {
+private:
+
+
+
+public:
+  Storage() {
+  
+  }
+  
+  
+  
 // contains all default values when re-writing EEPROM
 void initializeEEPROM(void) {
   PID[ROLL].P = 100.0;
@@ -171,7 +268,6 @@ void initializeEEPROM(void) {
   receiver->setXmitFactor(1.0);
   gyro->setSmoothFactor(1.0);
   accel->setSmoothFactor(1.0);
-  // AKA - old setOneG not in SI - accel->setOneG(500);
   accel->setOneG(9.80665); // AKA set one G to 9.8 m/s^2
   timeConstant = 7.0;
   for (byte channel = ROLL; channel < LASTCHANNEL; channel++) {
@@ -234,7 +330,11 @@ void initializeEEPROM(void) {
   receiver->setTransmitterOffset(THROTTLE, 500);
 }
 
-void readEEPROM(void) {
+
+
+
+  
+  void readEEPROM(void) {
   readPID(ROLL, ROLL_PID_GAIN_ADR);
   readPID(PITCH, PITCH_PID_GAIN_ADR);
   readPID(YAW, YAW_PID_GAIN_ADR);
@@ -330,8 +430,8 @@ void writeEEPROM(void){
   #endif
   writeFloat(windupGuard, WINDUPGUARD_ADR);
   writeFloat(receiver->getXmitFactor(), XMITFACTOR_ADR);
-  writeFloat(gyro->getSmoothFactor(), GYROSMOOTH_ADR);
-  writeFloat(accel->getSmoothFactor(), ACCSMOOTH_ADR);
+  writeFloat(gyro->getSmoothFactor(), GYRO_SMOOTH_ADR);
+  writeFloat(accel->getSmoothFactor(), ACCEL_SMOOTH_ADR);
   writeFloat(timeConstant, FILTERTERM_ADR);
 
   for(byte channel = ROLL; channel < LASTCHANNEL; channel++) {
@@ -365,22 +465,24 @@ void writeEEPROM(void){
 //  sei(); // Restart interrupts
 }
 
+
+  
 void initSensorsZeroFromEEPROM(void) {
   // Gyro initialization from EEPROM
   gyro->setZero(ROLL,readFloat(GYRO_ROLL_ZERO_ADR));
   gyro->setZero(PITCH,readFloat(GYRO_PITCH_ZERO_ADR));
   gyro->setZero(YAW,readFloat(GYRO_YAW_ZERO_ADR));
-  gyro->setSmoothFactor(readFloat(GYROSMOOTH_ADR));
+  gyro->setSmoothFactor(readFloat(GYRO_SMOOTH_ADR));
   
   // Accel initialization from EEPROM
   accel->setOneG(readFloat(ACCEL_1G_ADR));
   accel->setZero(XAXIS,readFloat(ACCEL_XAXIS_ZERO_ADR));
   accel->setZero(YAXIS,readFloat(ACCEL_YAXIS_ZERO_ADR));
   accel->setZero(ZAXIS,readFloat(ACCEL_ZAXIS_ZERO_ADR));
-  accel->setSmoothFactor(readFloat(ACCSMOOTH_ADR));
+  accel->setSmoothFactor(readFloat(ACCEL_SMOOTH_ADR));
   
   Serial.print("zero Accelerometer: ");
-  Serial.print(readFloat(ACCSMOOTH_ADR));
+  Serial.print(readFloat(ACCEL_SMOOTH_ADR));
   Serial.print("/");
   Serial.print(readFloat(ACCEL_1G_ADR));
   Serial.print("/");  
@@ -392,19 +494,20 @@ void initSensorsZeroFromEEPROM(void) {
   Serial.println("");
 }
 
+
 void storeSensorsZeroToEEPROM(void) {
   // Store gyro data to EEPROM
   writeFloat(gyro->getZero(ROLL), GYRO_ROLL_ZERO_ADR);
   writeFloat(gyro->getZero(PITCH), GYRO_PITCH_ZERO_ADR);
   writeFloat(gyro->getZero(YAW), GYRO_YAW_ZERO_ADR);
-  writeFloat(gyro->getSmoothFactor(), GYROSMOOTH_ADR);
+  writeFloat(gyro->getSmoothFactor(), GYRO_SMOOTH_ADR);
   
   // Store accel data to EEPROM
   writeFloat(accel->getOneG(), ACCEL_1G_ADR);
   writeFloat(accel->getZero(XAXIS), ACCEL_XAXIS_ZERO_ADR);
   writeFloat(accel->getZero(YAXIS), ACCEL_YAXIS_ZERO_ADR);
   writeFloat(accel->getZero(ZAXIS), ACCEL_ZAXIS_ZERO_ADR);
-  writeFloat(accel->getSmoothFactor(), ACCSMOOTH_ADR);
+  writeFloat(accel->getSmoothFactor(), ACCEL_SMOOTH_ADR);
 }
 
 void initReceiverFromEEPROM(void) {
@@ -417,3 +520,32 @@ void initReceiverFromEEPROM(void) {
   }
 }
 
+
+
+  void init(void) {
+    initializeEEPROM();
+  }
+  
+  
+  void load() {
+    readEEPROM();
+  }
+
+  void store(void) {
+    writeEEPROM();
+  }  
+  void initSensorsZero(void) {
+    initSensorsZeroFromEEPROM();
+  }
+  
+  void storeSensorsZero(void) {
+    storeSensorsZeroToEEPROM();
+  }
+  
+  void initReceiver(void) {
+    initReceiverFromEEPROM();
+  }
+
+};
+
+#endif

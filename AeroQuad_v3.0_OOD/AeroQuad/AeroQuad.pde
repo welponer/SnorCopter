@@ -49,13 +49,13 @@
  *********************** Define Flight Configuration ************************
  ****************************************************************************/
 // Use only one of the following definitions
-#define quadXConfig
+//#define quadXConfig
 //#define quadPlusConfig
 //#define hexPlusConfig
 //#define hexXConfig
 //#define triConfig
 //#define quadY4Config
-//#define hexY6Config
+#define hexY6Config
 //#define octoX8Congig
 
 //
@@ -92,6 +92,7 @@
 // *******************************************************************************************************************************
 #define LASTCHANNEL 6
 //#define LASTCHANNEL 8
+
 
 //
 // *******************************************************************************************************************************
@@ -131,7 +132,6 @@
 
 //#define DEBUG_LOOP
 
-
 /**
  * Kenny todo.
  * @todo : UNIT TEST
@@ -147,18 +147,11 @@
 #include "PID.h"
 #include <AQMath.h>
 
-#include "Copter.h"
-
 //********************************************************
 //********************************************************
 //********* PLATFORM SPECIFIC SECTION ********************
 //********************************************************
 //********************************************************
-
-// MultiCopter declaration  
-Copter copterSpecific;
-Copter* copter = &copterSpecific; 
-  
 
 #ifdef ArduMaple_CSG   // STM32
   #define Serial SerialUSB
@@ -197,7 +190,12 @@ Copter* copter = &copterSpecific;
     Magnetometer_HMC5883L compassSpecific;
     Compass *compass = &compassSpecific;
   #endif
- 
+
+  #include <Kinematics.h>
+  #include <Kinematics_MARG.h>
+  Kinematics_MARG tempKinematics;
+  Kinematics *kinematics = &tempKinematics;
+  
   // Altitude declaration
   #ifdef AltitudeHold
     #define BMP085
@@ -206,10 +204,20 @@ Copter* copter = &copterSpecific;
   // Battery monitor declaration
   #ifdef BattMonitor
     #include <BatterySensor.h>
-    //#include <BatteryMonitor_APM.h>
     BatterySensor batteryMonitorSpecific;
     BatterySensor* batteryMonitor = &batteryMonitorSpecific;
   #endif
+
+  // MultiCopter declaration  
+  #include "Copter.h"
+  Copter copterSpecific;
+  Copter* copter = &copterSpecific; 
+
+
+  #include "DataStorage.h"
+  Storage storageSpecific;
+  Storage* storage = &storageSpecific;
+
 
   // Put platform specific intialization need here
   void Copter::initPlatform() {
@@ -1027,20 +1035,24 @@ Copter* copter = &copterSpecific;
 //********************************************************
 //****************** KINEMATICS DECLARATION **************
 //********************************************************
+/*
 #include <Kinematics.h>
 #if defined (AeroQuadMega_CHR6DM) || defined (APM_OP_CHR6DM)
   // CHR6DM have it's own kinematics, so, initialize in it's scope
 #elif defined FlightAngleARG
   #include <Kinematics_ARG.h>
   Kinematics_ARG tempKinematics;
+  Kinematics *kinematics = &tempKinematics;
 #elif defined FlightAngleMARG
   #include <Kinematics_MARG.h>
   Kinematics_MARG tempKinematics;
-#else
+  Kinematics *kinematics = &tempKinematics;
+#elif FlightAngleDCM
   #include <Kinematics_DCM.h>
   Kinematics_DCM tempKinematics;
+  Kinematics *kinematics = &tempKinematics;
 #endif
-Kinematics *kinematics = &tempKinematics;
+*/
 
 //********************************************************
 //******************** RECEIVER DECLARATION **************
@@ -1214,7 +1226,8 @@ void setup() {
 #endif    
 
   // Read user values from EEPROM
-  readEEPROM(); // defined in DataStorage.h
+  //readEEPROM(); // defined in DataStorage.h
+  storage->load();
   
   copter->initPlatform();
   
@@ -1230,21 +1243,22 @@ void setup() {
 
   // Setup receiver pins for pin change interrupts
   receiver->initialize();
-  initReceiverFromEEPROM();
+  storage->initReceiver();
        
   // Initialize sensors
   // If sensors have a common initialization routine
   // insert it into the gyro class because it executes first
   gyro->initialize(); // defined in Gyro.h
   accel->initialize(); // defined in Accel.h
-  initSensorsZeroFromEEPROM();
+  storage->initSensorsZero();
     
   // Calibrate sensors
   gyro->calibrate(); // defined in Gyro.h
   accel->calibrate();
   zeroIntegralError();
-  levelAdjust[ROLL] = 0;
-  levelAdjust[PITCH] = 0;
+  //levelAdjust[ROLL] = 0;
+  //levelAdjust[PITCH] = 0;
+  copter->initialize();
 
   // Flight angle estimation
   #ifdef HeadingMagHold
@@ -1405,8 +1419,9 @@ void loop () {
       
       
       // Combines external pilot commands and measured sensor data to generate motor commands
-      processFlightControl();
-
+      //processFlightControl();
+      copter->processCopterControl();
+      
       #ifdef BinaryWrite
         if (fastTransfer == ON) {
           // write out fastTelemetry to Configurator or openLog
@@ -1496,8 +1511,7 @@ void loop () {
       statusSignal->update();
       #endif
       
-      testSignal ^= HIGH;
-      digitalWrite(LEDPIN, testSignal);
+      digitalWrite(LEDPIN, !digitalRead(LEDPIN));
       
       #ifdef DEBUG_LOOP
         digitalWrite(8, LOW);
