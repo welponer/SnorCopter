@@ -174,8 +174,8 @@
 
   // Receiver Declaration
   #include <Receiver.h>
-  #include <Receiver_STM32.h>
-  Receiver_STM32 receiverSpecific;
+  #include <Receiver_MapleR5.h>
+  Receiver_MapleR5 receiverSpecific;
   Receiver *receiver = &receiverSpecific;
   
   // Motor Declaration
@@ -185,11 +185,11 @@
   Motors *motors = &motorsSpecific;
   
   // Magnetometer heading hold declaration
-  #ifdef HeadingMagHold
-    #include <Magnetometer_HMC5883L.h>
-    Magnetometer_HMC5883L compassSpecific;
-    Compass *compass = &compassSpecific;
-  #endif
+#ifdef HeadingMagHold
+  #include <Magnetometer_HMC5883L.h>
+  Magnetometer_HMC5883L compassSpecific;
+  Compass *compass = &compassSpecific;
+#endif
 
   #include <Kinematics.h>
   #include <Kinematics_MARG.h>

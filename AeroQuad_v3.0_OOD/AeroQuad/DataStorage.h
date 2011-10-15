@@ -234,7 +234,7 @@ void initializeEEPROM(void) {
   PID[LEVELGYROPITCH].P = 100.0;
   PID[LEVELGYROPITCH].I = 0.0;
   PID[LEVELGYROPITCH].D = -300.0;
-
+  
   PID[ALTITUDE].P = 25.0;
   PID[ALTITUDE].I = 0.1;
   PID[ALTITUDE].D = 0.0;
@@ -259,6 +259,10 @@ void initializeEEPROM(void) {
     if (i != ALTITUDE)
         PID[i].windupGuard = windupGuard;
   }
+
+  PID[LEVELROLL].windupGuard = 0.375;
+  PID[LEVELPITCH].windupGuard = 0.375;
+  
   // AKA added so that each PID has a type incase we need special cases like detecting +/- PI
   for (byte i = ROLL; i <= ZDAMPENING; i++ ) {
     if (i != HEADING)

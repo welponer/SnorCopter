@@ -24,28 +24,28 @@
 #include <WProgram.h>
 #include "Receiver.h"
 
-
-#define RISING_EDGE 1
-#define FALLING_EDGE 0
 #define MINONWIDTH 950
 #define MAXONWIDTH 2075
-#define MINOFFWIDTH 12000
-#define MAXOFFWIDTH 24000
 
 #include "Receiver.h"
 #include <AQMath.h>
 #include <Axis.h>
 
+ROLL, PITCH, YAW, THROTTLE, MODE, AUX, AUX2, AUX3
+static byte receiverPin[8] = {5, 3, 2, 4, 1, 0, 0, 0};  
 
-#if defined (__AVR_ATmega1280__)
-  // arduino pins 67, 65, 64, 66, 63, 62
-  static byte receiverPin[6] = {5, 3, 2, 4, 1, 0}; // bit number of PORTK used for ROLL, PITCH, YAW, THROTTLE, MODE, AUX
-#else
- //arduino pins 63, 64, 65, 62, 66, 67
-  static byte receiverPin[6] = {1, 2, 3, 0, 4, 5}; // bit number of PORTK used for ROLL, PITCH, YAW, THROTTLE, MODE, AUX
-#endif
+typedef struct {
+  unsigned int beginTime;
+  unsigned int endTime;
+  unsigned int lastGood;
+} PinTiming;
 
+volatile static PinTiming pinData[8];
 
+volatile unsigned int chan1begin   = 0;
+volatile unsigned int chan1end     = 0;
+volatile unsigned int RxInPitch    = 0;
+volatile unsigned int chan1prev    = 0;
 
 
 class Receiver_STM32 : public Receiver {
@@ -54,9 +54,12 @@ public:
   }
 
   void initialize(void) {
- 
- //   for (byte channel = ROLL; channel < LASTCHANNEL; channel++)
- //     pinData[receiverPin[channel]].edge = FALLING_EDGE;
+    
+    for (byte channel = ROLL; channel < LASTCHANNEL; channel++) {
+      pinData[channel].beginTime = 0;
+      pinData[channel].endTime = 0;
+      pinData[channel].lastGood = MINCOMMAND;
+    }
   }
 
   void read(void) {
