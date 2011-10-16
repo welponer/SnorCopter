@@ -1,8 +1,7 @@
 /*
-  AeroQuad v3.0 - April 2011
-  www.AeroQuad.com 
-  Copyright (c) 2011 Ted Carancho.  All rights reserved.
-  An Open Source Arduino based multicopter.
+  AeroQuad Maple32 v3.0 - October 2011
+  Copyright (c) 2011 Mattias Welponer.  All rights reserved.
+  An Open Source Maple STM32 based multicopter.
  
   This program is free software: you can redistribute it and/or modify 
   it under the terms of the GNU General Public License as published by 

@@ -1,8 +1,7 @@
-	/*
-  AeroQuad v3.0 - May 2011
-  www.AeroQuad.com
-  Copyright (c) 2011 Ted Carancho.  All rights reserved.
-  An Open Source Arduino based multicopter.
+/*
+  AeroQuad Maple32 v3.0 - October 2011
+  Copyright (c) 2011 Mattias Welponer.  All rights reserved.
+  An Open Source Maple STM32 based multicopter.
  
   This program is free software: you can redistribute it and/or modify 
   it under the terms of the GNU General Public License as published by 
@@ -42,7 +41,7 @@ typedef struct {
 } PinTiming;
 
 volatile static PinTiming pinData[8];
-
+volatile static boolean receiverFail = false;
 
 
 void receiverPulesWidth(byte channel) {
@@ -51,14 +50,12 @@ void receiverPulesWidth(byte channel) {
     pinData[channel].beginTime = micros(); 
   } else {
     deltaTime = micros() - pinData[channel].beginTime;
-    if((deltaTime <= MAXONWIDTH) && (deltaTime >= MINONWIDTH)) 
-    {
+    if( (deltaTime <= MAXONWIDTH) && (deltaTime >= MINONWIDTH)) {
       pinData[channel].lastGood = deltaTime;
     } 
-    pinData[channel].beginTime = 0;
-    
+    pinData[channel].beginTime = 0; 
     if (deltaTime > MINOFFWIDTH) 
-      pinData[channel].beginTime += deltaTime;
+      pinData[channel].beginTime = 1;
   }  
 }
 
@@ -95,18 +92,18 @@ private:
 
 public:  
   Receiver_MapleR5() {
-    receiverChannels = 7;
+    receiverChannels = 4;
   }
 
   void initialize(void) {    
-    pinData[0].pinNumber = 31;  // roll (5V)
-    pinData[1].pinNumber = 32;  // pitch (5V)
-    pinData[2].pinNumber = 33;  // yaw (5V)
-    pinData[3].pinNumber = 34;  // throttle (5V)
-    pinData[4].pinNumber = 35;  // mode (5V)
-    pinData[5].pinNumber = 36;  // aux (5V)
-    pinData[6].pinNumber = 37;  // aux1 (5V)
-    pinData[7].pinNumber = 1000;  // aux2 (5V)
+    pinData[0].pinNumber = 31;  // roll
+    pinData[1].pinNumber = 32;  // pitch
+    pinData[2].pinNumber = 33;  // yaw
+    pinData[3].pinNumber = 34;  // throttle
+    pinData[4].pinNumber = 35;  // mode
+    pinData[5].pinNumber = 36;  // aux
+    pinData[6].pinNumber = 37;  // aux1
+    pinData[7].pinNumber = 26;  // aux2
     
     for (byte channel = ROLL; channel < THROTTLE; channel++) {
       pinData[channel].beginTime = 0;
@@ -123,7 +120,9 @@ public:
     attachInterrupt(pinData[1].pinNumber, receiverHandler1, CHANGE);
     attachInterrupt(pinData[2].pinNumber, receiverHandler2, CHANGE);
     attachInterrupt(pinData[3].pinNumber, receiverHandler3, CHANGE);
-    attachInterrupt(pinData[4].pinNumber, receiverHandler4, CHANGE);
+    if (receiverChannels > 4) {
+      attachInterrupt(pinData[4].pinNumber, receiverHandler4, CHANGE);
+    }
     if (receiverChannels > 5) {
       attachInterrupt(pinData[5].pinNumber, receiverHandler5, CHANGE);
       attachInterrupt(pinData[6].pinNumber, receiverHandler6, CHANGE);
