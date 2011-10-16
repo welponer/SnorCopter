@@ -95,12 +95,10 @@ private:
 
 public:  
   Receiver_MapleR5() {
-    receiverChannels = 5;
+    receiverChannels = 7;
   }
 
-  void initialize(byte channels = 5) {
-    receiverChannels = channels;
-    
+  void initialize(void) {    
     pinData[0].pinNumber = 31;  // roll (5V)
     pinData[1].pinNumber = 32;  // pitch (5V)
     pinData[2].pinNumber = 33;  // yaw (5V)
@@ -110,12 +108,12 @@ public:
     pinData[6].pinNumber = 37;  // aux1 (5V)
     pinData[7].pinNumber = 1000;  // aux2 (5V)
     
-    for (byte channel = 0; channel < 3; channel++) {
+    for (byte channel = ROLL; channel < THROTTLE; channel++) {
       pinData[channel].beginTime = 0;
       pinData[channel].lastGood = MIDCOMMAND;
       pinMode(pinData[channel].pinNumber, INPUT);
     }
-    for (byte channel = 0; channel < receiverChannels; channel++) {
+    for (byte channel = THROTTLE; channel < receiverChannels; channel++) {
       pinData[channel].beginTime = 0;
       pinData[channel].lastGood = MINCOMMAND;
       pinMode(pinData[channel].pinNumber, INPUT);
@@ -136,18 +134,20 @@ public:
   }
 
   void read(void) {
+  Serial.print("reciver: ");
     for(byte channel = ROLL; channel < receiverChannels; channel++) {
+    Serial.print(pinData[channel].lastGood); Serial.print("/");
       // Apply transmitter calibration adjustment
       receiverData[channel] = (mTransmitter[channel] * pinData[channel].lastGood) + bTransmitter[channel];
       // Smooth the flight control transmitter inputs
       transmitterCommandSmooth[channel] = filterSmooth(receiverData[channel], transmitterCommandSmooth[channel], transmitterSmooth[channel]);
     }
-
+Serial.println("");
     // Reduce transmitter commands using xmitFactor and center around 1500
     for (byte channel = ROLL; channel < THROTTLE; channel++)
       transmitterCommand[channel] = ((transmitterCommandSmooth[channel] - transmitterZero[channel]) * xmitFactor) + transmitterZero[channel];
     // No xmitFactor reduction applied for throttle, mode and AUX
-    for (byte channel = THROTTLE; channel < LASTCHANNEL; channel++)
+    for (byte channel = THROTTLE; channel < receiverChannels; channel++)
       transmitterCommand[channel] = transmitterCommandSmooth[channel];
   }
   
