@@ -23,8 +23,10 @@
 #include <WProgram.h>
 #include "Receiver.h"
 
-#define MINONWIDTH 950
-#define MAXONWIDTH 2050
+#define RISING_EDGE 1
+#define FALLING_EDGE 0
+#define MINONWIDTH 900
+#define MAXONWIDTH 2100
 #define MINOFFWIDTH 12000
 #define MAXOFFWIDTH 24000
 
@@ -36,33 +38,69 @@
 
 typedef struct {
   unsigned int beginTime;
+  unsigned int riseTime;
+  unsigned int fallTime;
   unsigned int lastGood;
+  byte edge;
   byte pinNumber;
 } PinTiming;
 
 volatile static PinTiming pinData[8];
 volatile static boolean receiverFail = false;
 
+void receiverPulesWidth(byte channel) {
+  int deltaTime;
+  unsigned int currentTime = micros(); 
+  
+  deltaTime = currentTime - pinData[channel].fallTime;
+  pinData[channel].riseTime = currentTime;
+  if ((deltaTime >= MINOFFWIDTH) && (deltaTime <= MAXOFFWIDTH)) {
+    Serial.print("r");
+    pinData[channel].edge = RISING_EDGE;
+  } else {
+    pinData[channel].edge = FALLING_EDGE; // invalid rising edge detected
+    Serial.print("f");
+  }
+  
+  deltaTime = currentTime - pinData[channel].riseTime;
+  pinData[channel].fallTime = currentTime;
+  if ((deltaTime >= MINONWIDTH) && (deltaTime <= MAXONWIDTH) ) { //&& (pinData[channel].edge == RISING_EDGE)) {
+    pinData[channel].lastGood = deltaTime;
+    pinData[channel].edge = FALLING_EDGE;
+    Serial.println("ok");
+  }
+    
+}
+
+
+
+/*
 
 void receiverPulesWidth(byte channel) {
-  unsigned int deltaTime;
+  int deltaTime;
+  deltaTime = micros() - pinData[channel].beginTime;
+  if (deltaTime > MINOFFWIDTH) 
+    pinData[channel].beginTime = 0;  
+  else
+    pinData[channel].beginTime = 1; 
+    
   if( pinData[channel].beginTime == 0) {
     pinData[channel].beginTime = micros(); 
   } else {
-    deltaTime = micros() - pinData[channel].beginTime;
+    //deltaTime = micros() - pinData[channel].beginTime;
     if( (deltaTime <= MAXONWIDTH) && (deltaTime >= MINONWIDTH)) {
       pinData[channel].lastGood = deltaTime;
     } 
-    pinData[channel].beginTime = 0; 
-    if (deltaTime > MINOFFWIDTH) 
-      pinData[channel].beginTime = 1;
+
+      pinData[channel].beginTime = 0;     
   }  
 }
+*/
+
 
 void receiverHandler0(void) { 
   receiverPulesWidth(0);
 }
-
 void receiverHandler1(void) { 
   receiverPulesWidth(1);
 }
@@ -116,10 +154,12 @@ public:
       pinMode(pinData[channel].pinNumber, INPUT);
     }
     
-    attachInterrupt(pinData[0].pinNumber, receiverHandler0, CHANGE);
+    delay(10);
+    
+/*    attachInterrupt(pinData[0].pinNumber, receiverHandler0, CHANGE);
     attachInterrupt(pinData[1].pinNumber, receiverHandler1, CHANGE);
     attachInterrupt(pinData[2].pinNumber, receiverHandler2, CHANGE);
-    attachInterrupt(pinData[3].pinNumber, receiverHandler3, CHANGE);
+*/    attachInterrupt(pinData[3].pinNumber, receiverHandler3, CHANGE);
     if (receiverChannels > 4) {
       attachInterrupt(pinData[4].pinNumber, receiverHandler4, CHANGE);
     }
@@ -133,15 +173,15 @@ public:
   }
 
   void read(void) {
-  Serial.print("reciver: ");
+  //Serial.print("reciver: ");
     for(byte channel = ROLL; channel < receiverChannels; channel++) {
-    Serial.print(pinData[channel].lastGood); Serial.print("/");
+   // Serial.print(pinData[channel].lastGood); Serial.print("/");
       // Apply transmitter calibration adjustment
       receiverData[channel] = (mTransmitter[channel] * pinData[channel].lastGood) + bTransmitter[channel];
       // Smooth the flight control transmitter inputs
       transmitterCommandSmooth[channel] = filterSmooth(receiverData[channel], transmitterCommandSmooth[channel], transmitterSmooth[channel]);
     }
-Serial.println("");
+//Serial.println("");
     // Reduce transmitter commands using xmitFactor and center around 1500
     for (byte channel = ROLL; channel < THROTTLE; channel++)
       transmitterCommand[channel] = ((transmitterCommandSmooth[channel] - transmitterZero[channel]) * xmitFactor) + transmitterZero[channel];
