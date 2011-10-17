@@ -61,7 +61,6 @@ void receiverPulesWidth(byte channel) {
     pinData[channel].edge = FALLING_EDGE; // invalid rising edge detected
     Serial.print("f");
   }
-  
   deltaTime = currentTime - pinData[channel].riseTime;
   pinData[channel].fallTime = currentTime;
   if ((deltaTime >= MINONWIDTH) && (deltaTime <= MAXONWIDTH) ) { //&& (pinData[channel].edge == RISING_EDGE)) {
