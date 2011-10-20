@@ -48,19 +48,49 @@ typedef struct {
 volatile static PinTiming pinData[8];
 volatile static boolean receiverFail = false;
 
-void receiverPulesWidth(byte channel) {
-  int deltaTime;
+void receiverPulesWidth(byte pin) {
+  unsigned int time;
   unsigned int currentTime = micros(); 
   
+  Serial.print("i ");
+  if (pinData[pin].edge == FALLING_EDGE) {
+        time = currentTime - pinData[pin].fallTime;
+        pinData[pin].riseTime = currentTime;
+        if ((time >= MINOFFWIDTH)) {   // && (time <= MAXOFFWIDTH)) {
+          pinData[pin].edge = RISING_EDGE;
+        } else {
+          pinData[pin].edge = FALLING_EDGE; // invalid rising edge detected
+          Serial.print("f"); Serial.println(time);
+        }
+      }
+      else {
+        time = currentTime - pinData[pin].riseTime;
+        pinData[pin].fallTime = currentTime;
+        if ((time >= MINONWIDTH) && (time <= MAXONWIDTH)) {
+          Serial.print("h"); Serial.println(time);
+          pinData[pin].lastGood = time;
+          pinData[pin].edge = FALLING_EDGE;
+        } else {
+          Serial.print("x"); Serial.println(time);
+        }
+          
+        pinData[pin].edge = FALLING_EDGE;
+      }
+  
+/*  
+  if (pinData[channel].edge == FALLING_EDGE) {
   deltaTime = currentTime - pinData[channel].fallTime;
   pinData[channel].riseTime = currentTime;
   if ((deltaTime >= MINOFFWIDTH) && (deltaTime <= MAXOFFWIDTH)) {
     Serial.print("r");
+    Serial.println(deltaTime);
     pinData[channel].edge = RISING_EDGE;
   } else {
     pinData[channel].edge = FALLING_EDGE; // invalid rising edge detected
     Serial.print("f");
+    Serial.println(deltaTime);
   }
+  } else {
   deltaTime = currentTime - pinData[channel].riseTime;
   pinData[channel].fallTime = currentTime;
   if ((deltaTime >= MINONWIDTH) && (deltaTime <= MAXONWIDTH) ) { //&& (pinData[channel].edge == RISING_EDGE)) {
@@ -68,7 +98,7 @@ void receiverPulesWidth(byte channel) {
     pinData[channel].edge = FALLING_EDGE;
     Serial.println("ok");
   }
-    
+  }  */
 }
 
 
@@ -145,11 +175,13 @@ public:
     for (byte channel = ROLL; channel < THROTTLE; channel++) {
       pinData[channel].beginTime = 0;
       pinData[channel].lastGood = MIDCOMMAND;
+      pinData[channel].edge = FALLING_EDGE;
       pinMode(pinData[channel].pinNumber, INPUT);
     }
     for (byte channel = THROTTLE; channel < receiverChannels; channel++) {
       pinData[channel].beginTime = 0;
       pinData[channel].lastGood = MINCOMMAND;
+      pinData[channel].edge = FALLING_EDGE;
       pinMode(pinData[channel].pinNumber, INPUT);
     }
     
