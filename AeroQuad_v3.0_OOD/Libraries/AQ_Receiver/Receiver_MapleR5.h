@@ -176,13 +176,13 @@ public:
       pinData[channel].beginTime = 0;
       pinData[channel].lastGood = MIDCOMMAND;
       pinData[channel].edge = FALLING_EDGE;
-      pinMode(pinData[channel].pinNumber, INPUT);
+      pinMode(pinData[channel].pinNumber, INPUT_PULLDOWN);
     }
     for (byte channel = THROTTLE; channel < receiverChannels; channel++) {
       pinData[channel].beginTime = 0;
       pinData[channel].lastGood = MINCOMMAND;
       pinData[channel].edge = FALLING_EDGE;
-      pinMode(pinData[channel].pinNumber, INPUT);
+      pinMode(pinData[channel].pinNumber, INPUT_PULLDOWN);
     }
     
     delay(10);
