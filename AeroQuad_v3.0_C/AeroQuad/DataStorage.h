@@ -102,9 +102,9 @@ void initializeEEPROM(void) {
   PID[ZDAMPENING].P = 0.0;
   PID[ZDAMPENING].I = 0.0;
   PID[ZDAMPENING].D = 0.0;
-  minThrottleAdjust = -50.0;
-  maxThrottleAdjust = 50.0; //we don't want it to be able to take over totally
   #ifdef AltitudeHold    
+    minThrottleAdjust = -50.0;
+    maxThrottleAdjust = 50.0; //we don't want it to be able to take over totally
     baroSmoothFactor = 0.1;
   #endif
   #ifdef HeadingMagHold

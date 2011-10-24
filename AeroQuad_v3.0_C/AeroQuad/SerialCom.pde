@@ -160,6 +160,7 @@ void readSerialCommand() {
       break;
     case 'b': // calibrate gyros
       calibrateGyro();
+      storeSensorsZeroToEEPROM();
       break;
     case 'c': // calibrate accels
       calibrateAccel();
@@ -167,6 +168,7 @@ void readSerialCommand() {
       calibrateKinematics();
       accelOneG = meterPerSec[ZAXIS];
 #endif
+      storeSensorsZeroToEEPROM();
       break;
     case 'd': // *** Spare ***
       // Spare command
@@ -366,7 +368,7 @@ void sendSerialTelemetry() {
 #endif
 #ifdef AltitudeHold
     PrintValueComma(getBaroAltitude());
-    SERIAL_PRINTLN((int)altitudeHold);
+    SERIAL_PRINTLN((int)altitudeHoldState);
 #else
     PrintValueComma(0);
     SERIAL_PRINTLN('0');
@@ -375,7 +377,7 @@ void sendSerialTelemetry() {
   case 'T': // Send processed transmitter values *** UPDATE ***
     PrintValueComma(receiverXmitFactor);
     for (byte axis = ROLL; axis < LASTAXIS; axis++) {
-      PrintValueComma(receiverData[axis]);
+      PrintValueComma(receiverCommand[axis]);
     }
     for (byte axis = ROLL; axis < LASTAXIS; axis++) {
       PrintValueComma(motorCommand[axis]);
@@ -385,13 +387,13 @@ void sendSerialTelemetry() {
     break;
   case 'U': // Send smoothed receiver with Transmitter Factor applied values
     for (byte channel = ROLL; channel < LASTCHANNEL; channel++) {
-      PrintValueComma(receiverData[channel]);
+      PrintValueComma(receiverCommand[channel]);
     }
     SERIAL_PRINTLN();
     break;
   case 'V': // Send receiver status
     for (byte channel = ROLL; channel < LASTCHANNEL; channel++) {
-      PrintValueComma(receiverData[channel]);
+      PrintValueComma(receiverCommand[channel]);
     }
     SERIAL_PRINTLN();
     break;

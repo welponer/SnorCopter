@@ -136,21 +136,21 @@ int throttle = 1000;
 int autoDescent = 0;
 
 // Altitude Hold
-#define ALTPANIC 2 // special state that allows immediate turn off of Altitude hold if large throttle changesa are made at the TX
-#define ALTBUMP 90 // amount of stick movement to cause an altutude bump (up or down)
-#define PANICSTICK_MOVEMENT 250 // 80 if althold on and throttle commanded to move by a gross amount, set PANIC
-//#define MINSTICK_MOVEMENT 32 // any movement less than this doesn't not trigger a rest of the holdaltitude
-#define TEMPERATURE 0
-#define PRESSURE 1
-int throttleAdjust = 0;
+#ifdef AltitudeHold
+  #define ALTPANIC 2 // special state that allows immediate turn off of Altitude hold if large throttle changesa are made at the TX
+  #define ALTBUMP 90 // amount of stick movement to cause an altitude bump (up or down)
+  #define PANICSTICK_MOVEMENT 250 // 80 if althold on and throttle commanded to move by a gross amount, set PANIC
 
+  float altitudeToHoldTarget = 0.0;
+  int altitudeHoldThrottle = 1000;
+  boolean isStoreAltitudeNeeded = false;
+  boolean altitudeHoldState = OFF;  // ON, OFF or ALTPANIC
+#endif
+int altitudeHoldThrottleCorrection = 0;
 int minThrottleAdjust = -50;
 int maxThrottleAdjust = 50;
-float holdAltitude = 0.0;
-int holdThrottle = 1000;
-float zDampening = 0.0;
-byte storeAltitude = OFF;
-byte altitudeHold = OFF;
+float batteyMonitorThrottleCorrection = 0;
+
 
 //// Receiver variables
 int delta;
@@ -321,11 +321,6 @@ void readPilotCommands(void);
 //////////////////////////////////////////////////////
 
 // defined in FlightControl.pde Flight control needs
-unsigned long lastSampleTime;
-float accelSample[3] = {0.0,0.0,0.0};
-float gyroSample[3] = {0.0,0.0,0.0};
-byte sampleCount = 0;
-
 int motorAxisCommandRoll = 0;
 int motorAxisCommandPitch = 0;
 int motorAxisCommandYaw = 0;
