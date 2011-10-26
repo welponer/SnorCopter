@@ -17,18 +17,12 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>. 
 */
 
-#ifndef _AEROQUAD_RECEIVER_MEGA_H_
-#define _AEROQUAD_RECEIVER_MEGA_H_
+#ifndef _AEROQUAD_RECEIVER_MAPLE_H_
+#define _AEROQUAD_RECEIVER_MAPLE_H_
 
 #include <WProgram.h>
 #include "Receiver.h"
-
-#define RISING_EDGE 1
-#define FALLING_EDGE 0
-#define MINONWIDTH 900
-#define MAXONWIDTH 2100
-#define MINOFFWIDTH 12000
-#define MAXOFFWIDTH 24000
+#include <wirish.h>
 
 #include "Receiver.h"
 #include <AQMath.h>
@@ -37,120 +31,56 @@
 // ROLL, PITCH, YAW, THROTTLE, MODE, AUX, AUX2, AUX3
 
 typedef struct {
-  unsigned int beginTime;
-  unsigned int riseTime;
-  unsigned int fallTime;
-  unsigned int lastGood;
-  byte edge;
-  byte pinNumber;
+  uint16 riseTime;
+  uint16 highTime;
+  int edgeMask;
+  timer_gen_reg_map *timerRegs;
+  __io uint32 *timerCCR;
+  int pinNumber;
 } PinTiming;
 
-volatile static PinTiming pinData[8];
-volatile static boolean receiverFail = false;
-
-void receiverPulesWidth(byte pin) {
-  unsigned int time;
-  unsigned int currentTime = micros(); 
-  
-  Serial.print("i ");
-  if (pinData[pin].edge == FALLING_EDGE) {
-        time = currentTime - pinData[pin].fallTime;
-        pinData[pin].riseTime = currentTime;
-        if ((time >= MINOFFWIDTH)) {   // && (time <= MAXOFFWIDTH)) {
-          pinData[pin].edge = RISING_EDGE;
-        } else {
-          pinData[pin].edge = FALLING_EDGE; // invalid rising edge detected
-          Serial.print("f"); Serial.println(time);
-        }
-      }
-      else {
-        time = currentTime - pinData[pin].riseTime;
-        pinData[pin].fallTime = currentTime;
-        if ((time >= MINONWIDTH) && (time <= MAXONWIDTH)) {
-          Serial.print("h"); Serial.println(time);
-          pinData[pin].lastGood = time;
-          pinData[pin].edge = FALLING_EDGE;
-        } else {
-          Serial.print("x"); Serial.println(time);
-        }
-          
-        pinData[pin].edge = FALLING_EDGE;
-      }
-  
-/*  
-  if (pinData[channel].edge == FALLING_EDGE) {
-  deltaTime = currentTime - pinData[channel].fallTime;
-  pinData[channel].riseTime = currentTime;
-  if ((deltaTime >= MINOFFWIDTH) && (deltaTime <= MAXOFFWIDTH)) {
-    Serial.print("r");
-    Serial.println(deltaTime);
-    pinData[channel].edge = RISING_EDGE;
-  } else {
-    pinData[channel].edge = FALLING_EDGE; // invalid rising edge detected
-    Serial.print("f");
-    Serial.println(deltaTime);
-  }
-  } else {
-  deltaTime = currentTime - pinData[channel].riseTime;
-  pinData[channel].fallTime = currentTime;
-  if ((deltaTime >= MINONWIDTH) && (deltaTime <= MAXONWIDTH) ) { //&& (pinData[channel].edge == RISING_EDGE)) {
-    pinData[channel].lastGood = deltaTime;
-    pinData[channel].edge = FALLING_EDGE;
-    Serial.println("ok");
-  }
-  }  */
-}
-
-
-
-/*
+volatile PinTiming pinTiming[8];
 
 void receiverPulesWidth(byte channel) {
-  int deltaTime;
-  deltaTime = micros() - pinData[channel].beginTime;
-  if (deltaTime > MINOFFWIDTH) 
-    pinData[channel].beginTime = 0;  
-  else
-    pinData[channel].beginTime = 1; 
-    
-  if( pinData[channel].beginTime == 0) {
-    pinData[channel].beginTime = micros(); 
+  timer_gen_reg_map *timer = pinTiming[channel].timerRegs;
+  uint16 c = *(pinTiming[channel].timerCCR);
+  bool rising = (timer->CCER & pinTiming[channel].edgeMask) == 0;
+  if(rising) {
+	pinTiming[channel].riseTime = c;   // rising edge
   } else {
-    //deltaTime = micros() - pinData[channel].beginTime;
-    if( (deltaTime <= MAXONWIDTH) && (deltaTime >= MINONWIDTH)) {
-      pinData[channel].lastGood = deltaTime;
-    } 
-
-      pinData[channel].beginTime = 0;     
-  }  
+	pinTiming[channel].highTime = c - pinTiming[channel].riseTime;  // falling edge
+  }
+  timer->CCER ^= pinTiming[channel].edgeMask;  // invert polarity
 }
-*/
 
-
-void receiverHandler0(void) { 
+void timerHandler0(void) { 
   receiverPulesWidth(0);
 }
-void receiverHandler1(void) { 
+void timerHandler1(void) { 
   receiverPulesWidth(1);
 }
-void receiverHandler2(void) { 
+void timerHandler2(void) { 
   receiverPulesWidth(2);
 }
-void receiverHandler3(void) { 
+void timerHandler3(void) { 
   receiverPulesWidth(3);
 }
-void receiverHandler4(void) { 
+void timerHandler4(void) { 
   receiverPulesWidth(4);
 }
-void receiverHandler5(void) { 
+void timerHandler5(void) { 
   receiverPulesWidth(5);
 }
-void receiverHandler6(void) { 
+void timerHandler6(void) { 
   receiverPulesWidth(6);
 }
-void receiverHandler7(void) { 
+void timerHandler7(void) { 
   receiverPulesWidth(7);
 }
+
+voidFuncPtr timerHandler[] = { timerHandler0, timerHandler1, timerHandler2, timerHandler3, 
+        timerHandler4, timerHandler5, timerHandler6, timerHandler7 };
+
 
 
 class Receiver_MapleR5 : public Receiver {
@@ -162,57 +92,75 @@ public:
     receiverChannels = 4;
   }
 
+  void setTimer(int channel, timer_dev *timerDev, int timerChannel)
+  {
+    timer_gen_reg_map *timer = timerDev->regs.gen;
+	pinTiming[channel].timerRegs = timer;
+	pinTiming[channel].timerCCR = &timer->CCR1 + timerChannel;
+		
+	int timerEnable = (1 << (4*timerChannel));
+    //pinTiming[channel].edgeMask = (1 << (4*timerChannel+1));
+	pinTiming[channel].edgeMask = timerEnable << 1;
+    
+	timer->PSC = 72-1;
+	timer->ARR = 0xffff;
+	timer->CR1 = 0;
+	timer->DIER &= ~(1);
+	timer->CCER &= ~timerEnable; // disable timer
+		
+	timer->CCER &= ~(pinTiming[channel].edgeMask);
+    if(timerChannel < 2) {
+      timer->CCMR1 &= ~(0xFF << (8*(timerChannel & 1)));   // prescaler 1
+      timer->CCMR1 |= 0x61<< (8*(timerChannel & 1));// 6=filter, 1=inputs 1,2,3,4
+    } else {
+      timer->CCMR2 &= ~(0xFF << (8*(timerChannel & 1)));   // prescaler 1
+      timer->CCMR2 |= 0x61<< (8*(timerChannel & 1));// 6=filter, 1=inputs 1,2,3,4
+    }
+	timer->CCER |= timerEnable; // enable timer
+	timer->CR1 = 1;
+  }
+
   void initialize(void) {    
-    pinData[0].pinNumber = 31;  // roll
-    pinData[1].pinNumber = 32;  // pitch
-    pinData[2].pinNumber = 33;  // yaw
-    pinData[3].pinNumber = 34;  // throttle
-    pinData[4].pinNumber = 35;  // mode
-    pinData[5].pinNumber = 36;  // aux
-    pinData[6].pinNumber = 37;  // aux1
-    pinData[7].pinNumber = 26;  // aux2
-    
-    for (byte channel = ROLL; channel < THROTTLE; channel++) {
-      pinData[channel].beginTime = 0;
-      pinData[channel].lastGood = MIDCOMMAND;
-      pinData[channel].edge = FALLING_EDGE;
-      pinMode(pinData[channel].pinNumber, INPUT_PULLDOWN);
+    pinTiming[0].pinNumber = 5;  // roll
+    pinTiming[1].pinNumber = 9;  // pitch
+    pinTiming[2].pinNumber = 14;  // yaw
+    pinTiming[3].pinNumber = 24;  // throttle
+    pinTiming[4].pinNumber = -1;  // mode
+    pinTiming[5].pinNumber = -1;  // aux
+    pinTiming[6].pinNumber = -1;  // aux1
+    pinTiming[7].pinNumber = -1;  // aux2
+
+    for (int channel = 0; channel < 8; channel++) {
+	  int pin = pinTiming[channel].pinNumber;
+	  if (pin != -1) {
+	    int timerChannel = PIN_MAP[pin].timer_channel; 
+	    timer_dev *timerDev = PIN_MAP[pin].timer_device;
+	  
+	    pinTiming[channel].highTime = 1500;
+        pinTiming[channel].riseTime = 0;
+        
+	    if (timerDev != NULL) {
+          pinMode(pin, INPUT);
+          setTimer(channel, timerDev, timerChannel-1);
+	      timer_attach_interrupt(timerDev, timerChannel, timerHandler[channel]);
+	    } 
+	  }
     }
-    for (byte channel = THROTTLE; channel < receiverChannels; channel++) {
-      pinData[channel].beginTime = 0;
-      pinData[channel].lastGood = MINCOMMAND;
-      pinData[channel].edge = FALLING_EDGE;
-      pinMode(pinData[channel].pinNumber, INPUT_PULLDOWN);
-    }
-    
-    delay(10);
-    
-/*    attachInterrupt(pinData[0].pinNumber, receiverHandler0, CHANGE);
-    attachInterrupt(pinData[1].pinNumber, receiverHandler1, CHANGE);
-    attachInterrupt(pinData[2].pinNumber, receiverHandler2, CHANGE);
-*/    attachInterrupt(pinData[3].pinNumber, receiverHandler3, CHANGE);
-    if (receiverChannels > 4) {
-      attachInterrupt(pinData[4].pinNumber, receiverHandler4, CHANGE);
-    }
-    if (receiverChannels > 5) {
-      attachInterrupt(pinData[5].pinNumber, receiverHandler5, CHANGE);
-      attachInterrupt(pinData[6].pinNumber, receiverHandler6, CHANGE);
-    }
-    if (receiverChannels > 7) {
-      attachInterrupt(pinData[7].pinNumber, receiverHandler7, CHANGE);
-    }    
+    Serial.println("init Receiver_MapleR5: done"); 
   }
 
   void read(void) {
-  //Serial.print("reciver: ");
+    Serial.print("reciver: ");
     for(byte channel = ROLL; channel < receiverChannels; channel++) {
-   // Serial.print(pinData[channel].lastGood); Serial.print("/");
+      volatile PinTiming *data = &pinTiming[channel];
+      unsigned int highTime = data->highTime;
+      Serial.print(highTime); Serial.print("/");
       // Apply transmitter calibration adjustment
-      receiverData[channel] = (mTransmitter[channel] * pinData[channel].lastGood) + bTransmitter[channel];
+      receiverData[channel] = (mTransmitter[channel] * highTime) + bTransmitter[channel];
       // Smooth the flight control transmitter inputs
       transmitterCommandSmooth[channel] = filterSmooth(receiverData[channel], transmitterCommandSmooth[channel], transmitterSmooth[channel]);
     }
-//Serial.println("");
+    Serial.println("");
     // Reduce transmitter commands using xmitFactor and center around 1500
     for (byte channel = ROLL; channel < THROTTLE; channel++)
       transmitterCommand[channel] = ((transmitterCommandSmooth[channel] - transmitterZero[channel]) * xmitFactor) + transmitterZero[channel];
