@@ -135,9 +135,6 @@ public:
 	  if (pin != -1) {
 	    int timerChannel = PIN_MAP[pin].timer_channel; 
 	    timer_dev *timerDev = PIN_MAP[pin].timer_device;
-	  
-	    pinTiming[channel].highTime = 1500;
-        pinTiming[channel].riseTime = 0;
         
 	    if (timerDev != NULL) {
           pinMode(pin, INPUT);
@@ -145,6 +142,8 @@ public:
 	      timer_attach_interrupt(timerDev, timerChannel, timerHandler[channel]);
 	    } 
 	  }
+	  pinTiming[channel].highTime = 1500;
+      pinTiming[channel].riseTime = 0;
     }
     Serial.println("init Receiver_MapleR5: done"); 
   }
@@ -157,7 +156,9 @@ public:
       receiverData[channel] = (mTransmitter[channel] * highTime) + bTransmitter[channel];
       // Smooth the flight control transmitter inputs
       transmitterCommandSmooth[channel] = filterSmooth(receiverData[channel], transmitterCommandSmooth[channel], transmitterSmooth[channel]);
+//Serial.print(receiverData[channel]);  Serial.print("/");  
     }
+//Serial.println("");    
     // Reduce transmitter commands using xmitFactor and center around 1500
     for (byte channel = ROLL; channel < THROTTLE; channel++)
       transmitterCommand[channel] = ((transmitterCommandSmooth[channel] - transmitterZero[channel]) * xmitFactor) + transmitterZero[channel];

@@ -42,14 +42,15 @@ public:
 
   void initialize(NB_Motors numbers) {
     numbersOfMotors = numbers;
-/*    timer_set_mode(TIMER4, TIMER_CH1, TIMER_PWM);
+/*
+   timer_set_mode(TIMER4, TIMER_CH1, TIMER_PWM);
    timer_set_mode(TIMER4, TIMER_CH2, TIMER_PWM);
    timer_set_mode(TIMER4, TIMER_CH3, TIMER_PWM);
    timer_pause(TIMER4);
    timer_set_count(TIMER4, 0);
    timer_set_reload(TIMER4, 60000);   // Sets the period of the PWM signal
    timer_resume(TIMER4);              // enable outputs to esc's
-   */
+*/
     
     Timer3.setPrescaleFactor(72);
     Timer3.setOverflow(20000);
@@ -85,7 +86,8 @@ public:
     Timer3.setCompare(TIMER_CH2, command);
     Timer3.setCompare(TIMER_CH3, command);
     Timer3.setCompare(TIMER_CH4, command);
-    if (numbersOfMotors == SIX_Motors) {      
+    if (numbersOfMotors == SIX_Motors) { 
+    
     }
   }  
 };

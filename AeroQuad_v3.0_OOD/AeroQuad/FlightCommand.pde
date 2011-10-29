@@ -35,6 +35,7 @@ void readPilotCommands() {
       #if defined(APM_OP_CHR6DM) || defined(ArduCopter) 
         digitalWrite(LED_Red, LOW);
       #endif
+      Serial.println("Copter disarmed");
     }    
     // Zero Gyro and Accel sensors (left stick lower left, right stick lower right corner)
     if ((receiver->getData(YAW) < MINCHECK) && (receiver->getData(ROLL) > MAXCHECK) && (receiver->getData(PITCH) < MINCHECK)) {
@@ -61,6 +62,7 @@ void readPilotCommands() {
       for (byte motor = 0; motor < LASTMOTOR; motor++) {
         motors->setMotorCommand(motor, MINTHROTTLE);
       }
+      Serial.println("Copter armed");
       //   delay(100);
       //altitude.measureGround();
     }
