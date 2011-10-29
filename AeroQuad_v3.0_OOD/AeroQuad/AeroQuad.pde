@@ -1174,21 +1174,21 @@
 //******** FLIGHT CONFIGURATION DECLARATION **************
 //********************************************************
 #if defined quadXConfig
-  #include "FlightControlQuadXMode.h"
+  #include <FlightControlQuadXMode.h>
 #elif defined quadPlusConfig
-  #include "FlightControlQuadPlusMode.h"
+  #include <FlightControlQuadPlusMode.h>
 #elif defined hexPlusConfig  
-  #include "FlightControlHexPlusMode.h"
+  #include <FlightControlHexPlusMode.h>
 #elif defined hexXConfig
-  #include "FlightControlHexXMode.h"
+  #include <FlightControlHexXMode.h>
 #elif defined triConfig
-  #include "FlightControlTriMode.h"
+  #include <FlightControlTriMode.h>
 #elif defined quadY4Config
-  #include "FlightControlQuadY4.h"
+  #include <FlightControlQuadY4.h>
 #elif defined hexY6Config
-  #include "FlightControlHexY6.h"  
+  #include <FlightControlHexY6.h>  
 #elif defined octoX8Congig
-  #include "FlightControlOctoX8.h"
+  #include <FlightControlOctoX8.h>
 #endif
 
 
