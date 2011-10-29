@@ -67,7 +67,7 @@ void nvrWritePID(unsigned char IDPid, unsigned int IDEeprom) {
 }
 
 // contains all default values when re-writing EEPROM
-void initializeEEPROM(void) {
+void initializeEEPROM() {
   PID[ROLL].P = 100.0;
   PID[ROLL].I = 0.0;
   PID[ROLL].D = -300.0;
@@ -78,10 +78,10 @@ void initializeEEPROM(void) {
   PID[YAW].I = 5.0;
   PID[YAW].D = 0.0;
   PID[LEVELROLL].P = 4.0;
-  PID[LEVELROLL].I = 0.6;
+  PID[LEVELROLL].I = 0.0;
   PID[LEVELROLL].D = 0.0;
   PID[LEVELPITCH].P = 4.0;
-  PID[LEVELPITCH].I = 0.6;
+  PID[LEVELPITCH].I = 0.0;
   PID[LEVELPITCH].D = 0.0;
   PID[HEADING].P = 3.0;
   PID[HEADING].I = 0.1;
@@ -96,7 +96,7 @@ void initializeEEPROM(void) {
   PID[LEVELGYROPITCH].D = -300.0;
 
   PID[ALTITUDE].P = 25.0;
-  PID[ALTITUDE].I = 0.1;
+  PID[ALTITUDE].I = 0.6;
   PID[ALTITUDE].D = 0.0;
   PID[ALTITUDE].windupGuard = 25.0; //this prevents the 0.1 I term to rise too far
   PID[ZDAMPENING].P = 0.0;
@@ -160,7 +160,7 @@ void initializeEEPROM(void) {
   #endif*/
 }
 
-void readEEPROM(void) {
+void readEEPROM() {
   readPID(ROLL, ROLL_PID_GAIN_ADR);
   readPID(PITCH, PITCH_PID_GAIN_ADR);
   readPID(YAW, YAW_PID_GAIN_ADR);
@@ -291,7 +291,7 @@ void writeEEPROM(){
   sei(); // Restart interrupts
 }
 
-void initSensorsZeroFromEEPROM(void) {
+void initSensorsZeroFromEEPROM() {
   // Gyro initialization from EEPROM
   gyroZero[ROLL] = readFloat(GYRO_ROLL_ZERO_ADR);
   gyroZero[PITCH] = readFloat(GYRO_PITCH_ZERO_ADR);

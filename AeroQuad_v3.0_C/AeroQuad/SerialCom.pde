@@ -562,7 +562,7 @@ void sendBinaryuslong(unsigned long data) {
 }
 
 #ifdef BinaryWrite
-void fastTelemetry(void)
+void fastTelemetry()
 {
   // **************************************************************
   // ***************** Fast Transfer Of Sensor Data ***************

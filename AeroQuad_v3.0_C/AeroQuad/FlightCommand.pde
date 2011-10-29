@@ -118,7 +118,6 @@ void readPilotCommands() {
      altitudeHoldState = OFF;
    }
   #endif
-
 }
 
 

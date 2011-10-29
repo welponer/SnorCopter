@@ -29,7 +29,7 @@
 
 #define ATTITUDE_SCALING (0.75 * PWM2RAD)
 
-void calculateFlightError(void)
+void calculateFlightError()
 {
   if (flightMode == STABLE) {
     float rollAttitudeCmd = updatePID((receiverCommand[ROLL] - receiverZero[ROLL]) * ATTITUDE_SCALING, kinematicsAngle[ROLL], &PID[LEVELROLL]);
@@ -46,7 +46,7 @@ void calculateFlightError(void)
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////// processCalibrateESC //////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void processCalibrateESC(void)
+void processCalibrateESC()
 {
   switch (calibrateESC) { // used for calibrating ESC's
   case 1:
@@ -73,7 +73,7 @@ void processCalibrateESC(void)
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////// processHeadingHold ///////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void processHeading(void)
+void processHeading()
 {
   if (headingHoldConfig == ON) {
 
@@ -140,7 +140,7 @@ void processHeading(void)
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////// processAltitudeHold //////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void processAltitudeHold(void)
+void processAltitudeHold()
 {
   // ****************************** Altitude Adjust *************************
   // Thanks to Honk for his work with altitude hold
@@ -149,8 +149,7 @@ void processAltitudeHold(void)
   // http://aeroquad.com/showthread.php?359-Stable-flight-logic...&p=10325&viewfull=1#post10325
 #ifdef AltitudeHold
   if (altitudeHoldState == ON) {
-    altitudeHoldThrottleCorrection = updatePID(altitudeToHoldTarget, getBaroAltitude(), &PID[ALTITUDE]);
-    //throttleAdjust = constrain((holdAltitude - altitude.getData()) * PID[ALTITUDE].P, minThrottleAdjust, maxThrottleAdjust);
+    int altitudeHoldThrottleCorrection = updatePID(altitudeToHoldTarget, getBaroAltitude(), &PID[ALTITUDE]);
     altitudeHoldThrottleCorrection = constrain(altitudeHoldThrottleCorrection, minThrottleAdjust, maxThrottleAdjust);
     if (abs(altitudeHoldThrottle - receiverCommand[THROTTLE]) > PANICSTICK_MOVEMENT) {
       altitudeHoldState = ALTPANIC; // too rapid of stick movement so PANIC out of ALTHOLD
@@ -162,35 +161,48 @@ void processAltitudeHold(void)
         altitudeToHoldTarget -= 0.01;
       }
     }
-    throttle = altitudeHoldThrottle;
+    throttle = altitudeHoldThrottle + altitudeHoldThrottleCorrection;
   }
   else {
     throttle = receiverCommand[THROTTLE];
-    altitudeHoldThrottleCorrection = 0;
   }
 #else
   throttle = receiverCommand[THROTTLE];
-  altitudeHoldThrottleCorrection = 0;
 #endif
 }
 
 void processThrottleCorrection() {
 
-  if (batteryStatus != OK) {
-    #ifdef AltitudeHold
-      if (throttle > 1400) {
-        altitudeToHoldTarget -= 0.2;
-      }
-    #else
-      if (throttle > 1400) {
-        batteyMonitorThrottleCorrection -= 0.1;
-      }
-    #endif
-  }
-  else {
-    batteyMonitorThrottleCorrection = 0.0;
-  }
-  throttle = throttle + altitudeHoldThrottleCorrection + (int)batteyMonitorThrottleCorrection;
+  #if defined (BattMonitor)
+    if (batteryStatus != OK) {
+      #ifdef AltitudeHold
+        if (throttle > BATTERY_MONITOR_THROTTLE_TARGET) {
+          altitudeToHoldTarget -= 0.2;
+        }
+      #else
+        if (batteryMonitorStartThrottle == 0) {  // init battery monitor throttle correction!
+          batteryMonitorStartTime = millis();
+          batteryMonitorStartThrottle = throttle; 
+        }
+        const int batteryMonitorThrottle = map(millis()-batteryMonitorStartTime,0,BATTERY_MONITOR_GOIN_DOWN_TIME,batteryMonitorStartThrottle,BATTERY_MONITOR_THROTTLE_TARGET);
+        if (throttle < batteryMonitorThrottle) {
+          batteyMonitorThrottleCorrection = 0;
+        }
+        else {
+          batteyMonitorThrottleCorrection = batteryMonitorThrottle - throttle;
+        }
+      #endif
+    }
+    else {
+      batteryMonitorStartThrottle = 0;
+      batteyMonitorThrottleCorrection = 0.0;
+    }
+  #endif
+  
+  // Thank Ziojo for this little adjustment on throttle when manuevering!
+  int throttleAsjust = throttle / (cos (radians (kinematicsAngle[ROLL])) * cos (radians (kinematicsAngle[PITCH])));
+  throttleAsjust = constrain ((throttleAsjust - throttle), 0, 160); //compensate max  +/- 25 deg ROLL or PITCH or  +/- 18 ( 18(ROLL) + 18(PITCH))
+  throttle = throttle + throttleAsjust + (int)batteyMonitorThrottleCorrection;
 }
 
 

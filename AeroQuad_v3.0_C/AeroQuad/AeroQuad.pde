@@ -30,13 +30,8 @@
 
 //#define AeroQuad_v1         // Arduino 2009 with AeroQuad Shield v1.7 and below
 //#define AeroQuad_v1_IDG     // Arduino 2009 with AeroQuad Shield v1.7 and below using IDG yaw gyro
-<<<<<<< .mine
 //#define AeroQuad_v18        // Arduino 2009 with AeroQuad Shield v1.8 or greater
 //#define AeroQuad_Mini       // Arduino Pro Mini with AeroQuad Mini Shield v1.0
-=======
-#define AeroQuad_v18        // Arduino 2009 with AeroQuad Shield v1.8 or greater
-//#define AeroQuad_Mini       // Arduino Pro Mini with AeroQuad Mini Shield v1.0
->>>>>>> .r801
 //#define AeroQuad_Wii        // Arduino 2009 with Wii Sensors and AeroQuad Shield v1.x
 //#define AeroQuad_Paris_v3   // Define along with either AeroQuad_Wii to include specific changes for MultiWiiCopter Paris v3.0 board
 //#define AeroQuadMega_v1     // Arduino Mega with AeroQuad Shield v1.7 and below
@@ -1034,26 +1029,18 @@ void setup() {
 
 
   // Setup receiver pins for pin change interrupts
-<<<<<<< .mine
   Serial.println(": receiver");
-  initializeReceiver(LASTCHANNEL);
-=======
   #if defined (ReceiverFailSafe)
     initializeReceiver(LASTCHANNEL,true);
   #else
     initializeReceiver(LASTCHANNEL);
   #endif
->>>>>>> .r801
   initReceiverFromEEPROM();
        
   // Initialize sensors
   // If sensors have a common initialization routine
   // insert it into the gyro class because it executes first
-<<<<<<< .mine
   Serial.println(": sensors");
-  initSensorsZeroFromEEPROM();
-=======
->>>>>>> .r801
   initializeGyro(); // defined in Gyro.h
   initializeAccel(); // defined in Accel.h
   initSensorsZeroFromEEPROM();

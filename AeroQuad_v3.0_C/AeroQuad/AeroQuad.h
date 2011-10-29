@@ -131,9 +131,15 @@ float setHeading = 0;
 unsigned long headingTime = micros();
 byte headingHoldState = OFF;
 
-// batteryMonitor & Altutude Hold
+// batteryMonitor & Altitude Hold
 int throttle = 1000;
-int autoDescent = 0;
+int batteyMonitorThrottleCorrection = 0;
+#if defined (BattMonitor)
+  int batteryMonitorStartThrottle = 0;
+  unsigned long batteryMonitorStartTime = 0;
+  #define BATTERY_MONITOR_THROTTLE_TARGET 1200
+  #define BATTERY_MONITOR_GOIN_DOWN_TIME 120000  // 2 minutes
+#endif
 
 // Altitude Hold
 #ifdef AltitudeHold
@@ -146,10 +152,10 @@ int autoDescent = 0;
   boolean isStoreAltitudeNeeded = false;
   boolean altitudeHoldState = OFF;  // ON, OFF or ALTPANIC
 #endif
-int altitudeHoldThrottleCorrection = 0;
+//int altitudeHoldThrottleCorrection = 0;
 int minThrottleAdjust = -50;
 int maxThrottleAdjust = 50;
-float batteyMonitorThrottleCorrection = 0;
+
 
 
 //// Receiver variables
@@ -310,14 +316,14 @@ void nvrWritePID(unsigned char IDPid, unsigned int IDEeprom);
 #define writePID(IDPid, addr) nvrWritePID(IDPid, GET_NVR_OFFSET(addr))
 
 // defined in DataStorage.h
-void readEEPROM(void); 
-void initSensorsZeroFromEEPROM(void);
-void storeSensorsZeroToEEPROM(void);
-void initReceiverFromEEPROM(void);
+void readEEPROM(); 
+void initSensorsZeroFromEEPROM();
+void storeSensorsZeroToEEPROM();
+void initReceiverFromEEPROM();
 //////////////////////////////////////////////////////
 
 // defined in FlightCommand.pde
-void readPilotCommands(void); 
+void readPilotCommands(); 
 //////////////////////////////////////////////////////
 
 // defined in FlightControl.pde Flight control needs
