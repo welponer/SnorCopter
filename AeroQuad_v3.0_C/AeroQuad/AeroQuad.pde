@@ -35,7 +35,7 @@
 //#define AeroQuad_Wii        // Arduino 2009 with Wii Sensors and AeroQuad Shield v1.x
 //#define AeroQuad_Paris_v3   // Define along with either AeroQuad_Wii to include specific changes for MultiWiiCopter Paris v3.0 board
 //#define AeroQuadMega_v1     // Arduino Mega with AeroQuad Shield v1.7 and below
-//#define AeroQuadMega_v2     // Arduino Mega with AeroQuad Shield v2.x
+#define AeroQuadMega_v2     // Arduino Mega with AeroQuad Shield v2.x
 //#define AeroQuadMega_Wii    // Arduino Mega with Wii Sensors and AeroQuad Shield v2.x
 //#define ArduCopter          // ArduPilot Mega (APM) with Oilpan Sensor Board
 //#define AeroQuadMega_CHR6DM // Clean Arduino Mega with CHR6DM as IMU/heading ref.
@@ -49,7 +49,7 @@
  *********************** Define Flight Configuration ************************
  ****************************************************************************/
 // Use only one of the following definitions
-#define quadXConfig
+//#define quadXConfig
 //#define quadPlusConfig
 //#define hexPlusConfig
 //#define hexXConfig      // not flight tested, take real care
@@ -69,9 +69,10 @@
 // *******************************************************************************************************************************
 #define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
 #define AltitudeHold // Enables BMP085 Barometer (experimental, use at your own risk)
-//#define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
+#define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
 //#define RateModeOnly // Use this if you only have a gyro sensor, this will disable any attitude modes.
 //#define RemotePCReceiver // EXPERIMENTAL Use PC as transmitter via serial communicator with XBEE
+//#define ReceiverPPM // Use a ppm receiver
 
 //
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -109,7 +110,7 @@
 //#define CameraControl
 
 // On screen display implementation using MAX7456 chip. See OSD.h for more info and configuration.
-//#define MAX7456_OSD
+#define MAX7456_OSD
 
 
 #define YAW_DIRECTION 1 // if you want to reverse the yaw correction direction
@@ -418,6 +419,7 @@
   // unsuported in mini
   #undef AltitudeHold
   #undef HeadingMagHold
+//  #define HMC5843
   
   /**
    * Put AeroQuad_Mini specific intialization need here
@@ -885,7 +887,9 @@
 //********************************************************
 //******************** RECEIVER DECLARATION **************
 //********************************************************
-#if defined (AeroQuad_Mini) && (defined (hexPlusConfig) || defined (hexXConfig) || defined (hexY6Config))
+#if defined ReceiverPPM
+  #include <Receiver_PPM.h>
+#elif defined (AeroQuad_Mini) && (defined (hexPlusConfig) || defined (hexXConfig) || defined (hexY6Config))
   #include <Receiver_PPM.h>
 #elif defined RemotePCReceiver
   #include <Receiver_RemotePC.h>
@@ -1157,8 +1161,8 @@ void loop () {
       G_Dt = (currentTime - hundredHZpreviousTime) / 1000000.0;
       hundredHZpreviousTime = currentTime;
       
-      evaluateMeterPerSec();
-      evalueateGyroRate();
+      evaluateMetersPerSec();
+      evaluateGyroRate();
       
       float filteredAccelRoll = computeFourthOrder(meterPerSec[XAXIS], &fourthOrder[AX_FILTER]);
       float filteredAccelPitch = computeFourthOrder(meterPerSec[YAXIS], &fourthOrder[AY_FILTER]);
@@ -1217,7 +1221,7 @@ void loop () {
                             filteredAccelRoll,                  
                             filteredAccelPitch,                  
                             filteredAccelYaw,                  
-                            accel->getOneG(),                               
+                            accelOneG,                               
                             0.0,                                             
                             0.0,
                             G_Dt);

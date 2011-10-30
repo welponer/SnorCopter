@@ -15,8 +15,8 @@ public:
   void initPlatform();
 
   void initialize(void) {
-    levelAdjust[0] = 0.0;
-    levelAdjust[1] = 0.0;
+    levelAdjust[ROLL] = 0.0;
+    levelAdjust[PITCH] = 0.0;
   }
   
   void processCopterControl(void) {

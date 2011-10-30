@@ -206,7 +206,8 @@ void detectVideoStandard() {
   boolean pal = false;
   #ifdef PAL
     pal = true;
-  #elif defined AUTODETECT
+  #endif
+  #ifdef defined AUTODETECT
     // if autodetect enabled modify the default if signal is present on either standard 
     // otherwise default is preserved
     spi_select();
@@ -238,7 +239,11 @@ void detectVideoStandard() {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////// Battery voltage Display //////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 #ifdef BattMonitor
+
 void displayVoltage() {
   int currentVoltage = batteryVoltage*10.0;
   char buf[7];
