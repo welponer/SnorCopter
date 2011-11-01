@@ -44,7 +44,7 @@
 #define ShowFlightTimer        //Displays how long the motors have been armed for since the Arduino was last reset
 #define ShowAttitudeIndicator
 #define ShowCallSign
-//#define ShowRSSI
+#define ShowRSSI
 //#define feet                   //Comment this line out for altitude measured in metres, uncomment it for feet
 
 //Choose your (default in case autodetect enabled) video standard: default=NTSC
@@ -97,10 +97,10 @@
 /********************** End of user configuration section ********************************/
 
 //OSD pins on AQ v2 shield:
-#define CS 22 //SS_OSD
+#define CS   22 //SS_OSD
 #define DOUT 51 //MOSI
-#define DIN 50 //MISO
-#define SCK 52 //SCLK
+#define DIN  50 //MISO
+#define SCK  52 //SCLK
 
 //MAX7456 register write addresses - see datasheet for lots of info
 #define DMM   0x04 //Display memory mode register - for choosing 16bit/8bit write mode, clearing display memory, enabling auto-increment
@@ -191,7 +191,7 @@ void writeChars( const char* buf, byte len, byte flags, byte y, byte x ) {
   for ( int i = 0; i < len; i++ ) {
     spi_writereg(DMDI, buf==NULL?0:buf[i] );
   }
-
+  
   // Send escape 11111111 to exit autoincrement mode
   if (len!=1) {
     spi_writereg(DMDI, END_string );
@@ -207,16 +207,16 @@ void detectVideoStandard() {
   #ifdef PAL
     pal = true;
   #endif
-  #ifdef defined AUTODETECT
+  #ifdef AUTODETECT
     // if autodetect enabled modify the default if signal is present on either standard 
     // otherwise default is preserved
     spi_select();
     byte stat=spi_readreg(STAT);
     if (stat & 0x01) {
-      pal=true;
+      pal = true;
     }
     if (stat & 0x02) {
-      pal=false;
+      pal = false;
     }
     spi_deselect();
   #endif
@@ -251,8 +251,6 @@ void displayVoltage() {
   writeChars( buf, 6, ((armed==ON)&&(batteryStatus!=OK))?1:0, VOLTAGE_ROW, VOLTAGE_COL );    
 }
 #endif
-
-
 
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////// AltitudeHold Display /////////////////////////////
@@ -331,7 +329,6 @@ void displayAltitude() {
 }
 #endif
 
-
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////// HeadingMagHold Display ///////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -364,7 +361,7 @@ void displayFlightTime() {
   }
 
   prevTime = currentTime;
-  unsigned int armedTimeSecs=armedTime/1000000;  
+  unsigned int armedTimeSecs=armedTime/1000000;
   if (armedTimeSecs!=prevArmedTimeSecs) {
     prevArmedTimeSecs=armedTimeSecs;
     char buf[7];
@@ -483,19 +480,20 @@ void displayReticle() {
 //   - display notification with blinking region = 'cursor'
 //   - characters between cstart and cstop will blink if OSD_CURSOR flag is used
 //
+//   fmt == NULL will clear
 //   flags -- message priority and options
-#define OSD_P_INFO 0x00
-#define OSD_P_WARN 0x40
-#define OSD_P_ERR  0x80
-#define OSD_P_CRIT 0xc0
+#define OSD_INFO    0x00
+#define OSD_WARN    0x40
+#define OSD_ERR     0x80
+#define OSD_CRIT    0xc0
 #define OSD_NOCLEAR 0x20 // do not clear the message after ~5s
 #define OSD_CURSOR  0x10 // enable cursor
 #define OSD_BLINK   0x08 // blinking message
 #define OSD_INVERT  0x04 // inverted message
 #define OSD_NOW     0x02 // show message immediately instead of waiting for next OSD
-// refresh, will block until transfer done. Use with care!
-// Could be used for emergency messages as message will remain on 
-// screen even if Arduino crashes
+                         // refresh, will block until transfer done. Use with care!
+                         // Could be used for emergency messages as message will remain on 
+                         // screen even if Arduino crashes
 #define OSD_CENTER  0x01 // Justify at center
 
 byte _n_cprio=0;
@@ -505,43 +503,41 @@ byte _n_flags;
 byte _n_cstart;
 byte _n_cstop;
 
-byte displayNotify() {
-  
+byte displayNotify(){
+
   if (_n_flags&OSD_NOW) {
     _n_flags&=~OSD_NOW;
     // we have new message to show
-    
+
     if ((_n_flags&OSD_CURSOR) && (_n_cstart!=255)) {
-      
+
       if (_n_cstart>0) {
-        Serial.print(_n_cstart);
-        Serial.print(_n_cstop);		  	
         writeChars(_n_buf,_n_cstart,
-        ((_n_flags&OSD_INVERT)?2:0)|((_n_flags&OSD_BLINK)?1:0),
-        NOTIFY_ROW,NOTIFY_COL);
+          ((_n_flags&OSD_INVERT)?2:0)|((_n_flags&OSD_BLINK)?1:0),
+          NOTIFY_ROW,NOTIFY_COL);
       }
-      
+
       writeChars(_n_buf+_n_cstart,_n_cstop-_n_cstart+1,
-      ((_n_flags&OSD_INVERT)?2:0)|((_n_flags&OSD_BLINK)?0:1),
-      NOTIFY_ROW,NOTIFY_COL+_n_cstart);
-      
+        ((_n_flags&OSD_INVERT)?2:0)|((_n_flags&OSD_BLINK)?0:1),
+        NOTIFY_ROW,NOTIFY_COL+_n_cstart);
+
       if (_n_cstop<27) {
         writeChars(_n_buf+_n_cstop+1,27-_n_cstop,
-        ((_n_flags&OSD_INVERT)?2:0)|((_n_flags&OSD_BLINK)?1:0),
-        NOTIFY_ROW,NOTIFY_COL+_n_cstop+1);
+          ((_n_flags&OSD_INVERT)?2:0)|((_n_flags&OSD_BLINK)?1:0),
+          NOTIFY_ROW,NOTIFY_COL+_n_cstop+1);
       }
-    } 
+    }
     else {
       writeChars(_n_buf,28,
-      ((_n_flags&OSD_INVERT)?2:0)|((_n_flags&OSD_BLINK)?1:0),
-      NOTIFY_ROW,NOTIFY_COL);
+        ((_n_flags&OSD_INVERT)?2:0)|((_n_flags&OSD_BLINK)?1:0),
+        NOTIFY_ROW,NOTIFY_COL);
     }
     return 1;
   }
-  
+
   if ((_n_ttl>0)&&(_n_ttl!=255)) {
     if (_n_ttl--==1) {
-      writeChars(NULL,28,0,NOTIFY_ROW,NOTIFY_COL);			
+      writeChars(NULL,28,0,NOTIFY_ROW,NOTIFY_COL);
       return 1;
     }
   }
@@ -550,53 +546,52 @@ byte displayNotify() {
 
 #define notifyOSD(flags,fmt,args...) notifyOSDmenu(flags,255,255,fmt, ## args)
 
-void notifyOSDmenu(byte flags, byte cstart, byte cstop, const char *fmt, ...) {
-  
+byte notifyOSDmenu(byte flags, byte cstart, byte cstop, const char *fmt, ...) {
+
   va_list ap;
-  if ((_n_ttl>0) && ((flags>>6)<_n_cprio)) {
-    return; // drop message
-  }
-  
-  _n_cprio=flags>>6;
-  _n_ttl=(flags&OSD_NOCLEAR)?255:50; // set timeout for message
-  va_start(ap,fmt);
-  byte len = vsnprintf(_n_buf,29,fmt,ap);
-  if (len>28) {
-    len=28; 
-  }
-  
-  va_end(ap);
-  memset(_n_buf+len,0,28-len);
-  
-  if (flags&OSD_CENTER) {
-    byte i=(28-len)/2;
-    if (i) {
-      // move text right to center it
-      memmove(_n_buf+i, _n_buf, strlen(_n_buf));
-      memset(_n_buf,0,i);
-      // adjust cursor position also
-      if (flags&OSD_CURSOR) {
-        cstart+=i;
-        cstop+=i;
-      }
-    } 
-  }
-  
-  _n_flags = flags;
-  _n_cstart = cstart < 27 ? cstart : 27;
-  _n_cstop = cstop < 27 ? cstop : 27;
-  if (flags&OSD_NOW) {
-    displayNotify();
+  if ((_n_ttl>0) && ((flags>>6)<_n_cprio)) return 1; // drop message, we tell it to caller
+  if (fmt==NULL) { 
+    // clear
+    memset(_n_buf,0,28);
+    _n_flags=0;
   } 
   else {
+    _n_cprio=flags>>6;
+    _n_ttl=(flags&OSD_NOCLEAR)?255:50; // set timeout for message
+    va_start(ap,fmt);
+    byte len=vsnprintf(_n_buf,29,fmt,ap);
+    if (len>28) len=28; 
+    va_end(ap);
+    memset(_n_buf+len,0,28-len);
+    if (flags&OSD_CENTER) {
+      byte i=(28-len)/2;
+      if (i) {
+        // move text right to center it
+        memmove(_n_buf+i,_n_buf,strlen(_n_buf));
+        memset(_n_buf,0,i);
+        // adjust cursor position also
+        if (flags&OSD_CURSOR) {
+          cstart+=i;
+          cstop+=i;
+        }
+      } 
+    }
+    _n_flags=flags;
+    _n_cstart=cstart<27?cstart:27;
+    _n_cstop=cstop<27?cstop:27;
+  }
+  if (flags&OSD_NOW) {
+    displayNotify();
+  } else {
     _n_flags|=OSD_NOW; // this will tell next update to show message
   }
+  return 0;
 }
 
 byte OSDsched = 0;
 
 void updateOSD() {
-  
+
   // OSD is updated fully in 4 rounds, these are (using bit)
   // 0x01 - Attitude Indicator
   // 0x02 - Altitude, Heading, Timer, RSSI, Reticle
@@ -604,14 +599,16 @@ void updateOSD() {
   // 0x08 - Battery info
 
   // Check notify first, if it did something we dont't have time for other stuff
-  if (displayNotify()) 
+  if (displayNotify()) {
     return;
+  }
 
   if ((OSDsched&0x01) || (OSDsched&0x04)) {
     #ifdef ShowAttitudeIndicator
       displayArtificialHorizon();
     #endif
   }
+
   if (OSDsched&0x02) {
     #ifdef AltitudeHold
       displayAltitude();
@@ -629,6 +626,7 @@ void updateOSD() {
       displayReticle();
     #endif
   }
+
   if (OSDsched&0x08) {
     #ifdef BattMonitor
       displayVoltage();
@@ -639,8 +637,9 @@ void updateOSD() {
     OSDsched=0x01;
   }
 }
-
+  
 void initializeOSD() {
+
   int i = 0;
   pinMode( CS, OUTPUT );
   pinMode( 53, OUTPUT ); //Default CS pin - needs to be output or SPI peripheral will behave as a slave instead of master
@@ -687,8 +686,4 @@ void initializeOSD() {
   notifyOSD(OSD_NOW, "VIDEO: %s", (DISABLE_display)?"PAL":"NTSC");
 }
 
-
 #endif  // #define _AQ_OSD_MAX7456_H_
-
-
-

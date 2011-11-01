@@ -49,13 +49,13 @@
  *********************** Define Flight Configuration ************************
  ****************************************************************************/
 // Use only one of the following definitions
-//#define quadXConfig
+#define quadXConfig
 //#define quadPlusConfig
 //#define hexPlusConfig
 //#define hexXConfig      // not flight tested, take real care
 //#define triConfig
 //#define quadY4Config
-#define hexY6Config
+//#define hexY6Config
 //#define octoX8Congig
 //#define octoPlusCongig  // not yet implemented
 //#define octoXCongig
@@ -107,10 +107,12 @@
 // D13 to D35 for yaw, connect servo to SERVO3
 // Please note that you will need to have battery connected to power on servos with v2.0 shield
 // *******************************************************************************************************************************
-//#define CameraControl
+#define CameraControl
 
 // On screen display implementation using MAX7456 chip. See OSD.h for more info and configuration.
 #define MAX7456_OSD
+// Menu system, currently only usable with OSD
+#define MENU_SYSTEM
 
 
 #define YAW_DIRECTION 1 // if you want to reverse the yaw correction direction
@@ -988,6 +990,13 @@
   #include "MAX7456.h"
 #endif
 
+//********************************************************
+//****************** MENU SYSTEM DECLARATION *************
+//********************************************************
+#ifdef MENU_SYSTEM
+  #include "Menu.h"
+#endif
+
 
 // Include this last as it contains objects from above declarations
 #include "DataStorage.h"
@@ -1288,6 +1297,10 @@ void loop () {
       readSerialCommand(); // defined in SerialCom.pde
       sendSerialTelemetry(); // defined in SerialCom.pde
       
+      #ifdef MENU_SYSTEM
+        updateMenu();
+      #endif
+
       #ifdef MAX7456_OSD
         updateOSD();
       #endif
