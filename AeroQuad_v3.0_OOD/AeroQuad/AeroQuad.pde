@@ -42,8 +42,7 @@
 //#define AeroQuadMega_CHR6DM // Clean Arduino Mega with CHR6DM as IMU/heading ref.
 //#define APM_OP_CHR6DM       // ArduPilot Mega with CHR6DM as IMU/heading ref., Oilpan for barometer (just uncomment AltitudeHold for baro), and voltage divider
 //#define ArduCopter_AQ
-//#define ArduCopter_CSG
-#define ArduMaple_CSG
+#define MapleCopter_CSG
 
 /****************************************************************************
  *********************** Define Flight Configuration ************************
@@ -67,7 +66,7 @@
 // *******************************************************************************************************************************
 #define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
 //#define AltitudeHold // Enables BMP085 Barometer (experimental, use at your own risk)
-//#define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
+#define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
 //#define RateModeOnly // Use this if you only have a gyro sensor, this will disable any attitude modes.
 //#define RemotePCReceiver // EXPERIMENTAL Use PC as transmitter via serial communicator with XBEE
 
@@ -153,7 +152,7 @@
 //********************************************************
 //********************************************************
 
-#ifdef ArduMaple_CSG   // STM32
+#ifdef MapleCopter_CSG   // STM32
   #define Serial SerialUSB
   #include <Device_I2C.h>
   
@@ -201,6 +200,7 @@
     #define BMP085
   #endif
 
+  #undef BattMonitor
   // Battery monitor declaration
   #ifdef BattMonitor
     #include <BatterySensor.h>
@@ -233,88 +233,6 @@
 #endif
 
 
-#ifdef ArduCopter_CSG
-  #include <APM_RC.h>
-  #include <Device_I2C.h>
-
-  // Gyroscope declaration
-  #define GYRO_ALTERNATE TRUE
-  #include <Gyroscope.h>
-  #include <Gyroscope_ITG3200.h>
-  Gyroscope_ITG3200 gyroSpecific;
-  Gyroscope *gyro = &gyroSpecific;
-  
-  // Accelerometer declaration
-  #define ACCEL_ALTERNATE TRUE
-  #include <Accelerometer.h>
-  #include <Accelerometer_BMA180.h>
-  Accelerometer_BMA180 accelSpecific;
-  Accelerometer *accel = &accelSpecific;
-
-
-  // Receiver Declaration
-  #define RECEIVER_APM
-  
-  // Motor Declaration
-  #define MOTOR_APM
-  
-  // heading mag hold declaration
-  #ifdef HeadingMagHold
-    #define HMC5843
-  #endif
- 
-  // Altitude declaration
-  #ifdef AltitudeHold
-    #define BMP085
-  #endif
-  
-  #ifdef STATUSMONITOR
-  #include "StatusSignal.h"
-  StatusSignal statusSignalSpecific;
-  StatusSignal* statusSignal = &statusSignalSpecific;
-  #endif
-  
-  // Battery monitor declaration
-  #ifdef BattMonitor
-    #include <BatterySensor.h>
-    //#include <BatteryMonitor_APM.h>
-    BatterySensor batteryMonitorSpecific;
-    BatterySensor* batteryMonitor = &batteryMonitorSpecific;
-  #endif
-  
-  Copter copterSpecific;
-  Copter* copter = &copterSpecific; 
-  
-  /**
-   * Put ArduCopter specific intialization need here
-   */
-  void initPlatform() {
-    initRC();
-    
-    Wire.begin();
-    TWBR = 12;
-    #ifdef STATUSMONITOR
-    statusSignal-> initialize();
-    #endif
-    //statusSignal->setTiming(0, 10, 50);
-  }
-  
-  /**
-   * Measure critical sensors
-   */
-  void measureCriticalSensors() {
-    gyro->measure();
-    accel->measure();
-  }
-  void measureNormalSensors() {
-  }
-  void measureSlowSensors() {
-  
-  }
-#endif
-
-
-
 #ifdef ArduCopter_AQ
   #include <APM_RC.h>
   #include <Device_I2C.h>
@@ -332,18 +250,27 @@
   Accelerometer *accel = &accelSpecific;
 
   // Receiver Declaration
-  #define RECEIVER_APM
+  #include <Receiver.h>
+  #include <Receiver_APM.h>
+  Receiver_APM receiverSpecific;
+  Receiver *receiver = &receiverSpecific;
   
   // Motor Declaration
   #define MOTOR_APM
   
   // heading mag hold declaration
-  #ifdef HeadingMagHold
-    #define HMC5843
-  #endif
+#ifdef HeadingMagHold
+  #include <Magnetometer_HMC5843.h>
+  Magnetometer_HMC5843 compassSpecific;
+  Compass *compass = &compassSpecific;
+#endif
+
+  #include <Kinematics.h>
+  #include <Kinematics_MARG.h>
+  Kinematics_MARG tempKinematics;
+  Kinematics *kinematics = &tempKinematics;
 
   #undef AltitudeHold 
-  #undef BattMonitor 
  
   // Altitude declaration
   #ifdef AltitudeHold
@@ -352,13 +279,26 @@
   
   // Battery monitor declaration
   #ifdef BattMonitor
-    #define BATTERY_MONITOR_APM
+    #include <BatteryMonitor.h>
+    #include <BatteryMonitor_APM2.h>
+    BatteryMonitor_APM2 batteryMonitorSpecific;
+    BatteryMonitor* batteryMonitor = &batteryMonitorSpecific;
   #endif
   
+  // MultiCopter declaration  
+  #include "Copter.h"
+  Copter copterSpecific;
+  Copter* copter = &copterSpecific; 
+
+
+  #include "DataStorage.h"
+  Storage storageSpecific;
+  Storage* storage = &storageSpecific;
+
   /**
    * Put ArduCopter specific intialization need here
    */
-  void initPlatform() {
+  void Copter::initPlatform() {
     initRC();
     Wire.begin();
     TWBR = 12;
@@ -1205,11 +1145,12 @@
 // ********************** Setup AeroQuad **********************
 // ************************************************************
 void setup() {
+  //Serial.begin(115200);
   Serial.begin();
   Serial.println("setup:");
   pinMode(LEDPIN, OUTPUT);
   digitalWrite(LEDPIN, LOW);
-  delay(5000);     
+//  delay(5000);     
   digitalWrite(LEDPIN, HIGH);
   
 #ifdef DEBUG_LOOP
@@ -1239,7 +1180,6 @@ void setup() {
   #elif defined (octoX8Congig)
      motors->initialize(HEIGHT_Motors); 
   #endif
-
 
   // Setup receiver pins for pin change interrupts
   receiver->initialize();
@@ -1502,7 +1442,6 @@ void loop () {
         readSerialCommand(); // defined in SerialCom.pde
         sendSerialTelemetry(); // defined in SerialCom.pde
 
-      
       #ifdef MAX7456_OSD
         osd.update();
       #endif
@@ -1510,7 +1449,14 @@ void loop () {
       #ifdef STATUSMONITOR
       statusSignal->update();
       #endif
-      
+/*      
+      Serial.print("> ");
+      for (byte motor = 0; motor < LASTMOTOR; motor++) {
+        Serial.print(motors->getMotorCommand(motor), DEC);
+        Serial.print(", ");
+      }
+      Serial.println();
+ */     
       digitalWrite(LEDPIN, !digitalRead(LEDPIN));
       
       #ifdef DEBUG_LOOP

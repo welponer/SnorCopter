@@ -173,8 +173,8 @@ void processAltitudeHold()
 
 void processThrottleCorrection() {
 
-  #if defined (BattMonitor)
-    if (batteryStatus != OK) {
+  #if defined (BattMonitor) && defined (BattMonitorAutoDescent)
+    if (batteryStatus == BATTERY_MOBITOR_ALARM) {
       #ifdef AltitudeHold
         if (throttle > BATTERY_MONITOR_THROTTLE_TARGET) {
           altitudeToHoldTarget -= 0.2;

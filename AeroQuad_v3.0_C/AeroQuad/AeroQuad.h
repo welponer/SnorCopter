@@ -138,7 +138,7 @@ int batteyMonitorThrottleCorrection = 0;
   int batteryMonitorStartThrottle = 0;
   unsigned long batteryMonitorStartTime = 0;
   #define BATTERY_MONITOR_THROTTLE_TARGET 1200
-  #define BATTERY_MONITOR_GOIN_DOWN_TIME 120000  // 2 minutes
+  #define BATTERY_MONITOR_GOIN_DOWN_TIME 60000  // 1 minutes
 #endif
 
 // Altitude Hold

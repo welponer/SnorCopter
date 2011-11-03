@@ -69,6 +69,7 @@ public:
     }
     
     commandAllMotors(1000);
+    Serial.println("init Motors_PWM_MapleR5: done");
   }
 
   void write() {
@@ -82,13 +83,10 @@ public:
   }
 
   void commandAllMotors(int command) {
-    Timer3.setCompare(TIMER_CH1, command);
-    Timer3.setCompare(TIMER_CH2, command);
-    Timer3.setCompare(TIMER_CH3, command);
-    Timer3.setCompare(TIMER_CH4, command);
-    if (numbersOfMotors == SIX_Motors) { 
-    
-    }
+    for( int i = 0; i < 4; i++) 
+      motorCommand[i] = command;
+    write();
+    Serial.print("motor command all: "); Serial.println(command);
   }  
 };
 

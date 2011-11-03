@@ -30,6 +30,8 @@
 
 class BatteryMonitor {
 private:
+
+public:
   float lowVoltageWarning;  // Pack voltage at which to trigger alarm (first alarm)
   float lowVoltageAlarm;    // Pack voltage at which to trigger alarm (critical alarm)
   float batteryVoltage;
@@ -39,7 +41,7 @@ public:
 
   BatteryMonitor() {
     lowVoltageWarning = 10.2; //10.8;
-    lowVoltageAlarm = 9.5; //10.2;
+    lowVoltageAlarm = 9.6; //10.2;
     batteryVoltage = lowVoltageWarning + 2;
     batteryStatus = OK;
   }

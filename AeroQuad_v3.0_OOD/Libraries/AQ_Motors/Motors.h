@@ -44,7 +44,7 @@ enum NB_Motors{
 
 class Motors {
 protected:
-  int motorCommand[6];  // LASTMOTOR not know here, so, default at 6 @todo : Kenny, find a better way
+  int motorCommand[8];  // LASTMOTOR not know here, so, default at 6 @todo : Kenny, find a better way
   
 public:
 

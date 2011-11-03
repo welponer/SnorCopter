@@ -30,7 +30,9 @@ void readPilotCommands() {
     // Disarm motors (left stick lower left corner)
     if (receiverCommand[YAW] < MINCHECK && armed == ON) {
       armed = OFF;
-      notifyOSD(OSD_CENTER|OSD_WARN, "MOTORS UNARMED");
+      #ifdef OSD
+        notifyOSD(OSD_CENTER|OSD_WARN, "MOTORS UNARMED");
+      #endif
       commandAllMotors(MINCOMMAND);
       #if defined(APM_OP_CHR6DM) || defined(ArduCopter) 
         digitalWrite(LED_Red, LOW);
@@ -54,15 +56,12 @@ void readPilotCommands() {
     if (receiverCommand[YAW] > MAXCHECK && armed == OFF && safetyCheck == ON) {
       zeroIntegralError();
       armed = ON;
-      notifyOSD(OSD_CENTER|OSD_WARN, "!MOTORS ARMED!");
-      #if defined(APM_OP_CHR6DM) || defined(ArduCopter) 
-        digitalWrite(LED_Red, HIGH);
-      #endif
+      #ifdef OSD
+        notifyOSD(OSD_CENTER|OSD_WARN, "!MOTORS ARMED!");
+      #endif  
       for (byte motor = 0; motor < LASTMOTOR; motor++) {
         motorCommand[motor] = MINTHROTTLE;
       }
-      //   delay(100);
-      //altitude.measureGround();
     }
     // Prevents accidental arming of motor output if no transmitter command received
     if (receiverCommand[YAW] > MINCHECK) safetyCheck = ON; 
