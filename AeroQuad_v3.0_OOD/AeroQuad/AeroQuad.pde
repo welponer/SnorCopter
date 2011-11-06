@@ -83,6 +83,9 @@
 //#define BinaryWritePID // Enables fast binary transfer of attitude PID data
 //#define OpenlogBinaryWrite // Enables fast binary transfer to serial1 and openlog hardware
 
+// High speed sampled gyro & accel sensor
+#define SENSOR_SAMPLED
+
 //
 // *******************************************************************************************************************************
 // Define how many channels that are connected from your R/C receiver
@@ -145,6 +148,7 @@
 #include <Axis.h>
 #include "PID.h"
 #include <AQMath.h>
+#include "filter.h"
 
 //********************************************************
 //********************************************************
@@ -311,6 +315,7 @@
     gyro->measure();
     accel->measure();
   }
+
 #endif
 
 
@@ -1145,27 +1150,17 @@
 // ********************** Setup AeroQuad **********************
 // ************************************************************
 void setup() {
-  //Serial.begin(115200);
+#ifdef MapleCopter_CSG  
   Serial.begin();
+#else
+  Serial.begin(115200);
+#endif
   Serial.println("setup:");
   pinMode(LEDPIN, OUTPUT);
   digitalWrite(LEDPIN, LOW);
 //  delay(5000);     
   digitalWrite(LEDPIN, HIGH);
-  
-#ifdef DEBUG_LOOP
-  pinMode(12, OUTPUT);
-  pinMode(11, OUTPUT);
-  pinMode(10, OUTPUT);
-  pinMode(9, OUTPUT);
-  pinMode(8, OUTPUT);
-  digitalWrite(12, LOW);
-  digitalWrite(11, LOW);
-  digitalWrite(10, LOW);
-  digitalWrite(9, LOW);
-  digitalWrite(8, LOW);
-#endif    
-
+ 
   // Read user values from EEPROM
   //readEEPROM(); // defined in DataStorage.h
   storage->load();
@@ -1198,6 +1193,7 @@ void setup() {
   zeroIntegralError();
   //levelAdjust[ROLL] = 0;
   //levelAdjust[PITCH] = 0;
+  
   copter->initialize();
 
   // Flight angle estimation
@@ -1281,6 +1277,11 @@ void loop () {
   currentTime = micros();
   deltaTime = currentTime - previousTime;
   
+  // High speed sampled sensor
+#ifdef SENSOR_SAMPLED  
+  measureCriticalSensors();
+#endif
+
   // Main scheduler loop set for 100hz
   if (deltaTime >= 10000) {
 
@@ -1305,7 +1306,20 @@ void loop () {
       measureCriticalSensors();
       
       // ****************** Calculate Absolute Angle *****************
-      #if defined HeadingMagHold && defined FlightAngleMARG
+      #if defined HeadingMagHold && defined FlightAngleMARG && defined SENSOR_SAMPLED
+        kinematics->calculate(gyro->getRadPerSecSample(ROLL),                       
+                               gyro->getRadPerSecSample(PITCH),                      
+                               gyro->getRadPerSecSample(YAW),                        
+                               accel->getMeterPerSecSample(XAXIS),                   
+                               accel->getMeterPerSecSample(YAXIS),                   
+                               accel->getMeterPerSecSample(ZAXIS),                   
+                               compass->getRawData(XAXIS),                      
+                               compass->getRawData(YAXIS),                     
+                               compass->getRawData(ZAXIS),
+                               G_Dt);
+      #endif
+    
+      #if defined HeadingMagHold && defined FlightAngleMARG && !defined SENSOR_SAMPLED
         kinematics->calculate(gyro->getRadPerSec(ROLL),                       
                                gyro->getRadPerSec(PITCH),                      
                                gyro->getRadPerSec(YAW),                        
@@ -1317,7 +1331,7 @@ void loop () {
                                compass->getRawData(ZAXIS),
                                G_Dt);
       #endif
-    
+      
       #if defined FlightAngleARG
         kinematics->calculate(gyro->getRadPerSec(ROLL),                       
                                gyro->getRadPerSec(PITCH),                      
@@ -1343,6 +1357,7 @@ void loop () {
                                compass->getHdgXY(YAXIS),
                                G_Dt);
       #endif
+
       
       #if !defined HeadingMagHold && !defined FlightAngleMARG && !defined FlightAngleARG
         kinematics->calculate(gyro->getRadPerSec(ROLL),                        
