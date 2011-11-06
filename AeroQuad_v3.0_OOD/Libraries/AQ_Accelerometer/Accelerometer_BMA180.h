@@ -42,6 +42,8 @@
 class Accelerometer_BMA180 : public Accelerometer {
 private:
   int deviceAddress;
+  float meterPerSecSample[3];
+  int countSample[3];
   
 public:
   Accelerometer_BMA180(boolean useSeccondAddress = false) : Accelerometer() {
@@ -50,6 +52,10 @@ public:
     deviceAddress = ACCEL_ADDRESS;
     if (useSeccondAddress)
 	  deviceAddress = ACCEL_ADDRESS_ALT;
+    for( byte axis = 0; axis < 3; axis++) {
+      meterPerSecSample[axis] = 0;
+      countSample[axis] = 1;
+    }
   }
 
   void initialize(void) {
@@ -96,7 +102,10 @@ public:
         accelADC = (readReverseShortI2C() >> 2) - zero[axis];
       else
         accelADC = zero[axis] - (readReverseShortI2C() >> 2);
+        
       meterPerSec[axis] = filterSmooth(accelADC * accelScaleFactor, meterPerSec[axis], smoothFactor);
+      meterPerSecSample[axis] += accelADC * accelScaleFactor;
+      countSample[axis]++;
     }  
   }
 
@@ -121,6 +130,15 @@ public:
     // store accel value that represents 1g
     measure();
     oneG = -meterPerSec[ZAXIS];
+  }
+  
+  float getMeterPerSecSample(byte axis) {
+    //return meterPerSec[axis];
+    float data = meterPerSecSample[axis] / countSample[axis];
+    //Serial.print(sampleCount[axis]); Serial.print(" / "); Serial.println(data);
+    countSample[axis] = 0;
+    meterPerSecSample[axis] = 0;
+    return data;
   }
 
 };

@@ -39,6 +39,8 @@
 class Gyroscope_ITG3200 : public Gyroscope {
 private:
   int deviceAddress;
+  float rateSample[3];
+  int countSample[3];
   
 public:
   Gyroscope_ITG3200(boolean useSeccondAddress = false) : Gyroscope() {
@@ -47,6 +49,8 @@ public:
     deviceAddress = ITG3200_ADDRESS;
     if (useSeccondAddress)
 	  deviceAddress = ITG3200_ADDRESS_ALT;
+	for( byte axis = 0; axis < 3; axis++) 
+	  countSample[axis] = 1;
   }
 /*  
   Gyroscope_ITG3200(byte address = 0x69) {
@@ -78,6 +82,8 @@ public:
 
     for (byte axis = 0; axis <= YAW; axis++) {
       rate[axis] = filterSmooth(gyroADC[axis] * scaleFactor, rate[axis], smoothFactor);
+      rateSample[axis] += gyroADC[axis] * scaleFactor;
+      countSample[axis]++;
     }
  
     // Measure gyro heading
@@ -100,5 +106,13 @@ public:
       zero[axis] = findMedianInt(findZero, FINDZERO);
     }
   }
+  
+  float getRadPerSecSample(byte axis) {
+    float data = rateSample[axis] / countSample[axis];
+    countSample[axis] = 0;
+    rateSample[axis] = 0;
+    return data;
+  }
+  
 };
 #endif

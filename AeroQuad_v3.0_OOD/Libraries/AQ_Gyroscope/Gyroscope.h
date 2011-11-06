@@ -70,6 +70,10 @@ public:
     return rate[axis];
   }
 
+  virtual float getRadPerSecSample(byte axis) { 
+    return 0;
+  }
+
   const float getHeading() {
     return heading;
   }

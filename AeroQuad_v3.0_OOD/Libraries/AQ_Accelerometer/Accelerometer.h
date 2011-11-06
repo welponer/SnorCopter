@@ -34,7 +34,6 @@ protected:
   
 public:  
   Accelerometer() {
-  /*
     for (int i = 0; i < 3; i++) {
       meterPerSec[i] = 0;
       zero[i] = 0;
@@ -42,13 +41,12 @@ public:
     oneG = 9.9;
     accelScaleFactor = 1.0;
     smoothFactor = 1.0;
-  */
   };
 
   virtual void initialize() {}
   virtual void calibrate() {}
   virtual void measure() {}
-  
+    
   const float getSmoothFactor() {
     return smoothFactor;
   }
@@ -68,6 +66,10 @@ public:
   float getMeterPerSec(byte axis) {
     return meterPerSec[axis];
   }
+  
+  virtual float getMeterPerSecSample(byte axis) { 
+    return 0;
+  }
 
   float getZero(byte axis) {
     return zero[axis];
@@ -76,5 +78,6 @@ public:
   void setZero(byte axis, float zero) {
     this->zero[axis] = zero;
   }
+  
 };
 #endif
