@@ -107,10 +107,18 @@ void initializeEEPROM() {
     maxThrottleAdjust = 50.0; //we don't want it to be able to take over totally
     baroSmoothFactor = 0.1;
   #endif
+  // Accel Cal
+  accelScaleFactor[XAXIS] = 1.0;
+  runTimeAccelBias[XAXIS] = 0.0;
+  accelScaleFactor[YAXIS] = 1.0;
+  runTimeAccelBias[YAXIS] = 0.0;
+  accelScaleFactor[ZAXIS] = 1.0;
+  runTimeAccelBias[ZAXIS] = 0.0;
+
   #ifdef HeadingMagHold
-    setMagCal(XAXIS, 1, 0);
-    setMagCal(YAXIS, 1, 0);
-    setMagCal(ZAXIS, 1, 0);
+    magBias[XAXIS] = 0.0;
+    magBias[YAXIS] = 0.0;
+    magBias[ZAXIS] = 0.0;
   #endif
   windupGuard = 1000.0;
 
@@ -129,7 +137,7 @@ void initializeEEPROM() {
   gyroSmoothFactor = 1.0;
   accelSmoothFactor = 1.0;
   // AKA - old setOneG not in SI - accel->setOneG(500);
-  accelOneG = 9.80665; // AKA set one G to 9.8 m/s^2
+  accelOneG = -9.80665; // AKA set one G to 9.8 m/s^2
   timeConstant = 7.0;
   for (byte channel = ROLL; channel < LASTCHANNEL; channel++) {
     receiverSlope[channel] = 1.0;
@@ -181,10 +189,19 @@ void readEEPROM() {
   #endif
   readPID(ZDAMPENING, ZDAMP_PID_GAIN_ADR);
 
+  // Accel calibration
+  accelScaleFactor[XAXIS] = readFloat(XAXIS_ACCEL_SCALE_FACTOR_ADR);
+  runTimeAccelBias[XAXIS] = readFloat(XAXIS_ACCEL_BIAS_ADR);
+  accelScaleFactor[YAXIS] = readFloat(YAXIS_ACCEL_SCALE_FACTOR_ADR);
+  runTimeAccelBias[YAXIS] = readFloat(YAXIS_ACCEL_BIAS_ADR);
+  accelScaleFactor[ZAXIS] = readFloat(ZAXIS_ACCEL_SCALE_FACTOR_ADR);
+  runTimeAccelBias[ZAXIS] = readFloat(ZAXIS_ACCEL_BIAS_ADR);
+
+  // Mag calibration
   #ifdef HeadingMagHold
-    setMagCal(XAXIS, readFloat(MAGXMAX_ADR), readFloat(MAGXMIN_ADR));
-    setMagCal(YAXIS, readFloat(MAGYMAX_ADR), readFloat(MAGYMIN_ADR));
-    setMagCal(ZAXIS, readFloat(MAGZMAX_ADR), readFloat(MAGZMIN_ADR));
+    magBias[XAXIS] = readFloat(XAXIS_MAG_BIAS_ADR);
+    magBias[YAXIS] = readFloat(YAXIS_MAG_BIAS_ADR);
+    magBias[ZAXIS] = readFloat(ZAXIS_MAG_BIAS_ADR);
   #endif
 
   windupGuard = readFloat(WINDUPGUARD_ADR);
@@ -239,20 +256,17 @@ void writeEEPROM(){
     writeFloat(0.1, ALTITUDE_SMOOTH_ADR);
   #endif
   writePID(ZDAMPENING, ZDAMP_PID_GAIN_ADR);
+  // Accel Cal
+  writeFloat(accelScaleFactor[XAXIS], XAXIS_ACCEL_SCALE_FACTOR_ADR);
+  writeFloat(runTimeAccelBias[XAXIS], XAXIS_ACCEL_BIAS_ADR);
+  writeFloat(accelScaleFactor[YAXIS], YAXIS_ACCEL_SCALE_FACTOR_ADR);
+  writeFloat(runTimeAccelBias[YAXIS], YAXIS_ACCEL_BIAS_ADR);
+  writeFloat(accelScaleFactor[ZAXIS], ZAXIS_ACCEL_SCALE_FACTOR_ADR);
+  writeFloat(runTimeAccelBias[ZAXIS], ZAXIS_ACCEL_BIAS_ADR);
   #ifdef HeadingMagHold
-    writeFloat(magMax[XAXIS], MAGXMAX_ADR);
-    writeFloat(magMin[XAXIS], MAGXMIN_ADR);
-    writeFloat(magMax[YAXIS], MAGYMAX_ADR);
-    writeFloat(magMin[YAXIS], MAGYMIN_ADR);
-    writeFloat(magMax[ZAXIS], MAGZMAX_ADR);
-    writeFloat(magMin[ZAXIS], MAGZMIN_ADR);
-  #else
-    writeFloat(1.0F, MAGXMAX_ADR);
-    writeFloat(0.0F, MAGXMIN_ADR);
-    writeFloat(1.0F, MAGYMAX_ADR);
-    writeFloat(0.0F, MAGYMIN_ADR);
-    writeFloat(1.0F, MAGZMAX_ADR);
-    writeFloat(0.0F, MAGZMIN_ADR);
+    writeFloat(magBias[XAXIS], XAXIS_MAG_BIAS_ADR);
+    writeFloat(magBias[YAXIS], YAXIS_MAG_BIAS_ADR);
+    writeFloat(magBias[ZAXIS], ZAXIS_MAG_BIAS_ADR);
   #endif
   writeFloat(windupGuard, WINDUPGUARD_ADR);
   writeFloat(receiverXmitFactor, XMITFACTOR_ADR);

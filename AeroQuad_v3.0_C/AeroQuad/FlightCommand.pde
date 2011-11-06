@@ -40,8 +40,8 @@ void readPilotCommands() {
     }    
     // Zero Gyro and Accel sensors (left stick lower left, right stick lower right corner)
     if ((receiverCommand[YAW] < MINCHECK) && (receiverCommand[ROLL] > MAXCHECK) && (receiverCommand[PITCH] < MINCHECK)) {
-      calibrateGyro(); // defined in Gyro.h
-      calibrateAccel(); // defined in Accel.h
+      calibrateGyro();
+     computeAccelBias();
       storeSensorsZeroToEEPROM();
       //accel.setOneG(accel.getFlightData(ZAXIS));
       calibrateKinematics();

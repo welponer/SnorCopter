@@ -290,17 +290,22 @@ typedef struct {
   float ALTITUDE_SMOOTH_ADR;
 //  float ZDAMP_PGAIN_ADR;
   float ALTITUDE_WINDUP_ADR;
-  float MAGXMAX_ADR;
-  float MAGXMIN_ADR;
-  float MAGYMAX_ADR;
-  float MAGYMIN_ADR;
-  float MAGZMAX_ADR;
-  float MAGZMIN_ADR;
   float SERVOMINPITCH_ADR;
   float SERVOMINROLL_ADR;
   float GYRO_ROLL_ZERO_ADR;
   float GYRO_PITCH_ZERO_ADR;
   float GYRO_YAW_ZERO_ADR;
+  // Accel Calibration
+  float XAXIS_ACCEL_BIAS_ADR;
+  float XAXIS_ACCEL_SCALE_FACTOR_ADR;
+  float YAXIS_ACCEL_BIAS_ADR;
+  float YAXIS_ACCEL_SCALE_FACTOR_ADR;
+  float ZAXIS_ACCEL_BIAS_ADR;
+  float ZAXIS_ACCEL_SCALE_FACTOR_ADR;
+  // Mag Calibration
+  float XAXIS_MAG_BIAS_ADR;
+  float YAXIS_MAG_BIAS_ADR;
+  float ZAXIS_MAG_BIAS_ADR;
 } t_NVR_Data;  
 
 

@@ -82,8 +82,13 @@ void readSerialCommand() {
       readSerialPID(LEVELGYROPITCH);
       windupGuard = readFloatSerial(); // defaults found in setup() of AeroQuad.pde
       break;
-    case 'G': // *** Spare ***
-      // Spare command
+    case 'G': // Write accel calibration values
+      accelScaleFactor[XAXIS] = readFloatSerial();
+      runTimeAccelBias[XAXIS] = readFloatSerial();      
+      accelScaleFactor[YAXIS] = readFloatSerial();
+      runTimeAccelBias[YAXIS] = readFloatSerial();      
+      accelScaleFactor[ZAXIS] = readFloatSerial();
+      runTimeAccelBias[ZAXIS] = readFloatSerial();
       break;
     case 'I': // Receiver altitude hold PID
 #ifdef AltitudeHold
@@ -120,7 +125,7 @@ void readSerialCommand() {
     case 'Y': // Initialize EEPROM with default values
       initializeEEPROM(); // defined in DataStorage.h
       calibrateGyro();
-      calibrateAccel();
+      computeAccelBias();
       zeroIntegralError();
 #ifdef HeadingMagHold
       initializeMagnetometer();
@@ -163,7 +168,7 @@ void readSerialCommand() {
       storeSensorsZeroToEEPROM();
       break;
     case 'c': // calibrate accels
-      calibrateAccel();
+      computeAccelBias();
 #if defined(AeroQuadMega_CHR6DM) || defined(APM_OP_CHR6DM)
       calibrateKinematics();
       accelOneG = meterPerSec[ZAXIS];
@@ -175,9 +180,9 @@ void readSerialCommand() {
       break;
     case 'f': // calibrate magnetometer
 #ifdef HeadingMagHold
-      for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
-        setMagCal(axis, readFloatSerial(), readFloatSerial());
-      }
+      magBias[XAXIS] = readFloatSerial();      
+      magBias[YAXIS] = readFloatSerial();
+      magBias[ZAXIS] = readFloatSerial();
 #endif
       break;
     case '~': //  read Camera values
@@ -244,7 +249,7 @@ void sendSerialTelemetry() {
   switch (queryType) {
   case '=': // Reserved debug command to view any variable from Serial Monitor
     //PrintValueComma(kinematics->getData(ROLL));
-    //SERIAL_PRINT(degrees(kinematics->getData(YAW)));
+    //SERIAL_PRINT(G_Dt, 6);
     //SERIAL_PRINTLN();
     //printFreeMemory();
     //queryType = 'X';
@@ -269,11 +274,19 @@ void sendSerialTelemetry() {
     SERIAL_PRINTLN(windupGuard);
     queryType = 'X';
     break;
-  case 'H': // *** Spare ***
-    // Spare telemetry
-    //PrintValueComma(0);
-    //SERIAL_PRINTLN(0);
-    //queryType = 'X';
+  case 'H': // Send accelerometer cal values
+    SERIAL_PRINT(accelScaleFactor[XAXIS], 6);
+    comma();
+    SERIAL_PRINT(runTimeAccelBias[XAXIS], 6);
+    comma();
+    SERIAL_PRINT(accelScaleFactor[YAXIS], 6);
+    comma();
+    SERIAL_PRINT(runTimeAccelBias[YAXIS], 6);
+    comma();
+    SERIAL_PRINT(accelScaleFactor[ZAXIS], 6);
+    comma();
+    SERIAL_PRINTLN(runTimeAccelBias[ZAXIS], 6);
+    queryType = 'X';
     break;
   case 'J': // Altitude Hold
 #ifdef AltitudeHold
@@ -323,56 +336,53 @@ void sendSerialTelemetry() {
     }
     for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
 #if defined(HeadingMagHold)
-      PrintValueComma(getMagnetometerRawData(axis));
-#else
-      PrintValueComma(0);
-#endif
-    }
-
-    PrintValueComma(degrees(kinematicsAngle[ROLL]));
-    PrintValueComma(degrees(kinematicsAngle[PITCH]));
-#if defined(HeadingMagHold) || defined(AeroQuadMega_CHR6DM) || defined(APM_OP_CHR6DM)
-    SERIAL_PRINTLN((kinematicsAngle[YAW]));
-#else
-    SERIAL_PRINTLN(degrees(gyroHeading));
-#endif
-    break;
-  case 'R': // *** Spare ***
-    // Spare telemetry
-    //PrintValueComma(0);
-    //SERIAL_PRINTLN(0);
-    //queryType = 'X';
-    break;
-  case 'S': // Send all flight data
-    PrintValueComma(deltaTime);
-    for (byte axis = ROLL; axis < LASTAXIS; axis++)
-      PrintValueComma(gyroRate[axis]);
-    for (byte axis = ROLL; axis < LASTAXIS; axis++)
-      PrintValueComma(meterPerSec[axis]);
-#ifdef BattMonitor
-    PrintValueComma(batteryVoltage);
+    PrintValueComma(getMagnetometerRawData(axis));
 #else
     PrintValueComma(0);
 #endif
-    for (byte motor = 0; motor < LASTMOTOR; motor++)
-      PrintValueComma(motorCommand[motor]);
-    PrintValueComma((int)armed);
-    if (flightMode == STABLE)
-      PrintValueComma(2000);
-    if (flightMode == ACRO)
-      PrintValueComma(1000);
-#ifdef HeadingMagHold
-    PrintValueComma(kinematicsGetDegreesHeading(YAW));
+    }
+    SERIAL_PRINTLN();
+    break;
+  case 'R': // *** Spare ***
+    PrintValueComma(kinematicsAngle[ROLL]);
+    PrintValueComma(kinematicsAngle[PITCH]);
+#if defined(HeadingMagHold) || defined(AeroQuadMega_CHR6DM) || defined(APM_OP_CHR6DM)
+    SERIAL_PRINTLN(kinematicsAngle[YAW]);
+#else
+    SERIAL_PRINTLN(gyroHeading);
+#endif
+    break;
+  case 'S': // Send all flight data
+    PrintValueComma(armed);
+    PrintValueComma(kinematicsAngle[ROLL]);
+    PrintValueComma(kinematicsAngle[PITCH]);
+#if defined(HeadingMagHold) || defined(AeroQuadMega_CHR6DM) || defined(APM_OP_CHR6DM)
+    PrintValueComma(kinematicsAngle[YAW]);
 #else
     PrintValueComma(gyroHeading);
 #endif
 #ifdef AltitudeHold
     PrintValueComma(getBaroAltitude());
-    SERIAL_PRINTLN((int)altitudeHoldState);
+    PrintValueComma((int)altitudeHoldState);
 #else
     PrintValueComma(0);
-    SERIAL_PRINTLN('0');
+    PrintValueComma('0');
 #endif
+    for (byte channel = ROLL; channel < LASTCHANNEL; channel++)
+      PrintValueComma(receiverCommand[channel]);
+    for (byte channel = 0; channel < (8 - LASTCHANNEL); channel++) // max of 8 transmitter channel supported
+      PrintValueComma(0); // zero out unused transmitter channels
+    for (byte motor = 0; motor < LASTMOTOR; motor++)
+      PrintValueComma(motorCommand[motor]);
+    for (byte motor = 0; motor < (8 - (LASTMOTOR - 1)); motor++) // max of 8 motor outputs supported
+      PrintValueComma(0); // zero out unused motor channels
+#ifdef BattMonitor
+    PrintValueComma(batteryData[0].voltage);
+#else
+    PrintValueComma(0);
+#endif
+    PrintValueComma(flightMode);
+    SERIAL_PRINTLN();
     break;
   case 'T': // Send processed transmitter values *** UPDATE ***
     PrintValueComma(receiverXmitFactor);
@@ -381,7 +391,6 @@ void sendSerialTelemetry() {
     }
     for (byte axis = ROLL; axis < LASTAXIS; axis++) {
       PrintValueComma(motorCommand[axis]);
-//      PrintValueComma(motorConfiguratorCommand[axis]);
     }
     SERIAL_PRINTLN();
     break;
@@ -399,11 +408,12 @@ void sendSerialTelemetry() {
     break;
   case 'X': // Stop sending messages
     break;
-  case 'Z': // *** Spare ***
-    // Spare telemetry
-    //PrintValueComma(0);
-    //SERIAL_PRINTLN(0);
-    //queryType = 'X';
+  case 'Z': // Accelerometer Calibration Output
+    measureAccelSum();
+    PrintValueComma(accelSample[XAXIS]/accelSampleCount);
+    PrintValueComma(accelSample[YAXIS]/accelSampleCount);
+    SERIAL_PRINTLN (accelSample[ZAXIS]/accelSampleCount);
+    accelSampleCount = 0;
     break;
   case '6': // Report remote commands
     for (byte motor = 0; motor < LASTMOTOR; motor++) {
@@ -418,59 +428,73 @@ void sendSerialTelemetry() {
     break;
   case '#': // Send software configuration
     // Determine which hardware is used to define max/min sensor values for Configurator plots
+    SERIAL_PRINT("SW Version: ");
+    SERIAL_PRINTLN(VERSION, 1);
+    SERIAL_PRINT("Board Type: ");
 #if defined(AeroQuad_v1)
-    PrintValueComma(0);
+    SERIAL_PRINTLN("v1.x");
 #elif defined(AeroQuadMega_v1)
-    PrintValueComma(1);
+    SERIAL_PRINTLN("Mega v1.x");
 #elif defined(AeroQuad_v18)
-    PrintValueComma(2);
+    SERIAL_PRINTLN("v1.8 and greater");
 #elif defined(AeroQuadMega_v2)
-    PrintValueComma(3);
+    SERIAL_PRINTLN("Mega v2");
 #elif defined(AeroQuad_Wii)
-    PrintValueComma(4);
+    SERIAL_PRINTLN("Wii");
 #elif defined(AeroQuadMega_Wii)
-    PrintValueComma(5);
+    SERIAL_PRINTLN("Mega Wii");
 #elif defined(ArduCopter)
-    PrintValueComma(6);
+    SERIAL_PRINTLN("ArduCopter");
 #elif defined(AeroQuadMega_CHR6DM)
-    PrintValueComma(5);
+    SERIAL_PRINTLN("CHR6DM");
 #elif defined(APM_OP_CHR6DM)
-    PrintValueComma(6);
+    SERIAL_PRINTLN("APM w/ CHR6DM");
 #elif defined(AeroQuad_Mini)
-    PrintValueComma(2);
+    SERIAL_PRINTLN("Mini");
 #endif
     // Determine which motor flight configuration for Configurator GUI
+    SERIAL_PRINT("Flight Config: ");
 #if defined(quadPlusConfig)
-    PrintValueComma('0');
-#elif defined(quadXConfig) || defined (quadY4Config) || defined (triConfig) 
-    PrintValueComma('1');
-#elif defined(hexPlusConfig) || defined(hexXConfig) || defined(hexY6Config)
-    PrintValueComma('2');
-#elif defined(octoX8Congig) || defined(octoXCongig) || defined(octoXPlusCongig)
-    PrintValueComma('3');
+    SERIAL_PRINTLN("Quad +");
+#elif defined(quadXConfig) 
+    SERIAL_PRINTLN("Quad X");
+#elif defined (quadY4Config)
+    SERIAL_PRINTLN("Quad Y4");
+#elif defined (triConfig)
+    SERIAL_PRINTLN("Tri");
+#elif defined(hexPlusConfig)
+    SERIAL_PRINTLN("Hex +");
+#elif defined(hexXConfig)
+    SERIAL_PRINTLN("Hex X");
+#elif defined(hexY6Config)
+    SERIAL_PRINTLN("Hex Y6");
+#elif defined(octoX8Config)
+    SERIAL_PRINTLN("Octo X8");
+#elif defined(octoXConfig)
+    SERIAL_PRINTLN("Octo X");
+#elif defined(octoXPlusConfig)
+    SERIAL_PRINTLN("Octo X+");
 #endif
-    PrintValueComma(LASTCHANNEL);
-    SERIAL_PRINT(LASTMOTOR);
-    SERIAL_PRINTLN();
+    SERIAL_PRINT("Receiver Ch's: ");
+    SERIAL_PRINTLN(LASTCHANNEL);
+    SERIAL_PRINT("Motors: ");
+    SERIAL_PRINTLN(LASTMOTOR);
     queryType = 'X';
     break;
-  case 'e': // *** Spare ***
-    // Spare telemetry
-    //PrintValueComma(0);
-    //SERIAL_PRINTLN(0);
-    //queryType = 'X';
+  case 'e': // Send raw mag
+#ifdef HeadingMagHold
+    PrintValueComma(getMagnetometerRawData(XAXIS));
+    PrintValueComma(getMagnetometerRawData(YAXIS));
+    SERIAL_PRINTLN(getMagnetometerRawData(ZAXIS));
+#endif
     break;
   case 'g': // Send magnetometer cal values
 #ifdef HeadingMagHold
-    // dirty trick to disable compiler loop unrolling
-    //for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
-    for (byte axis = XAXIS; axis < 99; axis++) {
-      if(axis == LASTAXIS)
-        break;
-      PrintValueComma(magMax[axis]);
-      PrintValueComma(magMin[axis]);
-    }
-    SERIAL_PRINTLN();
+	  SERIAL_PRINT(magBias[XAXIS], 6);
+	  comma();
+	  SERIAL_PRINT(magBias[YAXIS], 6);
+	  comma();
+	  SERIAL_PRINTLN(magBias[ZAXIS], 6);
 #endif
     queryType = 'X';
     break;
@@ -500,7 +524,7 @@ void sendSerialTelemetry() {
 
 // Used to read floating point values from the serial port
 float readFloatSerial() {
-  #define SERIALFLOATSIZE 10
+  #define SERIALFLOATSIZE 15
   byte index = 0;
   byte timeout = 0;
   char data[SERIALFLOATSIZE] = "";
