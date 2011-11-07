@@ -135,7 +135,7 @@ public:
   float getMeterPerSecSample(byte axis) {
     //return meterPerSec[axis];
     float data = meterPerSecSample[axis] / countSample[axis];
-    //Serial.print(sampleCount[axis]); Serial.print(" / "); Serial.println(data);
+    //Serial.print(countSample[axis]); Serial.print(" / "); Serial.println(data);
     countSample[axis] = 0;
     meterPerSecSample[axis] = 0;
     return data;

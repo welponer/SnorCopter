@@ -41,8 +41,8 @@
 //#define ArduCopter          // ArduPilot Mega (APM) with Oilpan Sensor Board
 //#define AeroQuadMega_CHR6DM // Clean Arduino Mega with CHR6DM as IMU/heading ref.
 //#define APM_OP_CHR6DM       // ArduPilot Mega with CHR6DM as IMU/heading ref., Oilpan for barometer (just uncomment AltitudeHold for baro), and voltage divider
-//#define ArduCopter_AQ
-#define MapleCopter_CSG
+#define ArduCopter_AQ
+//#define MapleCopter_CSG
 
 /****************************************************************************
  *********************** Define Flight Configuration ************************
@@ -84,7 +84,7 @@
 //#define OpenlogBinaryWrite // Enables fast binary transfer to serial1 and openlog hardware
 
 // High speed sampled gyro & accel sensor
-#define SENSOR_SAMPLED
+//#define SENSOR_SAMPLED
 
 //
 // *******************************************************************************************************************************
@@ -188,11 +188,10 @@
   Motors *motors = &motorsSpecific;
   
   // Magnetometer heading hold declaration
-#ifdef HeadingMagHold
+  #define HeadingMagHold
   #include <Magnetometer_HMC5883L.h>
   Magnetometer_HMC5883L compassSpecific;
   Compass *compass = &compassSpecific;
-#endif
 
   #include <Kinematics.h>
   #include <Kinematics_MARG.h>
@@ -217,11 +216,9 @@
   Copter copterSpecific;
   Copter* copter = &copterSpecific; 
 
-
   #include "DataStorage.h"
   Storage storageSpecific;
   Storage* storage = &storageSpecific;
-
 
   // Put platform specific intialization need here
   void Copter::initPlatform() {
@@ -263,11 +260,10 @@
   #define MOTOR_APM
   
   // heading mag hold declaration
-#ifdef HeadingMagHold
+  #define HeadingMagHold
   #include <Magnetometer_HMC5843.h>
   Magnetometer_HMC5843 compassSpecific;
   Compass *compass = &compassSpecific;
-#endif
 
   #include <Kinematics.h>
   #include <Kinematics_MARG.h>
@@ -275,7 +271,6 @@
   Kinematics *kinematics = &tempKinematics;
 
   #undef AltitudeHold 
- 
   // Altitude declaration
   #ifdef AltitudeHold
     #define BMP085
@@ -293,7 +288,6 @@
   #include "Copter.h"
   Copter copterSpecific;
   Copter* copter = &copterSpecific; 
-
 
   #include "DataStorage.h"
   Storage storageSpecific;
