@@ -156,9 +156,7 @@ public:
       receiverData[channel] = (mTransmitter[channel] * highTime) + bTransmitter[channel];
       // Smooth the flight control transmitter inputs
       transmitterCommandSmooth[channel] = filterSmooth(receiverData[channel], transmitterCommandSmooth[channel], transmitterSmooth[channel]);
-//Serial.print(receiverData[channel]);  Serial.print("/");  
     }
-//Serial.println("");    
     // Reduce transmitter commands using xmitFactor and center around 1500
     for (byte channel = ROLL; channel < THROTTLE; channel++)
       transmitterCommand[channel] = ((transmitterCommandSmooth[channel] - transmitterZero[channel]) * xmitFactor) + transmitterZero[channel];

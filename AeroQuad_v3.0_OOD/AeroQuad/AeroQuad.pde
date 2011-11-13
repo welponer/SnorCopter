@@ -41,7 +41,7 @@
 //#define ArduCopter          // ArduPilot Mega (APM) with Oilpan Sensor Board
 //#define AeroQuadMega_CHR6DM // Clean Arduino Mega with CHR6DM as IMU/heading ref.
 //#define APM_OP_CHR6DM       // ArduPilot Mega with CHR6DM as IMU/heading ref., Oilpan for barometer (just uncomment AltitudeHold for baro), and voltage divider
-//#define ArduCopter_AQ
+//#define ArduCopter_AQ       //  
 #define MapleCopter_CSG
 
 /****************************************************************************
@@ -1139,6 +1139,7 @@ Copter* copter = &copterSpecific;
   OSD osd;
 #endif
 
+FrameTimer timer;
 
 // Include this last as it contains objects from above declarations
 #include "DataStorage.h"
@@ -1274,6 +1275,8 @@ void loop () {
   currentTime = micros();
   deltaTime = currentTime - previousTime;
   
+  timer.update();
+  
   // High speed sampled sensor
 #ifdef SENSOR_SAMPLED  
   measureCriticalSensors();
@@ -1297,7 +1300,7 @@ void loop () {
         digitalWrite(11, HIGH);
       #endif
       
-      G_Dt = (currentTime - hundredHZpreviousTime) / 1000000.0;
+      copter->G_Dt = (currentTime - hundredHZpreviousTime) / 1000000.0;
       hundredHZpreviousTime = currentTime;
       
  #ifndef SENSOR_SAMPLED      
@@ -1315,7 +1318,7 @@ void loop () {
                                compass->getRawData(XAXIS),                      
                                compass->getRawData(YAXIS),                     
                                compass->getRawData(ZAXIS),
-                               G_Dt);
+                               copter->G_Dt);
       #endif
     
       #if defined HeadingMagHold && defined FlightAngleMARG && !defined SENSOR_SAMPLED
@@ -1328,7 +1331,7 @@ void loop () {
                                compass->getRawData(XAXIS),                      
                                compass->getRawData(YAXIS),                     
                                compass->getRawData(ZAXIS),
-                               G_Dt);
+                               copter->G_Dt);
       #endif
       
       #if defined FlightAngleARG
@@ -1341,7 +1344,7 @@ void loop () {
                                0.0,                                            
                                0.0,                                            
                                0.0,
-                               G_Dt);
+                               copter->G_Dt);
       #endif
 
       #if defined HeadingMagHold && !defined FlightAngleMARG && !defined FlightAngleARG
@@ -1354,7 +1357,7 @@ void loop () {
                                accel->getOneG(),                              
                                compass->getHdgXY(XAXIS),                        
                                compass->getHdgXY(YAXIS),
-                               G_Dt);
+                               copter->G_Dt);
       #endif
 
       
@@ -1368,9 +1371,8 @@ void loop () {
                                accel->getOneG(),                               
                                0.0,                                             
                                0.0,
-                               G_Dt);  
+                               copter->G_Dt);  
       #endif
-      
       
       // Combines external pilot commands and measured sensor data to generate motor commands
       //processFlightControl();
@@ -1396,7 +1398,7 @@ void loop () {
         digitalWrite(10, HIGH);
       #endif
       
-      G_Dt = (currentTime - fiftyHZpreviousTime) / 1000000.0;
+      copter->G_Dt = (currentTime - fiftyHZpreviousTime) / 1000000.0;
       fiftyHZpreviousTime = currentTime;
       
       // Reads external pilot commands and performs functions based on stick configuration
@@ -1419,7 +1421,7 @@ void loop () {
         digitalWrite(9, HIGH);
       #endif
       
-      G_Dt = (currentTime - twentyFiveHZpreviousTime) / 1000000.0;
+      copter->G_Dt = (currentTime - twentyFiveHZpreviousTime) / 1000000.0;
       twentyFiveHZpreviousTime = currentTime;
       
       #if defined(AltitudeHold)
@@ -1439,7 +1441,7 @@ void loop () {
         digitalWrite(8, HIGH);
       #endif
       
-      G_Dt = (currentTime - tenHZpreviousTime) / 1000000.0;
+      copter->G_Dt = (currentTime - tenHZpreviousTime) / 1000000.0;
       tenHZpreviousTime = currentTime;
 
 

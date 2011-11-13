@@ -178,7 +178,7 @@ HardwareSerial *binaryPort;
 #define TELEMETRYLOOPTIME 100000 // 100ms, 10Hz for slower computers/cables (more rough Configurator values)
 */
 
-float G_Dt = 0.002;
+//float G_Dt = 0.002;
 // Offset starting times so that events don't happen at the same time
 // main loop times
 unsigned long previousTime = 0;
