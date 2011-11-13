@@ -115,51 +115,50 @@ void processMinMaxCommand() {
 }
 
 void processHardManuevers() {
-  if (flightMode == ACRO) {
     if (receiver->getData(ROLL) < MINCHECK) {        // Maximum Left Roll Rate
       motorMinCommand[FRONT_RIGHT]   = MAXCOMMAND;
       motorMinCommand[REAR_RIGHT]    = MAXCOMMAND;
       motorMinCommand[FRONT_RIGHT_2] = MAXCOMMAND;
       motorMinCommand[REAR_RIGHT_2]  = MAXCOMMAND;
-      motorMaxCommand[FRONT_LEFT]    = minAcro;
-      motorMaxCommand[REAR_LEFT]     = minAcro;
-      motorMaxCommand[FRONT_LEFT_2]  = minAcro;
-      motorMaxCommand[REAR_LEFT_2]   = minAcro;
+      motorMaxCommand[FRONT_LEFT]    = MINACRO;
+      motorMaxCommand[REAR_LEFT]     = MINACRO;
+      motorMaxCommand[FRONT_LEFT_2]  = MINACRO;
+      motorMaxCommand[REAR_LEFT_2]   = MINACRO;
     }
     else if (receiver->getData(ROLL) > MAXCHECK) {   // Maximum Right Roll Rate
       motorMinCommand[FRONT_LEFT]    = MAXCOMMAND;
       motorMinCommand[REAR_LEFT]     = MAXCOMMAND;
       motorMinCommand[FRONT_LEFT_2]  = MAXCOMMAND;
       motorMinCommand[REAR_LEFT_2]   = MAXCOMMAND;
-      motorMaxCommand[FRONT_RIGHT]   = minAcro;
-      motorMaxCommand[REAR_RIGHT]    = minAcro;
-      motorMaxCommand[FRONT_RIGHT_2] = minAcro;
-      motorMaxCommand[REAR_RIGHT_2]  = minAcro;
+      motorMaxCommand[FRONT_RIGHT]   = MINACRO;
+      motorMaxCommand[REAR_RIGHT]    = MINACRO;
+      motorMaxCommand[FRONT_RIGHT_2] = MINACRO;
+      motorMaxCommand[REAR_RIGHT_2]  = MINACRO;
     }
     else if (receiver->getData(PITCH) < MINCHECK) {  // Maximum Nose Up Pitch Rate
       motorMinCommand[FRONT_LEFT]    = MAXCOMMAND;
       motorMinCommand[FRONT_RIGHT]   = MAXCOMMAND;
       motorMinCommand[FRONT_LEFT_2]  = MAXCOMMAND;
       motorMinCommand[FRONT_RIGHT_2] = MAXCOMMAND;
-      motorMaxCommand[REAR_LEFT]     = minAcro;
-      motorMaxCommand[REAR_RIGHT]    = minAcro;
-      motorMaxCommand[REAR_LEFT_2]   = minAcro;
-      motorMaxCommand[REAR_RIGHT_2]  = minAcro;
+      motorMaxCommand[REAR_LEFT]     = MINACRO;
+      motorMaxCommand[REAR_RIGHT]    = MINACRO;
+      motorMaxCommand[REAR_LEFT_2]   = MINACRO;
+      motorMaxCommand[REAR_RIGHT_2]  = MINACRO;
     }
     else if (receiver->getData(PITCH) > MAXCHECK) {  // Maximum Nose Down Pitch Rate
       motorMinCommand[REAR_LEFT]     = MAXCOMMAND;
       motorMinCommand[REAR_RIGHT]    = MAXCOMMAND;
       motorMinCommand[REAR_LEFT_2]   = MAXCOMMAND;
       motorMinCommand[REAR_RIGHT_2]  = MAXCOMMAND;
-      motorMaxCommand[FRONT_LEFT]    = minAcro;
-      motorMaxCommand[FRONT_RIGHT]   = minAcro;
-      motorMaxCommand[FRONT_LEFT_2]  = minAcro;
-      motorMaxCommand[FRONT_RIGHT_2] = minAcro;
+      motorMaxCommand[FRONT_LEFT]    = MINACRO;
+      motorMaxCommand[FRONT_RIGHT]   = MINACRO;
+      motorMaxCommand[FRONT_LEFT_2]  = MINACRO;
+      motorMaxCommand[FRONT_RIGHT_2] = MINACRO;
     }
-  }
 }
 
 
 
 #endif // #define _AQ_PROCESS_FLIGHT_CONTROL_X_MODE_H_
+
 

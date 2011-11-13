@@ -31,7 +31,7 @@
 
 void calculateFlightError(void)
 {
-  if (flightMode == ACRO) {
+  if (copter->flightMode == ACRO) {
     motorAxisCommandRoll = updatePID(receiver->getSIData(ROLL), gyro->getRadPerSec(ROLL), &PID[ROLL]);
     motorAxisCommandPitch = updatePID(receiver->getSIData(PITCH), -gyro->getRadPerSec(PITCH), &PID[PITCH]);
   }
@@ -75,7 +75,7 @@ void processCalibrateESC(void)
 //////////////////////////////////////////////////////////////////////////////
 void processHeading(void)
 {
-  if (headingHoldConfig == ON) {
+  if (copter->headingHoldConfig == ON) {
 
     #if defined(HeadingMagHold)
       heading = degrees(kinematics->getHeading(YAW));
@@ -195,7 +195,9 @@ void processFlightControl() {
   processMinMaxCommand();
 
   // Allows quad to do acrobatics by lowering power to opposite motors during hard manuevers
-  processHardManuevers();
+  if (copter->flightMode == ACRO) {
+    processHardManuevers();
+  }
   
   // Apply limits to motor commands
   for (byte motor = 0; motor < LASTMOTOR; motor++) {

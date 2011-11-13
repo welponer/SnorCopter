@@ -58,8 +58,6 @@ struct PIDdata {
   float lastPosition;
   // AKA experiments with PID
   float previousPIDTime;
-  bool firstPass;
-  bool typePID;
   float integratedError;
   float windupGuard; // Thinking about having individual wind up guards for each PID
 } PID[10];
@@ -72,15 +70,11 @@ struct PIDdata {
 // ZDAMPENING = 9 (used in altitude hold to dampen vertical accelerations)
 float windupGuard; // Read in from EEPROM
 
-// PID types
-#define NOTYPE 0
-#define TYPEPI 1
-
 // Smoothing filter parameters
 #define GYRO 0
 #define ACCEL 1
 #define FINDZERO 49
-float smoothHeading;
+//float smoothHeading;
 
 // Sensor pin assignments
 #define PITCHACCELPIN 0
@@ -103,13 +97,13 @@ float aref; // Read in from EEPROM
 // Flight Mode
 #define ACRO 0
 #define STABLE 1
-byte flightMode;
+//byte flightMode;
 unsigned long frameCounter = 0; // main loop executive frame counter
-int minAcro; // Read in from EEPROM, defines min throttle during flips
-
+//int minAcro; // Read in from EEPROM, defines min throttle during flips
+#define MINACRO 1300
 
 // Auto level setup
-float levelAdjust[2] = {0.0,0.0};
+//float levelAdjust[2] = {0.0,0.0};
 //int levelAdjust[2] = {0,0};
   // Scale to convert 1000-2000 PWM to +/- 45 degrees
 //float mLevelTransmitter = 0.09;
@@ -121,7 +115,7 @@ float levelAdjust[2] = {0.0,0.0};
 #endif
 
 // Heading hold
-byte headingHoldConfig = ON;
+//byte headingHoldConfig = ON;
 //float headingScaleFactor;
 float commandedYaw = 0;
 float headingHold = 0; // calculated adjustment for quad to go to heading (PID output)
@@ -157,7 +151,7 @@ byte altitudeHold = OFF;
 int delta;
 
 // Flight angle variables
-float timeConstant;
+//float timeConstant;
 
 // ESC Calibration
 byte calibrateESC = 0;

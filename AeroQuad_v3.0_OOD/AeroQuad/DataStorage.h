@@ -66,12 +66,12 @@ typedef struct {
   
   float WINDUPGUARD_ADR;
   float XMITFACTOR_ADR;
-  float FILTERTERM_ADR;
-  float HEADINGSMOOTH_ADR;
+//  float FILTERTERM_ADR;
+//  float HEADINGSMOOTH_ADR;
   float AREF_ADR;
   float FLIGHTMODE_ADR;
   float HEADINGHOLD_ADR;
-  float MINACRO_ADR;
+//  float MINACRO_ADR;
 //  float ALTITUDE_PGAIN_ADR;
   float ALTITUDE_MAX_THROTTLE_ADR;
   float ALTITUDE_MIN_THROTTLE_ADR;
@@ -179,12 +179,6 @@ void nvrReadPID(unsigned char IDPid, unsigned int IDEeprom) {
   pid->D = nvrReadFloat(IDEeprom+8);
   pid->lastPosition = 0;
   pid->integratedError = 0;
-  // AKA experiements with PIDS
-  pid->firstPass = true;
-  if (IDPid == HEADING)
-    pid->typePID = TYPEPI;
-  else
-    pid->typePID = NOTYPE;
 }
 
 void nvrWritePID(unsigned char IDPid, unsigned int IDEeprom) {
@@ -226,8 +220,6 @@ void initializeEEPROM(void) {
   PID[HEADING].P = 3.0;
   PID[HEADING].I = 0.1;
   PID[HEADING].D = 0.0;
-  // AKA PID experiements
-  PID[HEADING].typePID = TYPEPI;
   PID[LEVELGYROROLL].P = 100.0;
   PID[LEVELGYROROLL].I = 0.0;
   PID[LEVELGYROROLL].D = -300.0;
@@ -238,7 +230,6 @@ void initializeEEPROM(void) {
   PID[ALTITUDE].P = 25.0;
   PID[ALTITUDE].I = 0.1;
   PID[ALTITUDE].D = 0.0;
-  PID[ALTITUDE].windupGuard = 25.0; //this prevents the 0.1 I term to rise too far
   PID[ZDAMPENING].P = 0.0;
   PID[ZDAMPENING].I = 0.0;
   PID[ZDAMPENING].D = 0.0;
@@ -259,21 +250,17 @@ void initializeEEPROM(void) {
     if (i != ALTITUDE)
         PID[i].windupGuard = windupGuard;
   }
-
   PID[LEVELROLL].windupGuard = 0.375;
   PID[LEVELPITCH].windupGuard = 0.375;
   
-  // AKA added so that each PID has a type incase we need special cases like detecting +/- PI
-  for (byte i = ROLL; i <= ZDAMPENING; i++ ) {
-    if (i != HEADING)
-        PID[i].typePID = NOTYPE;
-  }
-    
+  PID[ALTITUDE].windupGuard = 25.0; //this prevents the 0.1 I term to rise too far
+  
+  
   receiver->setXmitFactor(1.0);
   gyro->setSmoothFactor(1.0);
   accel->setSmoothFactor(1.0);
-  accel->setOneG(9.80665); // AKA set one G to 9.8 m/s^2
-  timeConstant = 7.0;
+  accel->setOneG(9.80665); 
+//  timeConstant = 7.0;
   for (byte channel = ROLL; channel < LASTCHANNEL; channel++) {
     receiver->setTransmitterSlope(channel, 1.0);
     receiver->setTransmitterOffset(channel, 0.0);
@@ -281,11 +268,10 @@ void initializeEEPROM(void) {
   }
   receiver->setSmoothFactor(YAW, 0.5);
 
-  smoothHeading = 1.0;
-  flightMode = ACRO;
-  headingHoldConfig = OFF;
+ // smoothHeading = 1.0;
+  copter->flightMode = ACRO;
+  copter->headingHoldConfig = OFF;
 
-  minAcro = 1300;
   aref = 5.0; // Use 3.0 if using a v1.7 shield or use 2.8 for an AeroQuad Shield < v1.7
   
   /*#ifdef Camera
@@ -328,7 +314,7 @@ void initializeEEPROM(void) {
   PID[LEVELGYROPITCH].P = PID[ROLL].P;
   PID[LEVELGYROPITCH].I = PID[ROLL].I;
   PID[LEVELGYROPITCH].D = PID[ROLL].D;
-  headingHoldConfig = ON;
+  copter->headingHoldConfig = ON;
   aref = 5.0;
   receiver->setTransmitterSlope(THROTTLE, 0.5);
   receiver->setTransmitterOffset(THROTTLE, 500);
@@ -373,12 +359,12 @@ void initializeEEPROM(void) {
         PID[i].windupGuard = windupGuard;
   }
     
-  timeConstant = readFloat(FILTERTERM_ADR);
-  smoothHeading = readFloat(HEADINGSMOOTH_ADR);
+//  timeConstant = readFloat(FILTERTERM_ADR);
+//  smoothHeading = readFloat(HEADINGSMOOTH_ADR);
   aref = readFloat(AREF_ADR);
-  flightMode = readFloat(FLIGHTMODE_ADR);
-  headingHoldConfig = readFloat(HEADINGHOLD_ADR);
-  minAcro = readFloat(MINACRO_ADR);
+  copter->flightMode = readFloat(FLIGHTMODE_ADR);
+  copter->headingHoldConfig = readFloat(HEADINGHOLD_ADR);
+//  copter->minAcro = readFloat(MINACRO_ADR);
   accel->setOneG(readFloat(ACCEL_1G_ADR));
   
   /*#ifdef Camera
@@ -436,7 +422,7 @@ void writeEEPROM(void){
   writeFloat(receiver->getXmitFactor(), XMITFACTOR_ADR);
   writeFloat(gyro->getSmoothFactor(), GYRO_SMOOTH_ADR);
   writeFloat(accel->getSmoothFactor(), ACCEL_SMOOTH_ADR);
-  writeFloat(timeConstant, FILTERTERM_ADR);
+//  writeFloat(timeConstant, FILTERTERM_ADR);
 
   for(byte channel = ROLL; channel < LASTCHANNEL; channel++) {
     writeFloat(receiver->getTransmitterSlope(channel),  RECEIVER_DATA[channel].slope);
@@ -444,11 +430,11 @@ void writeEEPROM(void){
     writeFloat(receiver->getSmoothFactor(channel),      RECEIVER_DATA[channel].smooth_factor);
   }
 
-  writeFloat(smoothHeading, HEADINGSMOOTH_ADR);
+ // writeFloat(smoothHeading, HEADINGSMOOTH_ADR);
   writeFloat(aref, AREF_ADR);
-  writeFloat(flightMode, FLIGHTMODE_ADR);
-  writeFloat(headingHoldConfig, HEADINGHOLD_ADR);
-  writeFloat(minAcro, MINACRO_ADR);
+  writeFloat(copter->flightMode, FLIGHTMODE_ADR);
+  writeFloat(copter->headingHoldConfig, HEADINGHOLD_ADR);
+//  writeFloat(copter->minAcro, MINACRO_ADR);
   writeFloat(accel->getOneG(), ACCEL_1G_ADR);
     
   /*#ifdef Camera

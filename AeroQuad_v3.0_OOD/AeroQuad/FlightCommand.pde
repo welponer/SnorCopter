@@ -85,20 +85,20 @@ void readPilotCommands() {
   #else
     // Check Mode switch for Acro or Stable
     if (receiver->getData(MODE) > 1500) {
-      if (flightMode == ACRO) {
+      if (copter->flightMode == ACRO) {
         #if defined(AeroQuad_v18) || defined(AeroQuadMega_v2)
           digitalWrite(LED2PIN, HIGH);
         #endif
         zeroIntegralError();
       }
-      flightMode = STABLE;
+      copter->flightMode = STABLE;
    }
     else {
       #if defined(AeroQuad_v18) || defined(AeroQuadMega_v2)
         if (flightMode == STABLE)
           digitalWrite(LED2PIN, LOW);
       #endif
-      flightMode = ACRO;
+      copter->flightMode = ACRO;
     }
   #endif  
   

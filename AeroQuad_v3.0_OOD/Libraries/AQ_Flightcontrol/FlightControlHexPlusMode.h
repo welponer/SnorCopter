@@ -99,7 +99,6 @@ void processMinMaxCommand() {
 }
 
 void processHardManuevers() {
-  if (flightMode == ACRO) {
     if (receiver->getData(ROLL) < MINCHECK) {        // Maximum Left Roll Rate
       motorMinCommand[FRONT_RIGHT] = MAXCOMMAND;
       motorMinCommand[REAR_RIGHT]  = MAXCOMMAND;
@@ -128,9 +127,9 @@ void processHardManuevers() {
       motorMaxCommand[FRONT_LEFT]  = minAcro;
       motorMaxCommand[FRONT_RIGHT] = minAcro;
     }
-  }
 }
 
 
 #endif  // #define _AQ_PROCESS_FLIGHT_CONTROL_HEX_PLUS_MODE_H_
+
 

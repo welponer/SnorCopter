@@ -49,11 +49,6 @@ void readSerialPID(unsigned char PIDid) {
   pid->D = readFloatSerial();
   pid->lastPosition = 0;
   pid->integratedError = 0;
-  if (PIDid == HEADING)
-    pid->typePID = TYPEPI;
-  else
-    pid->typePID = NOTYPE;
-  pid->firstPass = true;
 }
 
 void readSerialCommand() {
@@ -65,12 +60,12 @@ void readSerialCommand() {
     case 'A': // Receive roll and pitch gyro PID
       readSerialPID(ROLL);
       readSerialPID(PITCH);
-      minAcro = readFloatSerial();
+      readFloatSerial();  // mwelp: dummy
       break;
     case 'C': // Receive yaw PID
       readSerialPID(YAW);
       readSerialPID(HEADING);
-      headingHoldConfig = readFloatSerial();
+      copter->headingHoldConfig = readFloatSerial();
       heading = 0;
       relativeHeading = 0;
       headingHold = 0;
@@ -98,7 +93,7 @@ void readSerialCommand() {
     case 'K': // Receive data filtering values
       gyro->setSmoothFactor(readFloatSerial());
       accel->setSmoothFactor(readFloatSerial());
-      timeConstant = readFloatSerial();
+//      timeConstant = readFloatSerial();
       aref = readFloatSerial();
       break;
     case 'M': // Receive transmitter smoothing values
@@ -254,13 +249,14 @@ void sendSerialTelemetry() {
   case 'B': // Send roll and pitch gyro PID values
     PrintPID(ROLL);
     PrintPID(PITCH);
-    SERIAL_PRINTLN(minAcro);
+//    SERIAL_PRINTLN(copter->minAcro);
+    SERIAL_PRINTLN(MINACRO);
     queryType = 'X';
     break;
   case 'D': // Send yaw PID values
     PrintPID(YAW);
     PrintPID(HEADING);
-    SERIAL_PRINTLN((int)headingHoldConfig);
+    SERIAL_PRINTLN((int)copter->headingHoldConfig);
     queryType = 'X';
     break;
   case 'F': // Send roll and pitch auto level PID values
@@ -296,7 +292,8 @@ void sendSerialTelemetry() {
   case 'L': // Send data filtering values
     PrintValueComma(gyro->getSmoothFactor());
     PrintValueComma(accel->getSmoothFactor());
-    PrintValueComma(timeConstant);
+//    PrintValueComma(timeConstant);
+    PrintValueComma(0);
     SERIAL_PRINTLN(aref);
     queryType = 'X';
     break;
@@ -359,9 +356,9 @@ void sendSerialTelemetry() {
     for (byte motor = 0; motor < LASTMOTOR; motor++)
       PrintValueComma(motors->getMotorCommand(motor));
     PrintValueComma((int)armed);
-    if (flightMode == STABLE)
+    if (copter->flightMode == STABLE)
       PrintValueComma(2000);
-    if (flightMode == ACRO)
+    if (copter->flightMode == ACRO)
       PrintValueComma(1000);
 #ifdef HeadingMagHold
     PrintValueComma(kinematics->getDegreesHeading(YAW));

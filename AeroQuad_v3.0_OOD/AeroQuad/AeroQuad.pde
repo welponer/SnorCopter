@@ -41,8 +41,8 @@
 //#define ArduCopter          // ArduPilot Mega (APM) with Oilpan Sensor Board
 //#define AeroQuadMega_CHR6DM // Clean Arduino Mega with CHR6DM as IMU/heading ref.
 //#define APM_OP_CHR6DM       // ArduPilot Mega with CHR6DM as IMU/heading ref., Oilpan for barometer (just uncomment AltitudeHold for baro), and voltage divider
-#define ArduCopter_AQ
-//#define MapleCopter_CSG
+//#define ArduCopter_AQ
+#define MapleCopter_CSG
 
 /****************************************************************************
  *********************** Define Flight Configuration ************************
@@ -150,6 +150,14 @@
 #include <AQMath.h>
 #include "filter.h"
 
+
+
+// MultiCopter declaration  
+#include "Copter.h"
+Copter copterSpecific;
+Copter* copter = &copterSpecific; 
+
+
 //********************************************************
 //********************************************************
 //********* PLATFORM SPECIFIC SECTION ********************
@@ -210,11 +218,6 @@
     BatterySensor batteryMonitorSpecific;
     BatterySensor* batteryMonitor = &batteryMonitorSpecific;
   #endif
-
-  // MultiCopter declaration  
-  #include "Copter.h"
-  Copter copterSpecific;
-  Copter* copter = &copterSpecific; 
 
   #include "DataStorage.h"
   Storage storageSpecific;
@@ -1155,6 +1158,9 @@ void setup() {
 //  delay(5000);     
   digitalWrite(LEDPIN, HIGH);
  
+  // Copter initialize
+  copter->initialize();
+ 
   // Read user values from EEPROM
   //readEEPROM(); // defined in DataStorage.h
   storage->load();
@@ -1185,10 +1191,6 @@ void setup() {
   gyro->calibrate(); // defined in Gyro.h
   accel->calibrate();
   zeroIntegralError();
-  //levelAdjust[ROLL] = 0;
-  //levelAdjust[PITCH] = 0;
-  
-  copter->initialize();
 
   // Flight angle estimation
   #ifdef HeadingMagHold
@@ -1198,6 +1200,7 @@ void setup() {
   #else
     kinematics->initialize(1.0, 0.0);  // with no compass, DCM matrix initalizes to a heading of 0 degrees
   #endif
+  
   // Integral Limit for attitude mode
   // This overrides default set in readEEPROM()
   // Set for 1/2 max attitude command (+/-0.75 radians)
@@ -1244,7 +1247,7 @@ void setup() {
 
   previousTime = micros();
   digitalWrite(LEDPIN, HIGH);
-  safetyCheck = 0;
+  safetyCheck = OFF;
 }
 
 /*******************************************************************
