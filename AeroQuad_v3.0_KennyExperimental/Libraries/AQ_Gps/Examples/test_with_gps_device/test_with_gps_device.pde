@@ -1,4 +1,4 @@
-//#include <NewSoftSerial.h>
+#include <NewSoftSerial.h>
 #include <TinyGPS.h>
 
 /* This sample code demonstrates the normal use of a TinyGPS object.
@@ -7,8 +7,7 @@
 */
 
 TinyGPS gps;
-HardwareSerial *nss;
-//NewSoftSerial nss(2, 3);
+NewSoftSerial nss(19, 18);
 
 void gpsdump(TinyGPS &gps);
 bool feedgps();
@@ -17,8 +16,7 @@ void printFloat(double f, int digits = 2);
 void setup()
 {
   Serial.begin(115200);
-  nss = &Serial1;
-  nss->begin(38400);
+  nss.begin(38400);
   
   Serial.print("Testing TinyGPS library v. "); Serial.println(TinyGPS::library_version());
   Serial.println("by Mikal Hart");
@@ -46,6 +44,9 @@ void loop()
     gpsdump(gps);
     Serial.println("-------------");
     Serial.println();
+  }
+  else {
+    Serial.println("No new data ");
   }
 }
 
@@ -94,7 +95,7 @@ void gpsdump(TinyGPS &gps)
   unsigned short sentences, failed;
 
   gps.get_position(&lat, &lon, &age);
-  Serial.print("Lat/Long(10^-6 deg): "); Serial.print(lat); Serial.print(", "); Serial.print(lon); 
+  Serial.print("Lat/Long(10^-5 deg): "); Serial.print(lat); Serial.print(", "); Serial.print(lon); 
   Serial.print(" Fix age: "); Serial.print(age); Serial.println("ms.");
   
   feedgps(); // If we don't feed the gps during this long routine, we may drop characters and get checksum errors
@@ -125,17 +126,15 @@ void gpsdump(TinyGPS &gps)
 
   feedgps();
 
-#ifndef _GPS_NO_STATS
   gps.stats(&chars, &sentences, &failed);
   Serial.print("Stats: characters: "); Serial.print(chars); Serial.print(" sentences: "); Serial.print(sentences); Serial.print(" failed checksum: "); Serial.println(failed);
-#endif
 }
   
 bool feedgps()
 {
-  while (nss->available())
+  while (nss.available())
   {
-    if (gps.encode(nss->read()))
+    if (gps.encode(nss.read()))
       return true;
   }
   return false;

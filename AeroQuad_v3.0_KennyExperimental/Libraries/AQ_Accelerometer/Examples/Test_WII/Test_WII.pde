@@ -18,9 +18,6 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>. 
 */
 
-#include <Platform_CHR6DM.h>  // Arduino IDE bug, needed because that the CHR6DM use Wire!
-#include <APM_ADC.h>          // Arduino IDE bug, needed because that the CHR6DM use Wire!
-
 #include <Wire.h>             
 #include <Device_I2C.h>       
 #include <Axis.h>
@@ -29,8 +26,6 @@
 #include <Accelerometer_WII.h>
 
 unsigned long timer;
-Platform_Wii platformWii;
-Accelerometer_WII accel;
 
 void setup() {
   
@@ -38,9 +33,11 @@ void setup() {
   Serial.println("Accelerometer library test (WII)");
   
   Wire.begin();
-  platformWii.initialize();
-  accel.setPlatformWii(&platformWii);
-  accel.calibrate();
+  
+  initializeWiiSensors(true);
+  initializeAccel();
+  computeAccelBias();
+  
   timer = millis();
 }
 
@@ -49,15 +46,14 @@ void loop() {
   if((millis() - timer) > 10) // 100Hz
   {
     timer = millis();
-    accel.measure();
+    measureAccel();
     
     Serial.print("Roll: ");
-    Serial.print(accel.getMeterPerSec(XAXIS));
+    Serial.print(meterPerSec[XAXIS]);
     Serial.print(" Pitch: ");
-    Serial.print(accel.getMeterPerSec(YAXIS));
+    Serial.print(meterPerSec[YAXIS]);
     Serial.print(" Yaw: ");
-    Serial.print(accel.getMeterPerSec(ZAXIS));
+    Serial.print(meterPerSec[ZAXIS]);
     Serial.println();
   }
-
 }

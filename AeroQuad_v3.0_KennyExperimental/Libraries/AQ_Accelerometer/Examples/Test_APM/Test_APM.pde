@@ -20,7 +20,6 @@
 
 #include <Wire.h>             // Arduino IDE bug, needed because that the ITG3200 use Wire!
 #include <Device_I2C.h>       // Arduino IDE bug, needed because that the ITG3200 use Wire!
-#include <Platform_CHR6DM.h>  // Arduino IDE bug, needed because that the CHR6DM use Wire!
 
 #include <Axis.h>
 #include <APM_ADC.h>
@@ -28,7 +27,6 @@
 #include <Accelerometer_APM.h>
 
 unsigned long timer;
-Accelerometer_APM accel;
 
 void setup() {
   
@@ -36,7 +34,10 @@ void setup() {
   Serial.println("Accelerometer library test (APM)");
   
   initializeADC();
-  accel.calibrate();
+  
+  initializeAccel();
+  computeAccelBias();
+
 }
 
 void loop() {
@@ -44,15 +45,14 @@ void loop() {
   if((millis() - timer) > 10) // 100Hz
   {
     timer = millis();
-    accel.measure();
+    measureAccel();
     
     Serial.print("Roll: ");
-    Serial.print(accel.getMeterPerSec(XAXIS));
+    Serial.print(meterPerSec[XAXIS]);
     Serial.print(" Pitch: ");
-    Serial.print(accel.getMeterPerSec(YAXIS));
+    Serial.print(meterPerSec[YAXIS]);
     Serial.print(" Yaw: ");
-    Serial.print(accel.getMeterPerSec(ZAXIS));
+    Serial.print(meterPerSec[ZAXIS]);
     Serial.println();
   }
-
 }

@@ -19,8 +19,6 @@
 */
 
 #include <Wire.h>             // @see Kenny, Arduino IDE compiliation bug
-#include <APM_ADC.h>          // @see Kenny, Arduino IDE compiliation bug
-#include <Platform_CHR6DM.h>  // @see Kenny, Arduino IDE compiliation bug
 
 #include <AQMath.h>
 #include <Device_I2C.h>
@@ -29,16 +27,14 @@
 
 unsigned long timer;
 
-Gyroscope_IDG_IDZ500 gyro;
-
 void setup()
 {
   Serial.begin(115200);
   Serial.println("Gyroscope library test (IDG_IDZ500)");
 
-  gyro.setAref(3.3);
-  gyro.initialize();
-  gyro.calibrate();
+  setGyroAref(3.3);
+  initializeGyro();
+  calibrateGyro();
   timer = millis();
 }
 
@@ -47,16 +43,16 @@ void loop(void)
   if((millis() - timer) > 10) // 100Hz
   {
     timer = millis();
-    gyro.measure();
+    measureGyro();
     
     Serial.print("Roll: ");
-    Serial.print(degrees(gyro.getRadPerSec(ROLL)));
+    Serial.print(degrees(gyroRate[ROLL]));
     Serial.print(" Pitch: ");
-    Serial.print(degrees(gyro.getRadPerSec(PITCH)));
+    Serial.print(degrees(gyroRate[PITCH]));
     Serial.print(" Yaw: ");
-    Serial.print(degrees(gyro.getRadPerSec(YAW)));
+    Serial.print(degrees(gyroRate[YAW]));
     Serial.print(" Heading: ");
-    Serial.print(degrees(gyro.getHeading()));
+    Serial.print(degrees(gyroHeading));
     Serial.println();
   }
 }

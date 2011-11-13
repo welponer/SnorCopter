@@ -107,11 +107,11 @@ void driftCorrection(float ax, float ay, float az, float oneG, float magX, float
   float accelVector[3];
   float accelWeight;
   float errorRollPitch[3];
-#ifdef HeadingMagHold  // not know here
+//#ifdef HeadingMagHold  // not know here
   float errorCourse;
   float errorYaw[3];
   float scaledOmegaP[3];
-#endif  
+//#endif  
   float scaledOmegaI[3];
   
   //  Roll and Pitch Compensation
@@ -139,7 +139,7 @@ void driftCorrection(float ax, float ay, float az, float oneG, float magX, float
   
   //  Yaw Compensation
   
-  #ifdef HeadingMagHold  // not know here
+//  #ifdef HeadingMagHold  // not know here
     errorCourse = (dcmMatrix[0] * magY) - (dcmMatrix[3] * magX);
     vectorScale(3, errorYaw, &dcmMatrix[6], errorCourse);
   
@@ -148,10 +148,10 @@ void driftCorrection(float ax, float ay, float az, float oneG, float magX, float
   
     vectorScale(3, &scaledOmegaI[0] ,&errorYaw[0], kiYaw);
     vectorAdd(3, omegaI, omegaI, scaledOmegaI);
-  #else
-    omegaP[YAW] = 0.0;
-    omegaI[YAW] = 0.0;
-  #endif
+//  #else
+//    omegaP[YAW] = 0.0;
+//    omegaI[YAW] = 0.0;
+//  #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

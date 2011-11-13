@@ -43,8 +43,5 @@
 #define ALTITUDE 8
 #define ZDAMPENING 9
 
-// @todo Kenny, those following defines may have to go somewhere else
-#define FINDZERO 49
-
 
 #endif

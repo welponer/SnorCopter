@@ -19,19 +19,15 @@
 */
 
 #include <Wire.h>
-#include <APM_ADC.h>          // @see Kenny, Arduino IDE compiliation bug
-#include <Platform_CHR6DM.h>  // @see Kenny, Arduino IDE compiliation bug
 
 #include <AQMath.h>
+#include <Axis.h>
 #include <Device_I2C.h>
 #include <Platform_Wii.h>
 #include <Gyroscope_Wii.h>
-#include <Axis.h>
+
 
 unsigned long timer;
-
-Platform_Wii platformWii;
-Gyroscope_Wii gyro;
 
 void setup()
 {
@@ -40,10 +36,9 @@ void setup()
 
   Wire.begin();
   
-  platformWii.initialize();
-  gyro.setPlatformWii(&platformWii);
-  gyro.initialize();
-  gyro.calibrate();
+  initializeWiiSensors(true);
+  initializeGyro();
+  calibrateGyro();
   timer = millis();
 }
 
@@ -52,16 +47,17 @@ void loop(void)
   if((millis() - timer) > 10) // 100Hz
   {
     timer = millis();
-    gyro.measure();
+    readWiiSensors();
+    measureGyro();
     
     Serial.print("Roll: ");
-    Serial.print(degrees(gyro.getRadPerSec(ROLL)));
+    Serial.print(degrees(gyroRate[ROLL]));
     Serial.print(" Pitch: ");
-    Serial.print(degrees(gyro.getRadPerSec(PITCH)));
+    Serial.print(degrees(gyroRate[PITCH]));
     Serial.print(" Yaw: ");
-    Serial.print(degrees(gyro.getRadPerSec(YAW)));
+    Serial.print(degrees(gyroRate[YAW]));
     Serial.print(" Heading: ");
-    Serial.print(degrees(gyro.getHeading()));
+    Serial.print(degrees(gyroHeading));
     Serial.println();
   }
 }

@@ -24,47 +24,52 @@
 #include <Accelerometer.h>
 
 void initializeAccel() {
-  accelScaleFactor = G_2_MPS2((3.3/4096) / 0.330);
+  // do nothing here
 }
   
 void measureAccel() {
 
   for (byte axis = ROLL; axis < LASTAXIS; axis++) {
     const float rawADC = readADC(axis+3);
-    if (rawADC > 500) { // Check if measurement good
-      if (axis == ROLL)
-        meterPerSec[axis] = (rawADC - accelZero[axis]) * accelScaleFactor;
-      else
-        meterPerSec[axis] = (accelZero[axis] - rawADC) * accelScaleFactor;
-    }
+	if (rawADC > 500) { // Check if measurement good
+	  meterPerSec[axis] = rawADC * accelScaleFactor[axis] + runTimeAccelBias[axis];
+	}
   }
 }
 
 void measureAccelSum() {
-  // do nothing here since it's already oversample in the APM_ADC class
+
+  for (byte axis = ROLL; axis < LASTAXIS; axis++) {
+    const float rawADC = readADC(axis+3);
+    if (rawADC > 500) { // Check if measurement good
+	  accelSample[axis] += rawADC;
+	}
+  }
+  accelSampleCount++;  
 }
 
 void evaluateMetersPerSec() {
-  // do nothing here since it's already oversample in the APM_ADC class
+  // do nothing here
 }
 
-void calibrateAccel() {
-  int findZero[FINDZERO];
-   
-  for(byte calAxis = XAXIS; calAxis < LASTAXIS; calAxis++) {
-    for (int i=0; i<FINDZERO; i++) {
-      findZero[i] = readADC(calAxis+3);
-      delay(2);
-    }
-    accelZero[calAxis] = findMedianInt(findZero, FINDZERO);
+void computeAccelBias() {
+  
+  for (int samples = 0; samples < SAMPLECOUNT; samples++) {
+    measureAccelSum();
+    delay(6);
   }
 
-  // replace with estimated Z axis 0g value
-  accelZero[ZAXIS] = (accelZero[ROLL] + accelZero[PITCH]) / 2;
-   
-  // store accel value that represents 1g
-  measureAccel();
-  accelOneG = -meterPerSec[ZAXIS];
+  for (byte axis = 0; axis < 3; axis++) {
+    meterPerSec[axis] = (float(accelSample[axis])/SAMPLECOUNT) * accelScaleFactor[axis];
+    accelSample[axis] = 0;
+  }
+  accelSampleCount = 0;
+
+  runTimeAccelBias[XAXIS] = -meterPerSec[XAXIS];
+  runTimeAccelBias[YAXIS] = -meterPerSec[YAXIS];
+  runTimeAccelBias[ZAXIS] = -9.8065 - meterPerSec[ZAXIS];
+
+  accelOneG = abs(meterPerSec[ZAXIS] + runTimeAccelBias[ZAXIS]);
 }
 
 #endif

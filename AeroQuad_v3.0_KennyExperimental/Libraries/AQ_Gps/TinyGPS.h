@@ -30,14 +30,13 @@
 #define _GPS_KMPH_PER_KNOT 1.852
 #define _GPS_MILES_PER_METER 0.00062137112
 #define _GPS_KM_PER_METER 0.001
-#define _GPS_NO_STATS
+//#define _GPS_NO_STATS
 
 class TinyGPS
 {
   public:
     TinyGPS();
     bool encode(char c); // process one character received from GPS
-    bool binaryEncode(byte c); // process one binary character received from GPS
     TinyGPS &operator << (char c) {encode(c); return *this;}
     
     // lat/long in hundred thousandths of a degree and age of fix in milliseconds
@@ -60,10 +59,6 @@ class TinyGPS
 
     // signed altitude in centimeters (from GPGGA sentence)
     inline long altitude() { return _altitude; }
-    
-    // fix type 
-    inline  uint8_t fix() { return _fix; }
-    inline uint8_t getSats(void) { return _num_sats; }
 
     // course in last full GPRMC sentence in 100th of a degree
     inline unsigned long course() { return _course; }
@@ -79,8 +74,8 @@ class TinyGPS
     {
       long lat, lon;
       get_position(&lat, &lon, fix_age);
-      *latitude = lat / 1000000.0;
-      *longitude = lon / 1000000.0;
+      *latitude = lat / 100000.0;
+      *longitude = lon / 100000.0;
     }
 
     inline void crack_datetime(int *year, byte *month, byte *day, 
@@ -156,55 +151,6 @@ private:
     bool gpsisdigit(char c) { return c >= '0' && c <= '9'; }
     long gpsatol(const char *str);
     int gpsstrcmp(const char *str1, const char *str2);
-
-    // Binary protocol support below this line    
-    uint8_t _fix;
-    uint8_t _hdop;
-    uint8_t _num_sats;
-    #pragma pack(1)
-  	struct diyd_mtk_msg {
-  		int32_t		latitude;
-  		int32_t		longitude;
-  		int32_t		altitude;
-  		int32_t		ground_speed;
-  		int32_t		ground_course;
-  		uint8_t		satellites;
-  		uint8_t		fix_type;
-  		uint32_t	utc_date;
-  		uint32_t	utc_time;
-  		uint16_t	hdop;
-  	};
-  
-    #pragma pack(pop)
-  	enum diyd_mtk_fix_type {
-  		FIX_NONE = 1,
-  		FIX_2D = 2,
-  		FIX_3D = 3
-  	};
-  
-  	enum diyd_mtk_protocol_bytes {
-  		PREAMBLE1 = 0xd0,
-  		PREAMBLE2 = 0xdd,
-  	};
-  
-  	// Packet checksum accumulators
-  	uint8_t 	_ck_a;
-  	uint8_t 	_ck_b;
-  
-  	// State machine state
-  	uint8_t 	_step;
-  	uint8_t		_payload_counter;
-  	
-  	// Time from UNIX Epoch offset
-  	long		_time_offset;
-  	bool		_offset_calculated;
-  
-  	// Receive buffer
-  	union {
-  		diyd_mtk_msg	msg;
-  		uint8_t			bytes[];
-  	} _buffer;
-  	
 };
 
 // Arduino 0012 workaround

@@ -24,11 +24,10 @@
 #include "pins_arduino.h"
 
 // Flight Software Version
-#define VERSION 3.0
+#define SOFTWARE_VERSION 3.0
 
 #define BAUD 115200
 //#define BAUD 111111 // use this to be compatible with USB and XBee connections
-//#define BAUD 57600
 #define LEDPIN 13
 #define ON 1
 #define OFF 0
@@ -58,8 +57,6 @@ struct PIDdata {
   float lastPosition;
   // AKA experiments with PID
   float previousPIDTime;
-  bool firstPass;
-  bool typePID;
   float integratedError;
   float windupGuard; // Thinking about having individual wind up guards for each PID
 } PID[10];
@@ -90,15 +87,6 @@ float smoothHeading;
 #define ROLLRATEPIN 4
 #define YAWRATEPIN 5
 
-// Analog Reference Value
-// This value provided from Configurator
-// Use a DMM to measure the voltage between AREF and GND
-// Enter the measured voltage below to define your value for aref
-// If you don't have a DMM use the following:
-// AeroQuad Shield v1.7, aref = 3.0
-// AeroQuad Shield v1.6 or below, aref = 2.8
-float aref;
-
 // Flight Mode
 #define ACRO 0
 #define STABLE 1
@@ -106,6 +94,15 @@ byte flightMode;
 unsigned long frameCounter = 0; // main loop executive frame counter
 int minAcro; // Read in from EEPROM, defines min throttle during flips
 
+
+// Analog Reference Value
+// This value provided from Configurator
+// Use a DMM to measure the voltage between AREF and GND
+// Enter the measured voltage below to define your value for aref
+// If you don't have a DMM use the following:
+// AeroQuad Shield v1.7, aref = 3.0
+// AeroQuad Shield v1.6 or below, aref = 2.8
+float aref; // Read in from EEPROM
 
 // Auto level setup
 float levelAdjust[2] = {0.0,0.0};
@@ -137,8 +134,12 @@ int batteyMonitorThrottleCorrection = 0;
 #if defined (BattMonitor)
   int batteryMonitorStartThrottle = 0;
   unsigned long batteryMonitorStartTime = 0;
-  #define BATTERY_MONITOR_THROTTLE_TARGET 1200
+  #define BATTERY_MONITOR_THROTTLE_TARGET 1100
   #define BATTERY_MONITOR_GOIN_DOWN_TIME 60000  // 1 minutes
+  #if defined BattMonitorAutoDescent
+    int batteryMonitorAlarmCounter = 0;
+    #define BATTERY_MONITOR_MAX_ALARM_COUNT 20
+  #endif
 #endif
 
 // Altitude Hold
@@ -270,6 +271,7 @@ typedef struct {
   t_NVR_PID ZDAMP_PID_GAIN_ADR;
   t_NVR_Receiver RECEIVER_DATA[LASTCHANNEL];
   
+  float SOFTWARE_VERSION_ADR;
   float WINDUPGUARD_ADR;
   float XMITFACTOR_ADR;
   float GYROSMOOTH_ADR;

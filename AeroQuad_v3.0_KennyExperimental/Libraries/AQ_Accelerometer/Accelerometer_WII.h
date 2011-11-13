@@ -25,54 +25,46 @@
 #include <Platform_Wii.h>
 
 void initializeAccel() {
-  accelScaleFactor = 0.09165093;  // Experimentally derived to produce meters/s^2 
+  // do nothing here
 }
 
 void measureAccel() {
-  meterPerSec[XAXIS] = (getWiiAccelADC(XAXIS) - accelZero[XAXIS]) * accelScaleFactor;
-  meterPerSec[YAXIS] = (accelZero[YAXIS] - getWiiAccelADC(YAXIS)) * accelScaleFactor;
-  meterPerSec[ZAXIS] = (accelZero[ZAXIS] - getWiiAccelADC(ZAXIS)) * accelScaleFactor;
+
+  for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
+    meterPerSec[axis] = getWiiAccelADC(axis) * accelScaleFactor[axis] + runTimeAccelBias[axis];
+  }
 }
 
 void measureAccelSum() {
-/**
+
   for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
 	accelSample[axis] += getWiiAccelADC(axis);
   }
   accelSampleCount++;
-*/  
 }
 
 void evaluateMetersPerSec() {
-/**
-  for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
-    if (axis == XAXIS)
-	  meterPerSec[axis] = accelSample[axis]/accelSampleCount - accelZero[axis];
-	else
-	  meterPerSec[axis] = accelZero[axis] - accelSample[axis]/accelSampleCount;
-	accelSample[axis] = 0.0;
+  // do nothing here
+}
+
+void computeAccelBias() {
+  
+  for (int samples = 0; samples < SAMPLECOUNT; samples++) {
+    readWiiSensors();
+    measureAccelSum();
+  }
+
+  for (byte axis = 0; axis < 3; axis++) {
+    meterPerSec[axis] = (float(accelSample[axis])/SAMPLECOUNT) * accelScaleFactor[axis];
+    accelSample[axis] = 0;
   }
   accelSampleCount = 0;
-*/  
+
+  runTimeAccelBias[XAXIS] = -meterPerSec[XAXIS];
+  runTimeAccelBias[YAXIS] = -meterPerSec[YAXIS];
+  runTimeAccelBias[ZAXIS] = -9.8065 - meterPerSec[ZAXIS];
+
+  accelOneG = abs(meterPerSec[ZAXIS] + runTimeAccelBias[ZAXIS]);
 }
-
-void calibrateAccel() {
-  int findZero[FINDZERO];
-
-  for(byte calAxis = XAXIS; calAxis < LASTAXIS; calAxis++) {
-    for (int i=0; i<FINDZERO; i++) {
-      readWiiSensors();
-      findZero[i] = getWiiAccelADC(calAxis);
-      delay(5);
-    }
-    accelZero[calAxis] = findMedianInt(findZero, FINDZERO);
-  }
-    
-  // store accel value that represents 1g
-  accelOneG = -meterPerSec[ZAXIS];
-  // replace with estimated Z axis 0g value
-  accelZero[ZAXIS] = (accelZero[XAXIS] + accelZero[YAXIS]) / 2;
-}
-
 
 #endif

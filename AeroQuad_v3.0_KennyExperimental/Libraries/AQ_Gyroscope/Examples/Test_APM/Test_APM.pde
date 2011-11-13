@@ -20,7 +20,6 @@
 
 #include <Wire.h>             // Arduino IDE bug, needed because that the ITG3200 use Wire!
 #include <Device_I2C.h>       // Arduino IDE bug, needed because that the ITG3200 use Wire!
-#include <Platform_CHR6DM.h>  // Arduino IDE bug, needed because that the CHR6DM use Wire!
 
 #include <Axis.h>
 #include <APM_ADC.h>
@@ -28,7 +27,6 @@
 #include <Gyroscope_APM.h>
 
 unsigned long timer;
-Gyroscope_APM gyro;
 
 void setup() {
   
@@ -36,7 +34,7 @@ void setup() {
   Serial.println("Gyroscope library test (APM)");
   
   initializeADC();
-  gyro.calibrate();
+  initializeGyro();
 }
 
 void loop() {
@@ -44,16 +42,16 @@ void loop() {
   if((millis() - timer) > 10) // 100Hz
   {
     timer = millis();
-    gyro.measure();
+    measureGyro();
     
     Serial.print("Roll: ");
-    Serial.print(degrees(gyro.getRadPerSec(ROLL)));
+    Serial.print(degrees(gyroRate[ROLL]));
     Serial.print(" Pitch: ");
-    Serial.print(degrees(gyro.getRadPerSec(PITCH)));
+    Serial.print(degrees(gyroRate[PITCH]));
     Serial.print(" Yaw: ");
-    Serial.print(degrees(gyro.getRadPerSec(YAW)));
+    Serial.print(degrees(gyroRate[YAW]));
     Serial.print(" Heading: ");
-    Serial.print(degrees(gyro.getHeading()));
+    Serial.print(degrees(gyroHeading));
     Serial.println();
   }
 

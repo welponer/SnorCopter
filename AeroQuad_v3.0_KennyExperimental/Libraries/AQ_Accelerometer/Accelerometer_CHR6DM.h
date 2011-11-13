@@ -31,37 +31,40 @@ void initializeAccel() {
 
 void measureAccel() {
 
-  meterPerSec[XAXIS] = accelChr6dm->data.ax - accelZero[XAXIS];
-  meterPerSec[YAXIS] = accelChr6dm->data.ay - accelZero[YAXIS];
-  meterPerSec[ZAXIS] = accelChr6dm->data.az - accelOneG;
+  meterPerSec[XAXIS] = accelChr6dm->data.ax * accelScaleFactor[XAXIS] + runTimeAccelBias[XAXIS];
+  meterPerSec[YAXIS] = accelChr6dm->data.ay * accelScaleFactor[YAXIS] + runTimeAccelBias[YAXIS];
+  meterPerSec[ZAXIS] = accelChr6dm->data.az * accelScaleFactor[ZAXIS] + runTimeAccelBias[ZAXIS];
 }
 
 void measureAccelSum() {
-  // do nothing here since it's already oversample in the APM_ADC class
+
+  accelSample[XAXIS] += accelChr6dm->data.ax;
+  accelSample[YAXIS] += accelChr6dm->data.ay;
+  accelSample[ZAXIS] += accelChr6dm->data.az;
 }
 
 void evaluateMetersPerSec() {
-  // do nothing here since it's already oversample in the APM_ADC class
+  // do nothing here
 }
 
-void calibrateAccel() {
-  float zeroXreads[FINDZERO];
-  float zeroYreads[FINDZERO];
-  float zeroZreads[FINDZERO];
-
-  for (int i=0; i<FINDZERO; i++) {
-    accelChr6dm->requestAndReadPacket();
-    zeroXreads[i] = accelChr6dm->data.ax;
-    zeroYreads[i] = accelChr6dm->data.ay;
-    zeroZreads[i] = accelChr6dm->data.az;
+void computeAccelBias() {
+  
+  for (int samples = 0; samples < SAMPLECOUNT; samples++) {
+    measureAccelSum();
+    delay(6);
   }
 
-  accelZero[XAXIS] = findMedianFloat(zeroXreads, FINDZERO);
-  accelZero[YAXIS] = findMedianFloat(zeroYreads, FINDZERO);
-  accelZero[ZAXIS] = findMedianFloat(zeroZreads, FINDZERO);
-   
-  // store accel value that represents 1g
-  accelOneG = accelZero[ZAXIS];
+  for (byte axis = 0; axis < 3; axis++) {
+    meterPerSec[axis] = (float(accelSample[axis])/SAMPLECOUNT) * accelScaleFactor[axis];
+    accelSample[axis] = 0;
+  }
+  accelSampleCount = 0;
+
+  runTimeAccelBias[XAXIS] = -meterPerSec[XAXIS];
+  runTimeAccelBias[YAXIS] = -meterPerSec[YAXIS];
+  runTimeAccelBias[ZAXIS] = -9.8065 - meterPerSec[ZAXIS];
+
+  accelOneG = abs(meterPerSec[ZAXIS] + runTimeAccelBias[ZAXIS]);
 }
 
 #endif

@@ -89,12 +89,18 @@ void processHeading()
     // AKA - THERE IS A BUG HERE - if relative heading is greater than 180 degrees, the PID will swing from negative to positive
     // Doubt that will happen as it would have to be uncommanded.
     relativeHeading = heading - setHeading;
-    if (heading <= (setHeading - 180)) relativeHeading += 360;
-    if (heading >= (setHeading + 180)) relativeHeading -= 360;
+    if (heading <= (setHeading - 180)) {
+      relativeHeading += 360;
+    }
+    if (heading >= (setHeading + 180)) {
+      relativeHeading -= 360;
+    }
 
     // Apply heading hold only when throttle high enough to start flight
     if (receiverCommand[THROTTLE] > MINCHECK ) { 
+      
       if ((receiverCommand[YAW] > (MIDCOMMAND + 25)) || (receiverCommand[YAW] < (MIDCOMMAND - 25))) {
+        
         // If commanding yaw, turn off heading hold and store latest heading
         setHeading = heading;
         headingHold = 0;
@@ -171,34 +177,42 @@ void processAltitudeHold()
 #endif
 }
 
-void processThrottleCorrection() {
-
-  #if defined (BattMonitor) && defined (BattMonitorAutoDescent)
+#if defined BattMonitorAutoDescent
+  void processBatteryMonitorThrottleAdjustment() {
     if (batteryStatus == BATTERY_MONITOR_ALARM) {
-      #ifdef AltitudeHold
-        if (throttle > BATTERY_MONITOR_THROTTLE_TARGET) {
-          altitudeToHoldTarget -= 0.2;
-        }
-      #else
-        if (batteryMonitorStartThrottle == 0) {  // init battery monitor throttle correction!
-          batteryMonitorStartTime = millis();
-          batteryMonitorStartThrottle = throttle; 
-        }
-        const int batteryMonitorThrottle = map(millis()-batteryMonitorStartTime,0,BATTERY_MONITOR_GOIN_DOWN_TIME,batteryMonitorStartThrottle,BATTERY_MONITOR_THROTTLE_TARGET);
-        if (throttle < batteryMonitorThrottle) {
-          batteyMonitorThrottleCorrection = 0;
-        }
-        else {
-          batteyMonitorThrottleCorrection = batteryMonitorThrottle - throttle;
-        }
-      #endif
+      if (batteryMonitorAlarmCounter < BATTERY_MONITOR_MAX_ALARM_COUNT) {
+        batteryMonitorAlarmCounter++;
+      }
+      else {
+        #ifdef AltitudeHold
+          if (throttle > BATTERY_MONITOR_THROTTLE_TARGET) {
+            altitudeToHoldTarget -= 0.2;
+          }
+        #else
+          if (batteryMonitorStartThrottle == 0) {  // init battery monitor throttle correction!
+            batteryMonitorStartTime = millis();
+            batteryMonitorStartThrottle = throttle; 
+          }
+          const int batteryMonitorThrottle = map(millis()-batteryMonitorStartTime,0,BATTERY_MONITOR_GOIN_DOWN_TIME,batteryMonitorStartThrottle,BATTERY_MONITOR_THROTTLE_TARGET);
+          if (throttle < batteryMonitorThrottle) {
+            batteyMonitorThrottleCorrection = 0;
+          }
+          else {
+            batteyMonitorThrottleCorrection = batteryMonitorThrottle - throttle;
+          }
+        #endif
+      }
     }
     else {
       batteryMonitorStartThrottle = 0;
       batteyMonitorThrottleCorrection = 0.0;
     }
-  #endif
-  
+  }
+#endif  
+
+
+void processThrottleCorrection() {
+ 
   // Thank Ziojo for this little adjustment on throttle when manuevering!
   int throttleAsjust = throttle / (cos (radians (kinematicsAngle[ROLL])) * cos (radians (kinematicsAngle[PITCH])));
   throttleAsjust = constrain ((throttleAsjust - throttle), 0, 160); //compensate max  +/- 25 deg ROLL or PITCH or  +/- 18 ( 18(ROLL) + 18(PITCH))
@@ -220,6 +234,10 @@ void processFlightControl() {
   if (frameCounter %  10 == 0) {  //   10 Hz tasks
     // ********************** Process Altitude hold **************************
     processAltitudeHold();
+    // ********************** Process Battery monitor hold **************************
+    #if defined BattMonitorAutoDescent
+      processBatteryMonitorThrottleAdjustment();
+    #endif
     // ********************** Process throttle correction ********************
     processThrottleCorrection();
   }

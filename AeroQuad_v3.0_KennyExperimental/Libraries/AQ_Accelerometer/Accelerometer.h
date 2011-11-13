@@ -24,13 +24,14 @@
 #include <WProgram.h>
 #include <Axis.h>
 
+#define SAMPLECOUNT 400.0
+
 float accelScaleFactor[3] = {0.0,0.0,0.0};
 float runTimeAccelBias[3] = {0, 0, 0};
 float accelSmoothFactor = 1.0; // can we remove if we go with 4th order filter?
 float accelOneG = 0.0;
 float meterPerSec[3] = {0.0,0.0,0.0};
-int accelZero[3] = {0.0,0.0,0.0}; // would like to remove this here and in DataStorage.h, do we need for other accels?
-//float accelScale; - checking with John if we can remove
+int   accelZero[3] = {0.0,0.0,0.0}; // would like to remove this here and in DataStorage.h, do we need for other accels?
 
 float accelSample[3] = {0.0,0.0,0.0};
 byte accelSampleCount = 0;

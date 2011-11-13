@@ -20,18 +20,19 @@
 
 #include <AQMath.h>
 #include <Axis.h>
+#include <APM_RC.h>
 #include <Receiver_APM.h>
 
 
 unsigned long timer;
-Receiver_APM receiver;
 
 void setup() {
   
   Serial.begin(115200);
   Serial.println("Receiver library test (Receiver_APM)");
 
-  receiver.initialize();  
+  initRC();  
+  initializeReceiver();
 }
 
 void loop() {
@@ -39,20 +40,20 @@ void loop() {
   if((millis() - timer) > 50) // 20Hz
   {
     timer = millis();
-    receiver.read();
+    readReceiver();
     
     Serial.print("Throttle: ");
-    Serial.print(receiver.getRaw(THROTTLE));
+    Serial.print(receiverCommand[THROTTLE]);
     Serial.print(" Yaw: ");
-    Serial.print(receiver.getRaw(YAW));
+    Serial.print(receiverCommand[YAW]);
     Serial.print(" Roll: ");
-    Serial.print(receiver.getRaw(ROLL));
+    Serial.print(receiverCommand[ROLL]);
     Serial.print(" Pitch: ");
-    Serial.print(receiver.getRaw(PITCH));
+    Serial.print(receiverCommand[PITCH]);
     Serial.print(" Mode: ");
-    Serial.print(receiver.getRaw(MODE));
+    Serial.print(receiverCommand[MODE]);
     Serial.print(" Aux: ");
-    Serial.print(receiver.getRaw(AUX));
+    Serial.print(receiverCommand[AUX]);
     Serial.println();
   }
 }

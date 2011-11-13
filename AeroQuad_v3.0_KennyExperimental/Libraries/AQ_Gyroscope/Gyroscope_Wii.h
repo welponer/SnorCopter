@@ -60,7 +60,7 @@ void measureGyro() {
   // Measure gyro heading
   long int currentTime = micros();
   if (gyroRate[YAW] > radians(1.0) || gyroRate[YAW] < radians(-1.0)) {
-    heading += gyroRate[YAW] * ((currentTime - gyroLastMesuredTime) / 1000000.0);
+    gyroHeading += gyroRate[YAW] * ((currentTime - gyroLastMesuredTime) / 1000000.0);
   }
   gyroLastMesuredTime = currentTime;
 }

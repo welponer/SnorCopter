@@ -18,9 +18,6 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>. 
 */
 
-#include <APM_ADC.h>          // Arduino IDE bug, needed because that the APM use it
-#include <Platform_CHR6DM.h>  // Arduino IDE bug, needed because that the CHR6DM use
-
 #include <Wire.h>
 #include <Device_I2C.h>
 #include <Axis.h>
@@ -28,7 +25,6 @@
 #include <Accelerometer_ADXL345.h>
 
 unsigned long timer;
-//Accelerometer_ADXL345 accel;
 
 void setup() {
   
@@ -37,10 +33,8 @@ void setup() {
 
   Wire.begin();
   
-  //accel.initialize();  
-  //accel.calibrate();
   initializeAccel();
-  calibrateAccel();
+  computeAccelBias();
 }
 
 void loop() {
@@ -48,19 +42,14 @@ void loop() {
   if((millis() - timer) > 10) // 100Hz
   {
     timer = millis();
-    //accel.measure();
     measureAccel();
     
     Serial.print("Roll: ");
-    //Serial.print(accel.getMeterPerSec(XAXIS));
     Serial.print(meterPerSec[XAXIS]);
     Serial.print(" Pitch: ");
-    //Serial.print(accel.getMeterPerSec(YAXIS));
     Serial.print(meterPerSec[YAXIS]);
     Serial.print(" Yaw: ");
-    //Serial.print(accel.getMeterPerSec(ZAXIS));
     Serial.print(meterPerSec[ZAXIS]);
     Serial.println();
   }
-
 }

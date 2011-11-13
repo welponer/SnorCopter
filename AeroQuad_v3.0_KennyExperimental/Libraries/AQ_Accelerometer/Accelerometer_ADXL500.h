@@ -23,57 +23,46 @@
 
 #include <Accelerometer.h>
 
-float accelAref;
-  
 void initializeAccel() {
-  accelScaleFactor = G_2_MPS2((3.0/1024.0) / 0.300);  // force aref to 3.0 for v1.7 shield
+  // do nothing here
 }
 
-void setAccelAref(float aref) {
-  accelAref = aref;
-  accelScaleFactor = G_2_MPS2((accelAref/1024.0) / 0.300);
-}
-  
 void measureAccel() {
 
-  meterPerSec[XAXIS] = (analogRead(1)    - accelZero[PITCH]) * accelScaleFactor;
-  meterPerSec[YAXIS] = (accelZero[ROLL]  - analogRead(0))    * accelScaleFactor;
-  meterPerSec[ZAXIS] = (accelZero[ZAXIS] - analogRead(2))   * accelScaleFactor;
+  meterPerSec[XAXIS] = analogRead(1) * accelScaleFactor[XAXIS] + runTimeAccelBias[XAXIS];
+  meterPerSec[YAXIS] = analogRead(0) * accelScaleFactor[YAXIS] + runTimeAccelBias[YAXIS];
+  meterPerSec[ZAXIS] = analogRead(2) * accelScaleFactor[ZAXIS] + runTimeAccelBias[ZAXIS];
 }
 
 void measureAccelSum() {
-  // do nothing here since it's already oversample in the APM_ADC class
+  
+  accelSample[XAXIS] += analogRead(1);
+  accelSample[YAXIS] += analogRead(0);
+  accelSample[ZAXIS] += analogRead(2);
 }
 
 void evaluateMetersPerSec() {
-  // do nothing here since it's already oversample in the APM_ADC class
+  // do nothing here
 }
 
-void calibrateAccel() {
-  int findZero[FINDZERO];
+void computeAccelBias() {
+  
+  for (int samples = 0; samples < SAMPLECOUNT; samples++) {
+    measureAccelSum();
+    delayMicroseconds(2500);
+  }
 
-  for (int i=0; i<FINDZERO; i++) {
-    findZero[i] = analogRead(1);
-    delay(2);
+  for (byte axis = 0; axis < 3; axis++) {
+    meterPerSec[axis] = (float(accelSample[axis])/SAMPLECOUNT) * accelScaleFactor[axis];
+    accelSample[axis] = 0;
   }
-  accelZero[XAXIS] = findMedianInt(findZero, FINDZERO);
-  for (int i=0; i<FINDZERO; i++) {
-    findZero[i] = analogRead(0);
-    delay(2);
-  }
-  accelZero[YAXIS] = findMedianInt(findZero, FINDZERO);
-  for (int i=0; i<FINDZERO; i++) {
-    findZero[i] = analogRead(2);
-	delay(2);
-  }
-  accelZero[ZAXIS] = findMedianInt(findZero, FINDZERO);
-	
-  // store accel value that represents 1g
-  measureAccel();
-  accelOneG = -meterPerSec[ZAXIS];
-  // replace with estimated Z axis 0g value
-  accelZero[ZAXIS] = (accelZero[XAXIS] + accelZero[YAXIS]) / 2;
+  accelSampleCount = 0;
+
+  runTimeAccelBias[XAXIS] = -meterPerSec[XAXIS];
+  runTimeAccelBias[YAXIS] = -meterPerSec[YAXIS];
+  runTimeAccelBias[ZAXIS] = -9.8065 - meterPerSec[ZAXIS];
+
+  accelOneG = abs(meterPerSec[ZAXIS] + runTimeAccelBias[ZAXIS]);
 }
-
 
 #endif

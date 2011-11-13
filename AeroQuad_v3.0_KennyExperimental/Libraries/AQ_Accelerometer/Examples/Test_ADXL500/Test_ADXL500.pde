@@ -28,14 +28,14 @@
 #include <Accelerometer_ADXL500.h>
 
 unsigned long timer;
-Accelerometer_ADXL500 accel;
 
 void setup() {
   
   Serial.begin(115200);
   Serial.println("Accelerometer library test (IDG500)");
   
-  accel.calibrate();
+  initializeAccel();
+  computeAccelBias();
 }
 
 void loop() {
@@ -43,15 +43,15 @@ void loop() {
   if((millis() - timer) > 10) // 100Hz
   {
     timer = millis();
-    accel.measure();
+    //accel.measure();
+    measureAccel();
     
     Serial.print("Roll: ");
-    Serial.print(accel.getMeterPerSec(XAXIS));
+    Serial.print(meterPerSec[XAXIS]);
     Serial.print(" Pitch: ");
-    Serial.print(accel.getMeterPerSec(YAXIS));
+    Serial.print(meterPerSec[YAXIS]);
     Serial.print(" Yaw: ");
-    Serial.print(accel.getMeterPerSec(ZAXIS));
+    Serial.print(meterPerSec[ZAXIS]);
     Serial.println();
   }
-
 }

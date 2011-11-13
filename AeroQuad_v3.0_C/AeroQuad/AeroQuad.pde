@@ -57,13 +57,22 @@
 //#define octoXCongig
 
 //
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// You must define *only* one of the following flightAngle calculations
+// If you only want DCM, then don't define either of the below
+// Use FlightAngleARG if you do not have a magnetometer, use DCM if you have a magnetometer installed
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//#define FlightAngleMARG // EXPERIMENTAL!  Fly at your own risk! Use this if you have a magnetometer installed and enabled HeadingMagHold above
+#define FlightAngleARG // Use this if you do not have a magnetometer installed
+
+//
 // *******************************************************************************************************************************
 // Optional Sensors
 // Warning:  If you enable HeadingHold or AltitudeHold and do not have the correct sensors connected, the flight software may hang
 // *******************************************************************************************************************************
 // You must define one of the next 3 attitude stabilization modes or the software will not build
 // *******************************************************************************************************************************
-#define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
+//#define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
 #define AltitudeHold // Enables BMP085 Barometer (experimental, use at your own risk)
 //#define RateModeOnly // Use this if you only have a gyro sensor, this will disable any attitude modes.
 
@@ -72,8 +81,8 @@
 // Battery Monitor Options
 // *******************************************************************************************************************************
 #define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
-//#define BattMonitorAlarmVoltage 10.0  // this have to be defined if BattMonitor is defined. default alarm voltage is 10 volt
-//#define BattMonitorAutoDescent  // if you want the craft to auto descent when the battery reach the alarm voltage
+#define BattMonitorAlarmVoltage 10.4  // this have to be defined if BattMonitor is defined. default alarm voltage is 10 volt
+#define BattMonitorAutoDescent  // if you want the craft to auto descent when the battery reach the alarm voltage
 
 //
 // *******************************************************************************************************************************
@@ -87,14 +96,9 @@
 //#define SKETCH_SERIAL_SUM_PPM SERIAL_SUM_PPM_3 //For some Hitec/Sanwa/Others
 
 //
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// You must define *only* one of the following flightAngle calculations
-// If you only want DCM, then don't define either of the below
-// Use FlightAngleARG if you do not have a magnetometer, use DCM if you have a magnetometer installed
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//#define FlightAngleMARG // Experimental!  Fly at your own risk! Use this if you have a magnetometer installed and enabled HeadingMagHold above
-//#define FlightAngleARG // Use this if you do not have a magnetometer installed
-
+// *******************************************************************************************************************************
+// Optional telemetry (most for debug purpose)
+// *******************************************************************************************************************************
 //#define WirelessTelemetry  // Enables Wireless telemetry on Serial3  // Wireless telemetry enable
 //#define BinaryWrite // Enables fast binary transfer of flight data to Configurator
 //#define BinaryWritePID // Enables fast binary transfer of attitude PID data
@@ -191,7 +195,6 @@
    */
   void initPlatform() {
     setGyroAref(aref);
-    setAccelAref(aref);
   }
 
   /**
@@ -230,7 +233,6 @@
    */
   void initPlatform() {
     setGyroAref(aref);
-    setAccelAref(aref);
   }
 
   /**
@@ -380,7 +382,6 @@
    */
   void initPlatform() {
     setGyroAref(aref);
-    setAccelAref(aref);
   }
 
   /**
@@ -467,7 +468,11 @@
 #endif
 
 #ifdef ArduCopter
-  #include <APM_ADC.h>
+  #if defined (HeadingMagHold) || defined (AltitudeHold)
+    #include <APM_ADC.h>
+  #else
+    #include <APM_ADC_Optimized.h>
+  #endif
   #include <APM_RC.h>
   #include <Device_I2C.h>
 
@@ -515,6 +520,7 @@
     initRC();
 
     Wire.begin();
+    TWBR = 12;
   }
 
   /**
@@ -942,6 +948,10 @@ void setup() {
 
   // Read user values from EEPROM
   readEEPROM(); // defined in DataStorage.h
+  if (readFloat(SOFTWARE_VERSION_ADR) != SOFTWARE_VERSION) { // If we detect the wrong soft version, we init all parameters
+    initializeEEPROM();
+    writeEEPROM();
+  }
 
   initPlatform();
 
@@ -975,7 +985,6 @@ void setup() {
   // Flight angle estimation
   #ifdef HeadingMagHold
     initializeMagnetometer();
-    //setHeading = compass->getHeading();
     initializeKinematics(getHdgXY(XAXIS), getHdgXY(YAXIS));
   #else
     initializeKinematics(1.0, 0.0);  // with no compass, DCM matrix initalizes to a heading of 0 degrees

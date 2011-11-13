@@ -26,7 +26,7 @@ void readPilotCommands() {
   // Read quad configuration commands from transmitter when throttle down
   if (receiverCommand[THROTTLE] < MINCHECK) {
     zeroIntegralError();
-    //receiver->adjustThrottle(throttleAdjust);
+
     // Disarm motors (left stick lower left corner)
     if (receiverCommand[YAW] < MINCHECK && armed == ON) {
       armed = OFF;
@@ -37,16 +37,19 @@ void readPilotCommands() {
       #if defined(APM_OP_CHR6DM) || defined(ArduCopter) 
         digitalWrite(LED_Red, LOW);
       #endif
+      #if defined BattMonitorAutoDescent
+        batteryMonitorAlarmCounter = 0;
+      #endif
     }    
     // Zero Gyro and Accel sensors (left stick lower left, right stick lower right corner)
     if ((receiverCommand[YAW] < MINCHECK) && (receiverCommand[ROLL] > MAXCHECK) && (receiverCommand[PITCH] < MINCHECK)) {
       calibrateGyro();
-     computeAccelBias();
+      computeAccelBias();
       storeSensorsZeroToEEPROM();
-      //accel.setOneG(accel.getFlightData(ZAXIS));
       calibrateKinematics();
       zeroIntegralError();
       pulseMotors(3);
+      
       // ledCW() is currently a private method in BatteryMonitor.h, fix and agree on this behavior in next revision
       //#if defined(BattMonitor) && defined(ArduCopter)
       //  ledCW(); ledCW(); ledCW();

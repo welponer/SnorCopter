@@ -19,7 +19,6 @@
 */
 
 #include <Wire.h>
-#include <APM_ADC.h>          // @see Kenny, Arduino IDE compiliation bug
 #include <Platform_CHR6DM.h> 
 #include <AQMath.h>
 #include <Device_I2C.h>
@@ -28,17 +27,14 @@
 
 unsigned long timer;
 
-CHR6DM chr6dm;
-Gyroscope_CHR6DM gyro;
 
 void setup()
 {
   Serial.begin(115200);
   Serial.println("Gyroscope library test (CHR6DM)");
 
-  gyro.setChr6dm(&chr6dm);
-  gyro.initialize();
-  gyro.calibrate();
+  calibrateGyro();
+  
   timer = millis();
 }
 
@@ -47,16 +43,16 @@ void loop(void)
   if((millis() - timer) > 10) // 100Hz
   {
     timer = millis();
-    gyro.measure();
+    measureGyro();
     
     Serial.print("Roll: ");
-    Serial.print(degrees(gyro.getRadPerSec(ROLL)));
+    Serial.print(degrees(gyroRate[ROLL]));
     Serial.print(" Pitch: ");
-    Serial.print(degrees(gyro.getRadPerSec(PITCH)));
+    Serial.print(degrees(gyroRate[PITCH]));
     Serial.print(" Yaw: ");
-    Serial.print(degrees(gyro.getRadPerSec(YAW)));
+    Serial.print(degrees(gyroRate[YAW]));
     Serial.print(" Heading: ");
-    Serial.print(degrees(gyro.getHeading()));
+    Serial.print(degrees(gyroHeading));
     Serial.println();
   }
 }

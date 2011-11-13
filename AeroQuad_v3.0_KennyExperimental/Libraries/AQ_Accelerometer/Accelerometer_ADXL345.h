@@ -22,14 +22,15 @@
 #define _AEROQUAD_ACCELEROMETER_ADXL345_H_
 
 #include <Accelerometer.h>
+#include <SensorsStatus.h>
 
 #define ACCEL_ADDRESS 0x53
 
 void initializeAccel() {
-  accelScaleFactor = G_2_MPS2(4.0/1024.0);  		// +/- 2G at 10bits of ADC
 
-  if (readWhoI2C(ACCEL_ADDRESS) !=  0xE5) 			// page 14 of datasheet
-    Serial.println("Accelerometer not found!");
+  if (readWhoI2C(ACCEL_ADDRESS) !=  0xE5) { 			// page 14 of datasheet
+    sensorsState |= ACCEL_BIT_STATE;
+  }
 	
   updateRegisterI2C(ACCEL_ADDRESS, 0x2D, 1<<3); 	// set device to *measure*
   updateRegisterI2C(ACCEL_ADDRESS, 0x31, 0x08); 	// set full range and +/- 2G
@@ -41,12 +42,10 @@ void measureAccel() {
 
   sendByteI2C(ACCEL_ADDRESS, 0x32);
   Wire.requestFrom(ACCEL_ADDRESS, 6);
+
   for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
-    if (axis == XAXIS)
-      meterPerSec[axis] = (((Wire.receive()|(Wire.receive() << 8))) - accelZero[axis]) * accelScaleFactor;
-    else
-      meterPerSec[axis] = (accelZero[axis] - ((Wire.receive()|(Wire.receive() << 8)))) * accelScaleFactor;
-  }
+    meterPerSec[axis] = ((Wire.receive()|(Wire.receive() << 8))) * accelScaleFactor[axis] + runTimeAccelBias[axis];
+  }  
 }
 
 void measureAccelSum() {
@@ -62,37 +61,32 @@ void measureAccelSum() {
 void evaluateMetersPerSec() {
 	
   for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
-    if (axis == XAXIS)
-      meterPerSec[axis] = (accelSample[axis] - accelZero[axis]) * accelScaleFactor;
-    else
-      meterPerSec[axis] = (accelZero[axis] - accelSample[axis]) * accelScaleFactor;
+    meterPerSec[axis] = (accelSample[axis] / accelSampleCount) * accelScaleFactor[axis] + runTimeAccelBias[axis];
 	accelSample[axis] = 0.0;
   }
-  accelSampleCount = 0;
+  accelSampleCount = 0;		
 }
 
-void calibrateAccel() {
-
-  int findZero[FINDZERO];
-  int dataAddress;
-    
-  for (byte calAxis = XAXIS; calAxis < ZAXIS; calAxis++) {
-    if (calAxis == XAXIS) dataAddress = 0x32;
-    if (calAxis == YAXIS) dataAddress = 0x34;
-    if (calAxis == ZAXIS) dataAddress = 0x36;
-    for (int i=0; i<FINDZERO; i++) {
-      sendByteI2C(ACCEL_ADDRESS, dataAddress);
-      findZero[i] = readReverseWordI2C(ACCEL_ADDRESS);
-      delay(10);
-    }
-    accelZero[calAxis] = findMedianInt(findZero, FINDZERO);
+void computeAccelBias() {
+  
+  for (int samples = 0; samples < SAMPLECOUNT; samples++) {
+    measureAccelSum();
+    delayMicroseconds(2500);
   }
 
-  // replace with estimated Z axis 0g value
-  accelZero[ZAXIS] = (accelZero[XAXIS] + accelZero[PITCH]) / 2;
-  // store accel value that represents 1g
-  measureAccel();
-  accelOneG = -meterPerSec[ZAXIS];
+  for (byte axis = 0; axis < 3; axis++) {
+    meterPerSec[axis] = (float(accelSample[axis])/SAMPLECOUNT) * accelScaleFactor[axis];
+    accelSample[axis] = 0;
+  }
+  accelSampleCount = 0;
+
+  runTimeAccelBias[XAXIS] = -meterPerSec[XAXIS];
+  runTimeAccelBias[YAXIS] = -meterPerSec[YAXIS];
+  runTimeAccelBias[ZAXIS] = -9.8065 - meterPerSec[ZAXIS];
+
+  accelOneG = abs(meterPerSec[ZAXIS] + runTimeAccelBias[ZAXIS]);
 }
+
+
 
 #endif

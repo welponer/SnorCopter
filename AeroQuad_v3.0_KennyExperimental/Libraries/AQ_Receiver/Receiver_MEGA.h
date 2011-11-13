@@ -51,7 +51,7 @@ typedef struct {
   unsigned long fallTime;
   unsigned int lastGoodWidth;
 } tPinTimingData;
-volatile static tPinTimingData pinData[LASTCHANNEL];
+volatile static tPinTimingData pinData[9];
 
 static void MegaPcIntISR() {
   uint8_t bit;

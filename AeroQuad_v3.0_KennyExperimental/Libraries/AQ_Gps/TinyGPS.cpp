@@ -41,8 +41,6 @@ TinyGPS::TinyGPS()
 ,  _term_number(0)
 ,  _term_offset(0)
 ,  _gps_data_good(false)
-,  _fix(0)
-,  _num_sats(0)
 #ifndef _GPS_NO_STATS
 ,  _encoded_characters(0)
 ,  _good_sentences(0)
@@ -60,9 +58,7 @@ bool TinyGPS::encode(char c)
 {
   bool valid_sentence = false;
 
-#ifndef _GPS_NO_STATS
   ++_encoded_characters;
-#endif  
   switch(c)
   {
   case ',': // term terminators
@@ -73,7 +69,6 @@ bool TinyGPS::encode(char c)
     if (_term_offset < sizeof(_term))
     {
       _term[_term_offset] = 0;
-//      Serial.println(&_term[0]);
       valid_sentence = term_complete();
     }
     ++_term_number;
@@ -97,125 +92,6 @@ bool TinyGPS::encode(char c)
     _parity ^= c;
 
   return valid_sentence;
-}
-
-bool TinyGPS::binaryEncode(byte data)
-{
-	//uint8_t 	data;
-	//int 		numc;
-#ifndef _GPS_NO_STATS	
-	++_encoded_characters;
-#endif	
-	bool		parsed = false;
-
-	//numc = nss->available();
-	//for (int i = 0; i < numc; i++) {	// Process bytes received
-
-		// read the next byte
-		//data = nss->read();
-
-//restart:		
-		switch(_step){
-
-			// Message preamble, class, ID detection
-			//
-			// If we fail to match any of the expected bytes, we
-			// reset the state machine and re-consider the failed
-			// byte as the first byte of the preamble.  This 
-			// improves our chances of recovering from a mismatch
-			// and makes it less likely that we will be fooled by
-			// the preamble appearing as data in some other message.
-			//
-		case 0:
-			if(PREAMBLE1 == data)
-				_step++;
-			break;
-		case 1:
-			if (PREAMBLE2 == data) {
-				_step++;
-				break;
-			}
-			_step = 0;
-			break;
-			//goto restart;
-		case 2:
-			if (sizeof(_buffer) == data) {
-				_step++;
-				_ck_b = _ck_a = data;				// reset the checksum accumulators
-				_payload_counter = 0;
-			} else {
-				_step = 0;							// reset and wait for a message of the right class
-				//goto restart;
-			}
-			break;
-
-			// Receive message data
-			//
-		case 3:
-			_buffer.bytes[_payload_counter++] = data;
-			_ck_b += (_ck_a += data);
-			if (_payload_counter == sizeof(_buffer))
-				_step++;
-			break;
-
-			// Checksum and message processing
-			//
-		case 4:
-			_step++;
-			if (_ck_a != data) {
-				_step = 0;
-			}
-			break;
-		case 5:
-			_step = 0;
-			if (_ck_b != data) {
-				break;
-			}
-
-       _last_time_fix = _new_time_fix;
-       _last_position_fix = _new_position_fix;
-
-			_fix				= _buffer.msg.fix_type;// == FIX_3D;
-			_latitude		= _buffer.msg.latitude;	
-			_longitude		= _buffer.msg.longitude;
-      _new_position_fix = millis();
-			_altitude		= _buffer.msg.altitude;
-			_speed	= _buffer.msg.ground_speed;
-			_course	= _buffer.msg.ground_course;
-			_num_sats		= _buffer.msg.satellites;
-			_hdop			= _buffer.msg.hdop;
-			_date			= _buffer.msg.utc_date;
-				
-			// time from gps is UTC, but convert here to msToD
-//			long time_utc	= _buffer.msg.utc_time;				
-      _time = _buffer.msg.utc_time / 10;
-/*			long temp = (time_utc/10000000);
-			time_utc -= temp*10000000;
-			_time = temp * 3600000;
-			temp = (time_utc/100000);
-			time_utc -= temp*100000;
-			_time += temp * 60000 + time_utc;
-*/			
-      _new_time_fix = millis();
-
-			parsed = true;
-			
-			/*	Waiting on clarification of MAVLink protocol!
-			if(!_offset_calculated && parsed) {
-				long tempd1 = date;
-				long day 	= tempd1/10000;
-				tempd1 		-= day * 10000;
-				long month	= tempd1/100;
-				long year	= tempd1 - month * 100;
-				_time_offset = _calc_epoch_offset(day, month, year);
-				_epoch = UNIX_EPOCH;
-				_offset_calculated = TRUE;
-			}
-			*/
-			
-		}
-	//} 
-	return parsed;
 }
 
 #ifndef _GPS_NO_STATS
@@ -299,18 +175,19 @@ bool TinyGPS::term_complete()
         case _GPS_SENTENCE_GPRMC:
           _time      = _new_time;
           _date      = _new_date;
-          _latitude  = _new_latitude * 10;
-          _longitude = _new_longitude * 10;
+          _latitude  = _new_latitude;
+          _longitude = _new_longitude;
           _speed     = _new_speed;
           _course    = _new_course;
           break;
         case _GPS_SENTENCE_GPGGA:
           _altitude  = _new_altitude;
           _time      = _new_time;
-          _latitude  = _new_latitude * 10;
-          _longitude = _new_longitude * 10;
+          _latitude  = _new_latitude;
+          _longitude = _new_longitude;
           break;
         }
+
         return true;
       }
     }
@@ -375,10 +252,6 @@ bool TinyGPS::term_complete()
       break;
     case 206: // Fix data (GPGGA)
       _gps_data_good = _term[0] > '0';
-      _fix = ((int)_term[0] - 48);
-      break;
-    case 207: // number of Sats (GPGGA)
-      _num_sats = atoi(_term);
       break;
     case 209: // Altitude (GPGGA)
       _new_altitude = parse_decimal();
@@ -403,7 +276,6 @@ int TinyGPS::gpsstrcmp(const char *str1, const char *str2)
   return *str1;
 }
 
- //sqrt((deltalat*111)^2+(deltalon*(-0.0114*lon^2)-0.2389*lon+112.54)^2)
 /* static */
 float TinyGPS::distance_between (float lat1, float long1, float lat2, float long2) 
 {

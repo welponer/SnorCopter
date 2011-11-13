@@ -25,7 +25,6 @@
 #include <BarometricSensor.h>
 #include <BarometricSensor_BMP085.h>
 
-//BarometricSensor_BMP085 barometricSensor;
 unsigned long timer = 0;
 
 void setup() {
@@ -35,7 +34,6 @@ void setup() {
 
   Wire.begin();
   
-  //barometricSensor.initialize(); 
   initializeBaro(); 
 }
 
@@ -44,12 +42,10 @@ void loop() {
   if((millis() - timer) > 50) // 20Hz
   {
     timer = millis();
-    //barometricSensor.measure();
     measureBaro();
     
     Serial.print("altitude : ");
-    //Serial.print(barometricSensor.getAltitude());
-    Serial.print(baroAltitude);
+    Serial.print(getBaroAltitude());
     Serial.println();
   }
 }
