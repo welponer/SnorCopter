@@ -128,6 +128,7 @@ void readSerialCommand() {
       barometricSensor->initialize();
 #endif
       break;
+ /*     mwelp: unsafe
     case '1': // Calibrate ESCS's by setting Throttle high on all channels
         validateCalibrateCommand(1);
       break;
@@ -151,6 +152,7 @@ void readSerialCommand() {
           motorConfiguratorCommand[motor] = (int)readFloatSerial();
       }
       break;
+ */
     case 'a': // fast telemetry transfer
       if (readFloatSerial() == 1.0)
         fastTransfer = ON;

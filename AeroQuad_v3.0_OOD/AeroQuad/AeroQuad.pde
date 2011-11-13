@@ -84,7 +84,7 @@
 //#define OpenlogBinaryWrite // Enables fast binary transfer to serial1 and openlog hardware
 
 // High speed sampled gyro & accel sensor
-//#define SENSOR_SAMPLED
+#define SENSOR_SAMPLED
 
 //
 // *******************************************************************************************************************************
@@ -1300,8 +1300,10 @@ void loop () {
       G_Dt = (currentTime - hundredHZpreviousTime) / 1000000.0;
       hundredHZpreviousTime = currentTime;
       
+ #ifndef SENSOR_SAMPLED      
       measureCriticalSensors();
-      
+ #endif     
+ 
       // ****************** Calculate Absolute Angle *****************
       #if defined HeadingMagHold && defined FlightAngleMARG && defined SENSOR_SAMPLED
         kinematics->calculate(gyro->getRadPerSecSample(ROLL),                       

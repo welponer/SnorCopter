@@ -63,11 +63,11 @@ unsigned long hundredHZpreviousTime;
       frameCounter++;
       
       if( frameCounter %   1 == 0) {  //  100 Hz tasks
-        Serial.print(".");
+
       }
       
       if( frameCounter %  10 == 0) {  //   10 Hz tasks
-         Serial.println("x");
+
       }
       
       previousTime = currentTime;

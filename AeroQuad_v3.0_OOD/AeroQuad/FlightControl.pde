@@ -48,6 +48,7 @@ void calculateFlightError(void)
 //////////////////////////////////////////////////////////////////////////////
 void processCalibrateESC(void)
 {
+  /*
   switch (calibrateESC) { // used for calibrating ESC's
   case 1:
     for (byte motor = 0; motor < LASTMOTOR; motor++)
@@ -68,6 +69,7 @@ void processCalibrateESC(void)
   }
   // Send calibration commands to motors
   motors->write(); // Defined in Motors.h
+*/
 }
 
 //////////////////////////////////////////////////////////////////////////////
