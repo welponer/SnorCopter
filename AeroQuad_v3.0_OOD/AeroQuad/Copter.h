@@ -61,8 +61,7 @@ void (*scheduleHandler)(void);
     currentTime = micros();
     deltaTime = 0;
     frameCounter = 0;
- //   (*timerHandler)[0] = &hundredHz;
- //   (*timerHandler)[1] = &tendHz; 
+    void (*scheduleHandler)(void) = &hundredHz;
   }
   
   void update(void) { 
