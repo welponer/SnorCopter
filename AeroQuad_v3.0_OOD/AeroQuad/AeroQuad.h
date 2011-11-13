@@ -117,14 +117,14 @@ unsigned long frameCounter = 0; // main loop executive frame counter
 // Heading hold
 //byte headingHoldConfig = ON;
 //float headingScaleFactor;
-float commandedYaw = 0;
+//float commandedYaw = 0;
 float headingHold = 0; // calculated adjustment for quad to go to heading (PID output)
 float heading = 0; // measured heading from yaw gyro (process variable)
 float relativeHeading = 0; // current heading the quad is set to (set point)
 //float absoluteHeading = 0;;
 float setHeading = 0;
 unsigned long headingTime = micros();
-byte headingHoldState = OFF;
+//byte headingHoldState = OFF;
 
 // batteryMonitor & Altutude Hold
 int throttle = 1000;
@@ -148,7 +148,7 @@ byte storeAltitude = OFF;
 byte altitudeHold = OFF;
 
 //// Receiver variables
-int delta;
+//int delta;
 
 // Flight angle variables
 //float timeConstant;
@@ -160,8 +160,8 @@ int testCommand = 1000;
 // Communication
 char queryType = 'X';
 byte tlmType = 0;
-byte armed = OFF;
-byte safetyCheck = OFF;
+//byte armed = OFF;
+//byte safetyCheck = OFF;
 byte update = 0;
 HardwareSerial *binaryPort;
 

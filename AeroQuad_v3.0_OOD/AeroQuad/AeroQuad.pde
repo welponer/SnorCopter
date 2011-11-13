@@ -1247,7 +1247,7 @@ void setup() {
 
   previousTime = micros();
   digitalWrite(LEDPIN, HIGH);
-  safetyCheck = OFF;
+  copter->safetyCheck = OFF;
 }
 
 /*******************************************************************
@@ -1461,14 +1461,7 @@ void loop () {
       #ifdef STATUSMONITOR
       statusSignal->update();
       #endif
-/*      
-      Serial.print("> ");
-      for (byte motor = 0; motor < LASTMOTOR; motor++) {
-        Serial.print(motors->getMotorCommand(motor), DEC);
-        Serial.print(", ");
-      }
-      Serial.println();
- */     
+      
       digitalWrite(LEDPIN, !digitalRead(LEDPIN));
       
       #ifdef DEBUG_LOOP

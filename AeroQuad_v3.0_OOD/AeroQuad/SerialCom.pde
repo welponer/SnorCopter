@@ -32,7 +32,7 @@
 bool validateCalibrateCommand(byte command)
 {
   if (readFloatSerial() == 123.45) {// use a specific float value to validate full throttle call is being sent
-    armed = OFF;
+    copter->armed = OFF;
     calibrateESC = command;
     return true;
   } else {
@@ -355,7 +355,7 @@ void sendSerialTelemetry() {
 #endif
     for (byte motor = 0; motor < LASTMOTOR; motor++)
       PrintValueComma(motors->getMotorCommand(motor));
-    PrintValueComma((int)armed);
+    PrintValueComma((int)copter->armed);
     if (copter->flightMode == STABLE)
       PrintValueComma(2000);
     if (copter->flightMode == ACRO)

@@ -56,6 +56,8 @@ void applyMotorCommand() {
 }
 
 void processMinMaxCommand() {
+  int delta;
+  
   if ((motors->getMotorCommand(FRONT_LEFT) <= MINTHROTTLE) || (motors->getMotorCommand(REAR_LEFT) <= MINTHROTTLE) || (motors->getMotorCommand(RIGHT) <= MINTHROTTLE)) {
     delta = receiver->getData(THROTTLE) - MINTHROTTLE;
     motorMaxCommand[REAR_RIGHT]  = constrain(receiver->getData(THROTTLE) + delta, MINTHROTTLE, MAXCHECK);

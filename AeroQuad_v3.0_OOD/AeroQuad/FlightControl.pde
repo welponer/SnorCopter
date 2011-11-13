@@ -60,7 +60,7 @@ void processCalibrateESC(void)
   case 5:
     for (byte motor = 0; motor < LASTMOTOR; motor++)
       motors->setMotorCommand(motor, constrain(motorConfiguratorCommand[motor], 1000, 1200));
-    safetyCheck = ON;
+    copter->safetyCheck = ON;
     break;
   default:
     for (byte motor = 0; motor < LASTMOTOR; motor++)
@@ -99,7 +99,7 @@ void processHeading(void)
         setHeading = heading;
         headingHold = 0;
         PID[HEADING].integratedError = 0;
-        headingHoldState = OFF;
+        copter->headingHoldState = OFF;
         headingTime = currentTime;
       }
       else {
@@ -107,9 +107,9 @@ void processHeading(void)
           headingHold = 0;
           PID[HEADING].integratedError = 0;
         }
-        else if (headingHoldState == OFF) { // quick fix to soften heading hold on new heading
+        else if (copter->headingHoldState == OFF) { // quick fix to soften heading hold on new heading
           if ((currentTime - headingTime) > 500000) {
-            headingHoldState = ON;
+            copter->headingHoldState = ON;
             headingTime = currentTime;
             setHeading = heading;
             headingHold = 0;
@@ -131,7 +131,7 @@ void processHeading(void)
     }
   }
   // NEW SI Version
-  commandedYaw = constrain(receiver->getSIData(YAW) + radians(headingHold), -PI, PI);
+  float commandedYaw = constrain(receiver->getSIData(YAW) + radians(headingHold), -PI, PI);
   motorAxisCommandYaw = updatePID(commandedYaw, gyro->getRadPerSec(YAW), &PID[YAW]);
   // uses flightAngle unbias rate
   //motors->setMotorAxisCommand(YAW, updatePID(commandedYaw, flightAngle->getGyroUnbias(YAW), &PID[YAW]));
@@ -187,7 +187,7 @@ void processFlightControl() {
   processHeading();
 
   // ********************** Calculate Motor Commands *************************
-  if (armed && safetyCheck) {
+  if (copter->armed && copter->safetyCheck) {
     applyMotorCommand();
   } 
 
@@ -219,7 +219,7 @@ void processFlightControl() {
 */
 
   // *********************** Command Motors **********************
-  if (armed == ON && safetyCheck == ON) {
+  if (copter->armed == ON && copter->safetyCheck == ON) {
     motors->write();
   }
 }

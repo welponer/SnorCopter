@@ -29,8 +29,8 @@ void readPilotCommands() {
     throttleAdjust = 0;
     //receiver->adjustThrottle(throttleAdjust);
     // Disarm motors (left stick lower left corner)
-    if (receiver->getData(YAW) < MINCHECK && armed == ON) {
-      armed = OFF;
+    if (receiver->getData(YAW) < MINCHECK && copter->armed == ON) {
+      copter->armed = OFF;
       motors->commandAllMotors(MINCOMMAND);
       #if defined(APM_OP_CHR6DM) || defined(ArduCopter) 
         digitalWrite(LED_Red, LOW);
@@ -53,9 +53,9 @@ void readPilotCommands() {
       //#endif
     }   
     // Arm motors (left stick lower right corner)
-    if (receiver->getData(YAW) > MAXCHECK && armed == OFF && safetyCheck == ON) {
+    if (receiver->getData(YAW) > MAXCHECK && copter->armed == OFF && copter->safetyCheck == ON) {
       zeroIntegralError();
-      armed = ON;
+      copter->armed = ON;
       #if defined(APM_OP_CHR6DM) || defined(ArduCopter) 
       digitalWrite(LED_Red, HIGH);
       #endif
@@ -67,7 +67,7 @@ void readPilotCommands() {
       //altitude.measureGround();
     }
     // Prevents accidental arming of motor output if no transmitter command received
-    if (receiver->getData(YAW) > MINCHECK) safetyCheck = ON; 
+    if (receiver->getData(YAW) > MINCHECK) copter->safetyCheck = ON; 
   }
   
   // Get center value of roll/pitch/yaw channels when enough throttle to lift off
