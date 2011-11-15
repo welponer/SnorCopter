@@ -48,9 +48,9 @@
 #define MAX_RECEIVER_OFFSET 10
 
 void applyMotorCommand() {
-  motors->setMotorCommand(FRONT_LEFT,  throttle + motorAxisCommandRoll - motorAxisCommandPitch*2/3);
-  motors->setMotorCommand(FRONT_RIGHT, throttle - motorAxisCommandRoll - motorAxisCommandPitch*2/3);
-  motors->setMotorCommand(REAR,        throttle + motorAxisCommandPitch*4/3);
+  motors->setMotorCommand(FRONT_LEFT,  copter->throttle + motorAxisCommandRoll - motorAxisCommandPitch*2/3);
+  motors->setMotorCommand(FRONT_RIGHT, copter->throttle - motorAxisCommandRoll - motorAxisCommandPitch*2/3);
+  motors->setMotorCommand(REAR,        copter->throttle + motorAxisCommandPitch*4/3);
   const float yawMotorCommand  = constrain(motorAxisCommandYaw,-MAX_RECEIVER_OFFSET-abs(receiver->getData(YAW)),+MAX_RECEIVER_OFFSET+abs(receiver->getData(YAW)));
   motors->setMotorCommand(SERVO, constrain(TRI_YAW_MIDDLE + YAW_DIRECTION * yawMotorCommand, TRI_YAW_CONSTRAINT_MIN, TRI_YAW_CONSTRAINT_MAX));
 }
@@ -101,12 +101,12 @@ void processHardManuevers() {
     if (receiver->getData(ROLL) < MINCHECK) {        // Maximum Left Roll Rate
       motorMinCommand[FRONT_RIGHT] = MAXCOMMAND;
       motorMaxCommand[FRONT_LEFT]  = MINACRO;
-      motorMaxCommand[REAR]        = throttle + motorAxisCommandPitch*4/3;
+      motorMaxCommand[REAR]        = copter->throttle + motorAxisCommandPitch*4/3;
     }
     else if (receiver->getData(ROLL) > MAXCHECK) {   // Maximum Right Roll Rate
       motorMinCommand[FRONT_LEFT]  = MAXCOMMAND;
       motorMaxCommand[FRONT_RIGHT] = MINACRO;
-      motorMaxCommand[REAR]        = throttle + motorAxisCommandPitch*4/3;
+      motorMaxCommand[REAR]        = copter->throttle + motorAxisCommandPitch*4/3;
     }
     else if (receiver->getData(PITCH) < MINCHECK) {  // Maximum Nose Up Pitch Rate
       motorMinCommand[FRONT_LEFT]  = MAXCOMMAND;

@@ -10,6 +10,8 @@ public:
   byte headingHoldState;
   float G_Dt;
  
+ int throttle;
+ 
   Copter(void) {
     armed = OFF;
     safetyCheck = OFF;
@@ -17,6 +19,8 @@ public:
     headingHoldConfig = ON;
     headingHoldState = OFF;
     G_Dt = 0.002;
+    
+    throttle = 1000;
   }
 
   void initialize(void) {
@@ -34,9 +38,9 @@ public:
 };
 
 
-void hundredHz(void) {};
+void hundredHz(void) { SerialUSB.print("."); };
 
-void tenHz(void) {};
+void tenHz(void) { SerialUSB.print("x"); };
 
 class FrameTimer {
 public:  
@@ -53,15 +57,25 @@ unsigned long twentyFiveHZpreviousTime;
 unsigned long fiftyHZpreviousTime;
 unsigned long hundredHZpreviousTime; 
 
-void (*scheduleHandler)(void);
 
+
+  void (*scheduleHandler[8])(void);
+  unsigned long previousTimeHandler[8];
 
   FrameTimer(void) {
     previousTime = 0;
     currentTime = micros();
     deltaTime = 0;
     frameCounter = 0;
-    void (*scheduleHandler)(void) = &hundredHz;
+    
+    for( int i = 0; i < 8; i++) {
+      scheduleHandler[i] = NULL;
+      previousTimeHandler[i] = 0;
+    }
+    
+    scheduleHandler[0] = hundredHz;
+    scheduleHandler[1] = tenHz;
+    
   }
   
   void update(void) { 
@@ -74,11 +88,11 @@ void (*scheduleHandler)(void);
       frameCounter++;
       
       if( frameCounter % 1 == 0) {  //  100 Hz tasks
-SerialUSB.print(".");
+  scheduleHandler[0]();
       }
       
       if( frameCounter % 10 == 0) {  //   10 Hz tasks
-SerialUSB.println("+");
+  scheduleHandler[1]();
       }
       
       previousTime = currentTime;

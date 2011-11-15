@@ -94,8 +94,8 @@ void processHeading(void)
     if (heading <= (setHeading - 180)) relativeHeading += 360;
     if (heading >= (setHeading + 180)) relativeHeading -= 360;
 
-    // Apply heading hold only when throttle high enough to start flight
-    if (receiver->getData(THROTTLE) > MINCHECK ) { 
+    // Apply heading hold only when copter->throttle high enough to start flight
+    if (receiver->getData(copter->throttle) > MINCHECK ) { 
       if ((receiver->getData(YAW) > (MIDCOMMAND + 25)) || (receiver->getData(YAW) < (MIDCOMMAND - 25))) {
         // If commanding yaw, turn off heading hold and store latest heading
         setHeading = heading;
@@ -126,7 +126,7 @@ void processHeading(void)
       }
     }
     else {
-      // minimum throttle not reached, use off settings
+      // minimum copter->throttle not reached, use off settings
       setHeading = heading;
       headingHold = 0;
       PID[HEADING].integratedError = 0;
@@ -151,30 +151,30 @@ void processAltitudeHold(void)
   // http://aeroquad.com/showthread.php?359-Stable-flight-logic...&p=10325&viewfull=1#post10325
 #ifdef AltitudeHold
   if (altitudeHold == ON) {
-    throttleAdjust = updatePID(holdAltitude, barometricSensor->getAltitude(), &PID[ALTITUDE]);
-    //throttleAdjust = constrain((holdAltitude - altitude.getData()) * PID[ALTITUDE].P, minThrottleAdjust, maxThrottleAdjust);
-    throttleAdjust = constrain(throttleAdjust, minThrottleAdjust, maxThrottleAdjust);
-    if (abs(holdThrottle - receiver->getData(THROTTLE)) > PANICSTICK_MOVEMENT) {
+    copter->throttleAdjust = updatePID(holdAltitude, barometricSensor->getAltitude(), &PID[ALTITUDE]);
+    //copter->throttleAdjust = constrain((holdAltitude - altitude.getData()) * PID[ALTITUDE].P, mincopter->throttleAdjust, maxcopter->throttleAdjust);
+    copter->throttleAdjust = constrain(copter->throttleAdjust, mincopter->throttleAdjust, maxcopter->throttleAdjust);
+    if (abs(holdcopter->throttle - receiver->getData(copter->throttle)) > PANICSTICK_MOVEMENT) {
       altitudeHold = ALTPANIC; // too rapid of stick movement so PANIC out of ALTHOLD
     } else {
-      if (receiver->getData(THROTTLE) > (holdThrottle + ALTBUMP)) { // AKA changed to use holdThrottle + ALTBUMP - (was MAXCHECK) above 1900
+      if (receiver->getData(copter->throttle) > (holdcopter->throttle + ALTBUMP)) { // AKA changed to use holdcopter->throttle + ALTBUMP - (was MAXCHECK) above 1900
         holdAltitude += 0.01;
       }
-      if (receiver->getData(THROTTLE) < (holdThrottle - ALTBUMP)) { // AKA change to use holdThorrle - ALTBUMP - (was MINCHECK) below 1100
+      if (receiver->getData(copter->throttle) < (holdcopter->throttle - ALTBUMP)) { // AKA change to use holdThorrle - ALTBUMP - (was MINCHECK) below 1100
         holdAltitude -= 0.01;
       }
     }
   }
   else {
-    // Altitude hold is off, get throttle from receiver
-    holdThrottle = receiver->getData(THROTTLE);
+    // Altitude hold is off, get copter->throttle from receiver
+    holdcopter->throttle = receiver->getData(THROTTLE);
     throttleAdjust = autoDescent; // autoDescent is lowered from BatteryMonitor.h during battery alarm
   }
   // holdThrottle set in FlightCommand.pde if altitude hold is on
-  throttle = holdThrottle + throttleAdjust; // holdThrottle is also adjust by BatteryMonitor.h during battery alarm
+  copter->throttle = holdThrottle + throttleAdjust; // holdThrottle is also adjust by BatteryMonitor.h during battery alarm
 #else
   // If altitude hold not enabled in AeroQuad.pde, get throttle from receiver
-  throttle = receiver->getData(THROTTLE) + autoDescent; //autoDescent is lowered from BatteryMonitor.h while battery critical, otherwise kept 0
+  copter->throttle = receiver->getData(THROTTLE) + autoDescent; //autoDescent is lowered from BatteryMonitor.h while battery critical, otherwise kept 0
 #endif
 }
 

@@ -127,7 +127,7 @@ unsigned long headingTime = micros();
 //byte headingHoldState = OFF;
 
 // batteryMonitor & Altutude Hold
-int throttle = 1000;
+//int throttle = 1000;
 int autoDescent = 0;
 
 // Altitude Hold
@@ -143,7 +143,7 @@ int minThrottleAdjust = -50;
 int maxThrottleAdjust = 50;
 float holdAltitude = 0.0;
 int holdThrottle = 1000;
-float zDampening = 0.0;
+//float zDampening = 0.0;
 byte storeAltitude = OFF;
 byte altitudeHold = OFF;
 

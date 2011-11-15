@@ -46,10 +46,10 @@
 void applyMotorCommand() {
   // Front = Front/Right, Back = Left/Rear, Left = Front/Left, Right = Right/Rear 
   const int throttleCorrection = abs(motorAxisCommandYaw*1/2);
-  motors->setMotorCommand(LEFT,        (throttle)                    - motorAxisCommandPitch + motorAxisCommandRoll);
-  motors->setMotorCommand(RIGHT,       (throttle)                    - motorAxisCommandPitch - motorAxisCommandRoll);
-  motors->setMotorCommand(REAR_UNDER,  (throttle-throttleCorrection) + motorAxisCommandPitch + (YAW_DIRECTION * motorAxisCommandYaw));
-  motors->setMotorCommand(REAR,        (throttle-throttleCorrection) + motorAxisCommandPitch - (YAW_DIRECTION * motorAxisCommandYaw));
+  motors->setMotorCommand(LEFT,        (copter->throttle)                    - motorAxisCommandPitch + motorAxisCommandRoll);
+  motors->setMotorCommand(RIGHT,       (copter->throttle)                    - motorAxisCommandPitch - motorAxisCommandRoll);
+  motors->setMotorCommand(REAR_UNDER,  (copter->throttle-throttleCorrection) + motorAxisCommandPitch + (YAW_DIRECTION * motorAxisCommandYaw));
+  motors->setMotorCommand(REAR,        (copter->throttle-throttleCorrection) + motorAxisCommandPitch - (YAW_DIRECTION * motorAxisCommandYaw));
 }
 
 void processMinMaxCommand() {
