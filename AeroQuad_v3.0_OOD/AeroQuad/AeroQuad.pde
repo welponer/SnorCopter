@@ -152,11 +152,6 @@
 
 
 
-// MultiCopter declaration  
-#include "Copter.h"
-Copter copterSpecific;
-Copter* copter = &copterSpecific; 
-
 
 //********************************************************
 //********************************************************
@@ -218,6 +213,14 @@ Copter* copter = &copterSpecific;
     BatterySensor batteryMonitorSpecific;
     BatterySensor* batteryMonitor = &batteryMonitorSpecific;
   #endif
+
+  #include "Copter.h"
+  Copter copterSpecific;
+  Copter* copter = &copterSpecific; 
+
+  FlightControlQuadX4 flightControlSpecific;
+  FlightControl* flightControl = &flightControlSpecific;
+
 
   #include "DataStorage.h"
   Storage storageSpecific;
@@ -314,7 +317,6 @@ Copter* copter = &copterSpecific;
   }
 
 #endif
-
 
 #ifdef AeroQuad_v1
   // Gyroscope declaration
@@ -1376,7 +1378,7 @@ void loop () {
       
       // Combines external pilot commands and measured sensor data to generate motor commands
       //processFlightControl();
-      copter->processCopterControl();
+      flightControl->process();
       
       #ifdef BinaryWrite
         if (fastTransfer == ON) {

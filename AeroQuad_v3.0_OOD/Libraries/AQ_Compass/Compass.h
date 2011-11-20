@@ -51,7 +51,7 @@ public:
     if (axis == YAXIS) return hdgY;
   }
 
-  const int getRawData(byte axis) {
+  const float getRawData(byte axis) {
     if (axis == XAXIS) return measuredMagX;
     if (axis == YAXIS) return measuredMagY;
     if (axis == ZAXIS) return measuredMagZ;

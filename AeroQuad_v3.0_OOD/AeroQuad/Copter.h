@@ -1,5 +1,5 @@
 
-
+#define ATTITUDE_SCALING (0.75 * PWM2RAD)
 
 class Copter {
 public:
@@ -10,7 +10,12 @@ public:
   byte headingHoldState;
   float G_Dt;
  
- int throttle;
+  int throttle;
+  // defined in FlightControl.pde Flight control needs
+  int motorAxisCommandRoll;
+  int motorAxisCommandPitch;
+  int motorAxisCommandYaw;
+
  
   Copter(void) {
     armed = OFF;
@@ -21,6 +26,9 @@ public:
     G_Dt = 0.002;
     
     throttle = 1000;
+    motorAxisCommandRoll = 0;
+    motorAxisCommandPitch = 0;
+    motorAxisCommandYaw = 0;
   }
 
   void initialize(void) {
@@ -30,12 +38,84 @@ public:
   void initPlatform();
   
   
-  void processCopterControl(void) {
-    processFlightControl();
+
+};
+
+
+class FlightControl {
+public:
+
+void process() {
+  // ********************** Calculate Flight Error ***************************
+  calculateFlightError();
+  
+  // ********************** Update Yaw ***************************************
+  processHeading();
+
+  // ********************** Calculate Motor Commands *************************
+  if (copter->armed && copter->safetyCheck) {
+    applyMotorCommand();
+  } 
+
+  // *********************** process min max motor command *******************
+  processMinMaxCommand();
+
+  // Allows quad to do acrobatics by lowering power to opposite motors during hard manuevers
+  if (copter->flightMode == ACRO) {
+    processHardManuevers();
   }
+  
+  // Apply limits to motor commands
+  for (byte motor = 0; motor < LASTMOTOR; motor++) {
+    motors->setMotorCommand(motor, constrain(motors->getMotorCommand(motor), motorMinCommand[motor], motorMaxCommand[motor]));
+  }
+
+  // If throttle in minimum position, don't apply yaw
+  if (receiver->getData(THROTTLE) < MINCHECK) {
+    for (byte motor = 0; motor < LASTMOTOR; motor++) {
+      motors->setMotorCommand(motor, MINTHROTTLE);
+    }
+  }
+
+/*
+  // ESC Calibration
+  if (armed == OFF) {
+    processCalibrateESC();
+  }
+*/
+
+  // *********************** Command Motors **********************
+  if (copter->armed == ON && copter->safetyCheck == ON) {
+    motors->write();
+  }
+}
+
+
 
 
 };
+
+
+class FlightControlQuadX4 : public FlightControl {
+public:
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void hundredHz(void) { SerialUSB.print("."); };

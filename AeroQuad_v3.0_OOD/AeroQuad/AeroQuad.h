@@ -250,10 +250,10 @@ void readPilotCommands(void);
 //////////////////////////////////////////////////////
 
 // defined in FlightControl.pde Flight control needs
-int motorAxisCommandRoll = 0;
+/*int motorAxisCommandRoll = 0;
 int motorAxisCommandPitch = 0;
 int motorAxisCommandYaw = 0;
-
+*/
 #if defined quadXConfig || defined quadPlusConfig || defined triConfig || defined quadY4Config
   int motorMaxCommand[4];
   int motorMinCommand[4];

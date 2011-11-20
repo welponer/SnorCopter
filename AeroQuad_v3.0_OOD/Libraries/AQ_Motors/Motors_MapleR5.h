@@ -81,7 +81,12 @@ public:
            
     }
   }
-
+  
+  void commandMotor( byte motor, int command) {
+    motorCommand[motor] = command;
+    write();
+  }
+  
   void commandAllMotors(int command) {
     for( int i = 0; i < 4; i++) 
       motorCommand[i] = command;
