@@ -29,8 +29,8 @@ void readPilotCommands() {
     throttleAdjust = 0;
     //receiver->adjustThrottle(throttleAdjust);
     // Disarm motors (left stick lower left corner)
-    if (receiver->getData(YAW) < MINCHECK && copter->armed == ON) {
-      copter->armed = OFF;
+    if (receiver->getData(YAW) < MINCHECK && flight->armed == ON) {
+      flight->armed = OFF;
       motors->commandAllMotors(MINCOMMAND);
       #if defined(APM_OP_CHR6DM) || defined(ArduCopter) 
         digitalWrite(LED_Red, LOW);
@@ -53,13 +53,13 @@ void readPilotCommands() {
       //#endif
     }   
     // Arm motors (left stick lower right corner)
-    if (receiver->getData(YAW) > MAXCHECK && copter->armed == OFF && copter->safetyCheck == ON) {
+    if (receiver->getData(YAW) > MAXCHECK && flight->armed == OFF && flight->safetyCheck == ON) {
       zeroIntegralError();
-      copter->armed = ON;
+      flight->armed = ON;
       #if defined(APM_OP_CHR6DM) || defined(ArduCopter) 
       digitalWrite(LED_Red, HIGH);
       #endif
-      for (byte motor = 0; motor < LASTMOTOR; motor++) {
+      for (byte motor = 0; motor < motors->motorChannels; motor++) {
         motors->setMotorCommand(motor, MINTHROTTLE);
       }
       Serial.println("Copter armed");
@@ -67,7 +67,7 @@ void readPilotCommands() {
       //altitude.measureGround();
     }
     // Prevents accidental arming of motor output if no transmitter command received
-    if (receiver->getData(YAW) > MINCHECK) copter->safetyCheck = ON; 
+    if (receiver->getData(YAW) > MINCHECK) flight->safetyCheck = ON; 
   }
   
   // Get center value of roll/pitch/yaw channels when enough throttle to lift off
@@ -85,20 +85,20 @@ void readPilotCommands() {
   #else
     // Check Mode switch for Acro or Stable
     if (receiver->getData(MODE) > 1500) {
-      if (copter->flightMode == ACRO) {
+      if (flight->flightMode == ACRO) {
         #if defined(AeroQuad_v18) || defined(AeroQuadMega_v2)
           digitalWrite(LED2PIN, HIGH);
         #endif
         zeroIntegralError();
       }
-      copter->flightMode = STABLE;
+      flight->flightMode = STABLE;
    }
     else {
       #if defined(AeroQuad_v18) || defined(AeroQuadMega_v2)
         if (flightMode == STABLE)
           digitalWrite(LED2PIN, LOW);
       #endif
-      copter->flightMode = ACRO;
+      flight->flightMode = ACRO;
     }
   #endif  
   

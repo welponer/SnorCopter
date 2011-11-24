@@ -31,17 +31,17 @@
 #define MOTORPIN5 2
 #define MOTORPIN6 3
  
-class Motors_PWM_MapleR5 : public Motors {
-private:
-  NB_Motors numbersOfMotors;
+class Motors_PWM_MapleR5 : public Motors {  
 public:
 
-  Motors_PWM_MapleR5() {
-    numbersOfMotors = FOUR_Motors;
+  Motors_PWM_MapleR5() : Motors(8) {
+    motorChannels = 8;
+  }
+  
+  Motors_PWM_MapleR5( byte channels = 8) : Motors( channels) {
   }
 
-  void initialize(NB_Motors numbers) {
-    numbersOfMotors = numbers;
+  void initialize() {
 /*
    timer_set_mode(TIMER4, TIMER_CH1, TIMER_PWM);
    timer_set_mode(TIMER4, TIMER_CH2, TIMER_PWM);
@@ -60,7 +60,7 @@ public:
     pinMode(MOTORPIN3, PWM);
     pinMode(MOTORPIN4, PWM);
 
-    if (numbersOfMotors == SIX_Motors) {
+    if (motorChannels <= 6) {
       Timer2.setPrescaleFactor(72);
       Timer2.setOverflow(20000);
 
@@ -69,7 +69,10 @@ public:
     }
     
     commandAllMotors(1000);
-    Serial.println("init Motors_PWM_MapleR5: done");
+    Serial.print("init Motors_PWM_MapleR5: "); 
+    Serial.print(motorChannels);
+    Serial.println(" done");
+    
   }
 
   void write() {
@@ -77,8 +80,8 @@ public:
     Timer3.setCompare(TIMER_CH2, motorCommand[MOTOR2]);
     Timer3.setCompare(TIMER_CH3, motorCommand[MOTOR3]);
     Timer3.setCompare(TIMER_CH4, motorCommand[MOTOR4]);
-    if (numbersOfMotors == SIX_Motors) {  
-           
+    if (motorChannels <= 6) {  
+    
     }
   }
   
@@ -88,7 +91,7 @@ public:
   }
   
   void commandAllMotors(int command) {
-    for( int i = 0; i < 4; i++) 
+    for( int i = 0; i < motorChannels; i++) 
       motorCommand[i] = command;
     write();
     Serial.print("motor command all: "); Serial.println(command);

@@ -35,42 +35,60 @@
 #define MINCOMMAND 1000
 #define MAXCOMMAND 2000
 
-enum NB_Motors{
-  FOUR_Motors = 4,
-  SIX_Motors = 6,
-  HEIGHT_Motors = 8
-};
-
 
 class Motors {
-protected:
-  int motorCommand[8];  // LASTMOTOR not know here, so, default at 6 @todo : Kenny, find a better way
+public:
+  int* motorCommand;
+  int* motorMaxCommand;
+  int* motorMinCommand;
+  byte motorChannels;
   
 public:
 
   Motors() {
+    motorChannels = 4;
+    motorCommand = (int*)malloc(motorChannels);
+    motorMaxCommand = (int*)malloc(motorChannels);
+    motorMinCommand = (int*)malloc(motorChannels);
+  }
+  
+  Motors(byte number = 8) {
+    motorChannels = number;
+    motorCommand = (int*)malloc(motorChannels);
+    motorMaxCommand = (int*)malloc(motorChannels);
+    motorMinCommand = (int*)malloc(motorChannels);
   }
 	
-  virtual void initialize(NB_Motors numbers = FOUR_Motors) {}
-  virtual void write() {}
+  virtual void initialize( void) {}
+  virtual void write(void) {}
   virtual void commandAllMotors(int command) {}
 
-  void pulseMotors(byte nbPulse) {
-    for (byte i = 0; i < nbPulse; i++) {
-      commandAllMotors(MINCOMMAND + 100);
-      delay(250);
-      commandAllMotors(MINCOMMAND);
-      delay(250);
-    }
-  }
-
-  void setMotorCommand(byte motor, int command) {
+  void setMotorCommand( byte motor, int command) {
     motorCommand[motor] = command;
   }
 
-  int getMotorCommand(byte motor) {
+  int getMotorCommand( byte motor) {
     return motorCommand[motor];
   }
+  
+  void pulseMotors( int command) {
+  
+  }
+  
+  void setMaxCommand( byte motor, int maxCommand) {
+    motorMaxCommand[motor] = maxCommand;
+  }
+  
+  void setMinCommand( byte motor, int minCommand) {
+    motorMinCommand[motor] = minCommand;
+  }
+  
+  void constrainMotors( void) {
+    for (byte motor = 0; motor < motorChannels; motor++) {
+      motorCommand[motor] = constrain(motorCommand[motor], motorMinCommand[motor], motorMaxCommand[motor]);
+    }
+  }
+  
 };
 
 

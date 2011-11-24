@@ -269,8 +269,8 @@ void initializeEEPROM(void) {
   receiver->setSmoothFactor(YAW, 0.5);
 
  // smoothHeading = 1.0;
-  copter->flightMode = ACRO;
-  copter->headingHoldConfig = OFF;
+  flight->flightMode = ACRO;
+  flight->headingHoldConfig = OFF;
 
   aref = 5.0; // Use 3.0 if using a v1.7 shield or use 2.8 for an AeroQuad Shield < v1.7
   
@@ -314,7 +314,7 @@ void initializeEEPROM(void) {
   PID[LEVELGYROPITCH].P = PID[ROLL].P;
   PID[LEVELGYROPITCH].I = PID[ROLL].I;
   PID[LEVELGYROPITCH].D = PID[ROLL].D;
-  copter->headingHoldConfig = ON;
+  flight->headingHoldConfig = ON;
   aref = 5.0;
   receiver->setTransmitterSlope(THROTTLE, 0.5);
   receiver->setTransmitterOffset(THROTTLE, 500);
@@ -362,8 +362,8 @@ void initializeEEPROM(void) {
 //  timeConstant = readFloat(FILTERTERM_ADR);
 //  smoothHeading = readFloat(HEADINGSMOOTH_ADR);
   aref = readFloat(AREF_ADR);
-  copter->flightMode = readFloat(FLIGHTMODE_ADR);
-  copter->headingHoldConfig = readFloat(HEADINGHOLD_ADR);
+  flight->flightMode = readFloat(FLIGHTMODE_ADR);
+  flight->headingHoldConfig = readFloat(HEADINGHOLD_ADR);
 //  copter->minAcro = readFloat(MINACRO_ADR);
   accel->setOneG(readFloat(ACCEL_1G_ADR));
   
@@ -432,8 +432,8 @@ void writeEEPROM(void){
 
  // writeFloat(smoothHeading, HEADINGSMOOTH_ADR);
   writeFloat(aref, AREF_ADR);
-  writeFloat(copter->flightMode, FLIGHTMODE_ADR);
-  writeFloat(copter->headingHoldConfig, HEADINGHOLD_ADR);
+  writeFloat(flight->flightMode, FLIGHTMODE_ADR);
+  writeFloat(flight->headingHoldConfig, HEADINGHOLD_ADR);
 //  writeFloat(copter->minAcro, MINACRO_ADR);
   writeFloat(accel->getOneG(), ACCEL_1G_ADR);
     

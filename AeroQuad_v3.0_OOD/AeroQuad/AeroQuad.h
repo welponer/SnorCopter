@@ -254,6 +254,7 @@ void readPilotCommands(void);
 int motorAxisCommandPitch = 0;
 int motorAxisCommandYaw = 0;
 */
+/*
 #if defined quadXConfig || defined quadPlusConfig || defined triConfig || defined quadY4Config
   int motorMaxCommand[4];
   int motorMinCommand[4];
@@ -268,14 +269,15 @@ int motorAxisCommandYaw = 0;
   int motorConfiguratorCommand[8];
 #endif
 
-
-
+*/
+/*
 void calculateFlightError();
 void processHeading();
 void processAltitudeHold();
 void processCalibrateESC();
 void processFlightControl();
 void processAltitudeHold();
+*/
 //////////////////////////////////////////////////////
 
 //defined in SerialCom.pde

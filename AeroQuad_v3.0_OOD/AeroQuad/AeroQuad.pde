@@ -187,7 +187,7 @@
   // Motor Declaration
   #include <Motors.h>
   #include <Motors_MapleR5.h>
-  Motors_PWM_MapleR5 motorsSpecific;
+  Motors_PWM_MapleR5 motorsSpecific(6);
   Motors *motors = &motorsSpecific;
   
   // Magnetometer heading hold declaration
@@ -218,8 +218,8 @@
   Copter copterSpecific;
   Copter* copter = &copterSpecific; 
 
-  FlightControlQuadX4 flightControlSpecific;
-  FlightControl* flightControl = &flightControlSpecific;
+  FlightControlX4 flightControlSpecific;
+  FlightControl* flight = &flightControlSpecific;
 
 
   #include "DataStorage.h"
@@ -263,7 +263,10 @@
   Receiver *receiver = &receiverSpecific;
   
   // Motor Declaration
-  #define MOTOR_APM
+  #include <Motors.h>
+  #include <Motors_APM.h>
+  Motors_APM motorsSpecific;
+  Motors *motors = &motorsSpecific;
   
   // heading mag hold declaration
   #define HeadingMagHold
@@ -282,6 +285,14 @@
     #define BMP085
   #endif
   
+  // MultiCopter declaration  
+  #include "Copter.h"
+  Copter copterSpecific;
+  Copter* copter = &copterSpecific; 
+
+  FlightControlX4 flightControlSpecific;
+  FlightControl* flight = &flightControlSpecific;
+
   // Battery monitor declaration
   #ifdef BattMonitor
     #include <BatteryMonitor.h>
@@ -290,10 +301,7 @@
     BatteryMonitor* batteryMonitor = &batteryMonitorSpecific;
   #endif
   
-  // MultiCopter declaration  
-  #include "Copter.h"
-  Copter copterSpecific;
-  Copter* copter = &copterSpecific; 
+
 
   #include "DataStorage.h"
   Storage storageSpecific;
@@ -1174,9 +1182,9 @@ void setup() {
   #if defined(quadXConfig) || defined(quadPlusConfig) || defined(quadY4Config)
      motors->initialize(); 
   #elif defined(hexPlusConfig) || defined(hexXConfig) || defined (hexY6Config)
-     motors->initialize(SIX_Motors); 
+     motors->initialize(6); 
   #elif defined (octoX8Congig)
-     motors->initialize(HEIGHT_Motors); 
+     motors->initialize(8); 
   #endif
 
   // Setup receiver pins for pin change interrupts
@@ -1250,7 +1258,7 @@ void setup() {
 
   previousTime = micros();
   digitalWrite(LEDPIN, HIGH);
-  copter->safetyCheck = OFF;
+  flight->safetyCheck = OFF;
 }
 
 /*******************************************************************
@@ -1378,7 +1386,7 @@ void loop () {
       
       // Combines external pilot commands and measured sensor data to generate motor commands
       //processFlightControl();
-      flightControl->process();
+      flight->processControl();
       
       #ifdef BinaryWrite
         if (fastTransfer == ON) {
@@ -1451,9 +1459,9 @@ void loop () {
           compass->measure(kinematics->getData(ROLL), kinematics->getData(PITCH));
         #endif
         #if defined(BattMonitor)
-          batteryMonitor->measure(armed);
+          batteryMonitor->measure(flight->armed);
         #endif
-        processAltitudeHold();
+        flight->processAltitudeHold();
 
       // Listen for configuration commands and reports telemetry
 

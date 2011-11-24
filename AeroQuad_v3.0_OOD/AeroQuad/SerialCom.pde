@@ -32,7 +32,7 @@
 bool validateCalibrateCommand(byte command)
 {
   if (readFloatSerial() == 123.45) {// use a specific float value to validate full throttle call is being sent
-    copter->armed = OFF;
+    flight->armed = OFF;
     calibrateESC = command;
     return true;
   } else {
@@ -65,7 +65,7 @@ void readSerialCommand() {
     case 'C': // Receive yaw PID
       readSerialPID(YAW);
       readSerialPID(HEADING);
-      copter->headingHoldConfig = readFloatSerial();
+      flight->headingHoldConfig = readFloatSerial();
       heading = 0;
       relativeHeading = 0;
       headingHold = 0;
@@ -258,7 +258,7 @@ void sendSerialTelemetry() {
   case 'D': // Send yaw PID values
     PrintPID(YAW);
     PrintPID(HEADING);
-    SERIAL_PRINTLN((int)copter->headingHoldConfig);
+    SERIAL_PRINTLN((int)flight->headingHoldConfig);
     queryType = 'X';
     break;
   case 'F': // Send roll and pitch auto level PID values
@@ -355,12 +355,12 @@ void sendSerialTelemetry() {
 #else
     PrintValueComma(0);
 #endif
-    for (byte motor = 0; motor < LASTMOTOR; motor++)
+    for (byte motor = 0; motor < motors->motorChannels; motor++)
       PrintValueComma(motors->getMotorCommand(motor));
-    PrintValueComma((int)copter->armed);
-    if (copter->flightMode == STABLE)
+    PrintValueComma((int)flight->armed);
+    if (flight->flightMode == STABLE)
       PrintValueComma(2000);
-    if (copter->flightMode == ACRO)
+    if (flight->flightMode == ACRO)
       PrintValueComma(1000);
 #ifdef HeadingMagHold
     PrintValueComma(kinematics->getDegreesHeading(YAW));
@@ -407,7 +407,7 @@ void sendSerialTelemetry() {
     //queryType = 'X';
     break;
   case '6': // Report remote commands
-    for (byte motor = 0; motor < LASTMOTOR; motor++) {
+    for (byte motor = 0; motor < motors->motorChannels; motor++) {
       PrintValueComma(motors->getMotorCommand(motor));
     }
     SERIAL_PRINTLN();
@@ -451,7 +451,7 @@ void sendSerialTelemetry() {
     PrintValueComma('3');
 #endif
     PrintValueComma(LASTCHANNEL);
-    SERIAL_PRINT(LASTMOTOR);
+    SERIAL_PRINT(motors->motorChannels);
     SERIAL_PRINTLN();
     queryType = 'X';
     break;
