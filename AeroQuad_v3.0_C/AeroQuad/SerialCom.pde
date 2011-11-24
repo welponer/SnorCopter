@@ -362,7 +362,7 @@ void sendSerialTelemetry() {
       PrintValueComma((int)altitudeHoldState);
     #else
       PrintValueComma(0);
-      PrintValueComma('0');
+      PrintValueComma(0);
     #endif
     for (byte channel = ROLL; channel < LASTCHANNEL; channel++) {
       PrintValueComma(receiverCommand[channel]);
@@ -373,7 +373,7 @@ void sendSerialTelemetry() {
     for (byte motor = 0; motor < LASTMOTOR; motor++) {
       PrintValueComma(motorCommand[motor]);
     }
-    for (byte motor = 0; motor < (8 - (LASTMOTOR - 1)); motor++) {// max of 8 motor outputs supported
+    for (byte motor = 0; motor < (8 - (LASTMOTOR)); motor++) {// max of 8 motor outputs supported
       PrintValueComma(0); // zero out unused motor channels
     }
     #ifdef BattMonitor
@@ -384,7 +384,7 @@ void sendSerialTelemetry() {
     PrintValueComma(flightMode);
     SERIAL_PRINTLN();
     break;
-  case 'T': // Send processed transmitter values *** UPDATE ***
+  case 'T': // Send processed transmitter values
     PrintValueComma(receiverXmitFactor);
     for (byte axis = ROLL; axis < LASTAXIS; axis++) {
       PrintValueComma(receiverCommand[axis]);
@@ -394,7 +394,8 @@ void sendSerialTelemetry() {
     }
     SERIAL_PRINTLN();
     break;
-  case 'U': // Send smoothed receiver with Transmitter Factor applied values
+  case 'U': // Spare
+    break;
   case 'V': // Send receiver status
     for (byte channel = ROLL; channel < LASTCHANNEL; channel++) {
       PrintValueComma(receiverCommand[channel]);

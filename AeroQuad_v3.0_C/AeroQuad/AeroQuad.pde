@@ -45,7 +45,7 @@
  *********************** Define Flight Configuration ************************
  ****************************************************************************/
 // Use only one of the following definitions
-#define quadXConfig
+//#define quadXConfig
 //#define quadPlusConfig
 //#define hexPlusConfig
 //#define hexXConfig      // not flight tested, take real care
@@ -53,8 +53,8 @@
 //#define quadY4Config
 //#define hexY6Config
 //#define octoX8Congig
-//#define octoPlusCongig  // not yet implemented
-//#define octoXCongig
+#define octoPlusCongig  // not yet implemented
+//#define octoXCongig     // EXPERIMENTAL: not completely re-tested
 
 //
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -81,7 +81,7 @@
 // Battery Monitor Options
 // *******************************************************************************************************************************
 #define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
-#define BattMonitorAlarmVoltage 10.4  // this have to be defined if BattMonitor is defined. default alarm voltage is 10 volt
+#define BattMonitorAlarmVoltage 10.3  // this have to be defined if BattMonitor is defined. default alarm voltage is 10 volt
 #define BattMonitorAutoDescent  // if you want the craft to auto descent when the battery reach the alarm voltage
 
 //
@@ -906,7 +906,7 @@
   #include "FlightControlOctoX8.h"
 #elif defined octoXConfig
   #include "FlightControlOctoX.h"
-#elif defined octoPlusConfig
+#elif defined octoPlusCongig
   #include "FlightControlOctoPlus.h"
 #endif
 
@@ -960,7 +960,7 @@ void setup() {
      initializeMotors(FOUR_Motors);
   #elif defined(hexPlusConfig) || defined(hexXConfig) || defined (hexY6Config)
      initializeMotors(SIX_Motors);
-  #elif defined (octoX8Congig) || defined (octoXCongig) || defined (octoXPlusCongig)
+  #elif defined (octoX8Congig) || defined (octoXCongig) || defined (octoPlusCongig)
      initializeMotors(HEIGHT_Motors);
   #endif
 
