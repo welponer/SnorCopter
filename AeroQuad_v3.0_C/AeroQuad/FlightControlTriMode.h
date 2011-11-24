@@ -36,9 +36,9 @@
 
 
 #define SERVO       MOTOR1
-#define REAR        MOTOR2
+#define FRONT_LEFT  MOTOR2
 #define FRONT_RIGHT MOTOR3
-#define FRONT_LEFT  MOTOR4
+#define REAR        MOTOR4
 #define LASTMOTOR   MOTOR4+1
 
 #define TRI_YAW_CONSTRAINT_MIN 1100

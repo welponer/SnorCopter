@@ -37,11 +37,9 @@
        CCW/CW           CW/CCW
 */     
 
-
-
 #define FRONT_LEFT    MOTOR1
-#define REAR_RIGHT    MOTOR2
-#define FRONT_RIGHT   MOTOR3
+#define FRONT_RIGHT   MOTOR2
+#define REAR_RIGHT    MOTOR3
 #define REAR_LEFT     MOTOR4
 #define FRONT_LEFT_2  MOTOR5
 #define FRONT_RIGHT_2 MOTOR6

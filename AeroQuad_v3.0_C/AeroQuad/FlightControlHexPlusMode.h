@@ -36,12 +36,12 @@
 */     
 
 
-#define FRONT_LEFT  MOTOR1
-#define REAR_RIGHT  MOTOR2
-#define FRONT_RIGHT MOTOR3
-#define REAR_LEFT   MOTOR4
-#define FRONT       MOTOR5
-#define REAR        MOTOR6
+#define FRONT       MOTOR1
+#define FRONT_RIGHT MOTOR2
+#define REAR_RIGHT  MOTOR3
+#define REAR        MOTOR4
+#define REAR_LEFT   MOTOR5
+#define FRONT_LEFT  MOTOR6
 #define LASTMOTOR   MOTOR6+1
 
 void applyMotorCommand() {

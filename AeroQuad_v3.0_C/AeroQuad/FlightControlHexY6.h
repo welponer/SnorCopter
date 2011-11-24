@@ -38,8 +38,8 @@
 
 
 #define LEFT            MOTOR1
-#define REAR            MOTOR2
-#define RIGHT           MOTOR3
+#define RIGHT           MOTOR2
+#define REAR            MOTOR3
 #define REAR_UNDER      MOTOR4
 #define LEFT_UNDER      MOTOR5
 #define RIGHT_UNDER     MOTOR6
