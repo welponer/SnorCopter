@@ -33,12 +33,8 @@
  
 class Motors_PWM_MapleR5 : public Motors {  
 public:
-
-  Motors_PWM_MapleR5() : Motors(8) {
-    motorChannels = 8;
-  }
   
-  Motors_PWM_MapleR5( byte channels = 8) : Motors( channels) {
+  Motors_PWM_MapleR5( byte channels = 4) : Motors( channels) {
   }
 
   void initialize() {
@@ -48,8 +44,8 @@ public:
    timer_set_mode(TIMER4, TIMER_CH3, TIMER_PWM);
    timer_pause(TIMER4);
    timer_set_count(TIMER4, 0);
-   timer_set_reload(TIMER4, 60000);   // Sets the period of the PWM signal
-   timer_resume(TIMER4);              // enable outputs to esc's
+   timer_set_reload(TIMER4, 60000);   
+   timer_resume(TIMER4);             
 */
     
     Timer3.setPrescaleFactor(72);

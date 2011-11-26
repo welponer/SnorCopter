@@ -28,6 +28,7 @@
 
 #define BAUD 115200
 //#define BAUD 111111 // use this to be compatible with USB and XBee connections
+//#define BAUD 57600
 #define LEDPIN 13
 #define ON 1
 #define OFF 0
@@ -43,7 +44,7 @@
   #define PIANO_SW1 42
   #define PIANO_SW2 43
 #endif
-#ifdef AeroQuadMega_v2  
+#if defined (AeroQuadMega_v2) || defined (AeroQuadMega_v21) || defined (AutonavShield)  
   #define LED2PIN 4
   #define LED3PIN 31
 #else
@@ -209,28 +210,14 @@ unsigned long fastTelemetryTime = 0;
 
 // jihlein: wireless telemetry defines
 /**************************************************************/
-/********************** Wireless Telem Port *******************/
+/********** Serial comminucation definition *******************/
 /**************************************************************/
-#if defined WirelessTelemetry && (defined(AeroQuadMega_v1)     || \
-                                  defined(AeroQuadMega_v2)     || \
-                                  defined(AeroQuadMega_Wii)    || \
-                                  defined(ArduCopter)          || \
-                                  defined(AeroQuadMega_CHR6DM) || \
-                                  defined(APM_OP_CHR6DM))
-  #define SERIAL_PRINT      Serial3.print
-  #define SERIAL_PRINTLN    Serial3.println
-  #define SERIAL_AVAILABLE  Serial3.available
-  #define SERIAL_READ       Serial3.read
-  #define SERIAL_FLUSH      Serial3.flush
-  #define SERIAL_BEGIN      Serial3.begin
-#else
-  #define SERIAL_PRINT      Serial.print
-  #define SERIAL_PRINTLN    Serial.println
-  #define SERIAL_AVAILABLE  Serial.available
-  #define SERIAL_READ       Serial.read
-  #define SERIAL_FLUSH      Serial.flush
-  #define SERIAL_BEGIN      Serial.begin
-#endif
+#define SERIAL_PRINT      SERIAL_PORT.print
+#define SERIAL_PRINTLN    SERIAL_PORT.println
+#define SERIAL_AVAILABLE  SERIAL_PORT.available
+#define SERIAL_READ       SERIAL_PORT.read
+#define SERIAL_FLUSH      SERIAL_PORT.flush
+#define SERIAL_BEGIN      SERIAL_PORT.begin
 
 /**************************************************************/
 /********************** Debug Parameters **********************/
@@ -346,7 +333,7 @@ int motorAxisCommandYaw = 0;
   int motorMaxCommand[6] = {0,0,0,0,0,0};
   int motorMinCommand[6] = {0,0,0,0,0,0};
   int motorConfiguratorCommand[6] = {0,0,0,0,0,0};
-#elif defined (octoX8Congig) || defined (octoXCongig) || defined (octoPlusCongig) 
+#elif defined (octoX8Config) || defined (octoXConfig) || defined (octoPlusConfig) 
   int motorMaxCommand[8] = {0,0,0,0,0,0,0,0};
   int motorMinCommand[8] = {0,0,0,0,0,0,0,0};
   int motorConfiguratorCommand[8] = {0,0,0,0,0,0,0,0};

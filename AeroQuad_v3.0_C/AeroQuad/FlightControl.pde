@@ -220,6 +220,21 @@ void processThrottleCorrection() {
 }
 
 
+
+void processHardManuevers() {
+  
+  if ((receiverCommand[ROLL] < MINCHECK) ||
+      (receiverCommand[ROLL] > MAXCHECK) ||
+      (receiverCommand[PITCH] < MINCHECK) ||
+      (receiverCommand[PITCH] > MAXCHECK)) {  
+        
+    for (int motor = 0; motor < LASTMOTOR; motor++) {
+      motorMinCommand[motor] = minAcro;
+      motorMaxCommand[motor] = MAXCOMMAND;
+    }
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////// processFlightControl main function ///////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -251,7 +266,9 @@ void processFlightControl() {
   processMinMaxCommand();
 
   // Allows quad to do acrobatics by lowering power to opposite motors during hard manuevers
-//  processHardManuevers();    // This is not a good way to handle loop, just learn to pilot and do it normally!
+  if (flightMode == ACRO) {
+    processHardManuevers();    // This is not a good way to handle loop, just learn to pilot and do it normally!
+  }
   
   // Apply limits to motor commands
   for (byte motor = 0; motor < LASTMOTOR; motor++) {

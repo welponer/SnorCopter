@@ -33,11 +33,17 @@
                  CW
 */     
 
-
-#define FRONT MOTOR1
-#define RIGHT MOTOR2
-#define REAR  MOTOR3
-#define LEFT  MOTOR4
+#ifdef OLD_MOTOR_NUMBERING  
+  #define FRONT MOTOR1
+  #define REAR  MOTOR2
+  #define RIGHT MOTOR3
+  #define LEFT  MOTOR4
+#else
+  #define FRONT MOTOR1
+  #define RIGHT MOTOR2
+  #define REAR  MOTOR3
+  #define LEFT  MOTOR4
+#endif
 #define LASTMOTOR MOTOR4+1
 
 void applyMotorCommand() {
@@ -49,6 +55,11 @@ void applyMotorCommand() {
 }
 
 void processMinMaxCommand() {
+
+  if (receiverCommand[THROTTLE] > MAXCHECK) { // if the throttle is about the max, we used tue PID values!
+    return;
+  }
+  
   if ((motorCommand[FRONT] <= MINTHROTTLE) || (motorCommand[REAR] <= MINTHROTTLE)){
     delta = receiverCommand[THROTTLE] - MINTHROTTLE;
     motorMaxCommand[RIGHT] = constrain(receiverCommand[THROTTLE] + delta, MINTHROTTLE, MAXCHECK);
@@ -84,26 +95,24 @@ void processMinMaxCommand() {
   }
 }
 
-void processHardManuevers() {
-  if (flightMode == ACRO) {
-    if (receiverCommand[ROLL] < MINCHECK) {        // Maximum Left Roll Rate
-      motorMinCommand[RIGHT] = MAXCOMMAND;
-      motorMaxCommand[LEFT] = minAcro;
-    }
-    else if (receiverCommand[ROLL] > MAXCHECK) {   // Maximum Right Roll Rate
-      motorMinCommand[LEFT] = MAXCOMMAND;
-      motorMaxCommand[RIGHT] = minAcro;
-    }
-    else if (receiverCommand[PITCH] < MINCHECK) {  // Maximum Nose Up Pitch Rate
-      motorMinCommand[FRONT] = MAXCOMMAND;
-      motorMaxCommand[REAR] = minAcro;
-    }
-    else if (receiverCommand[PITCH] > MAXCHECK) {  // Maximum Nose Down Pitch Rate
-      motorMinCommand[REAR] = MAXCOMMAND;
-      motorMaxCommand[FRONT] = minAcro;
-    }
-  }
-}
-
+//void processHardManuevers() {
+//
+//  if (receiverCommand[ROLL] < MINCHECK) {        // Maximum Left Roll Rate
+//    motorMinCommand[RIGHT] = MAXCOMMAND;
+//    motorMaxCommand[LEFT] = minAcro;
+//  }
+//  else if (receiverCommand[ROLL] > MAXCHECK) {   // Maximum Right Roll Rate
+//    motorMinCommand[LEFT] = MAXCOMMAND;
+//    motorMaxCommand[RIGHT] = minAcro;
+//  }
+//  else if (receiverCommand[PITCH] < MINCHECK) {  // Maximum Nose Up Pitch Rate
+//    motorMinCommand[FRONT] = MAXCOMMAND;
+//    motorMaxCommand[REAR] = minAcro;
+//  }
+//  else if (receiverCommand[PITCH] > MAXCHECK) {  // Maximum Nose Down Pitch Rate
+//    motorMinCommand[REAR] = MAXCOMMAND;
+//    motorMaxCommand[FRONT] = minAcro;
+//  }
+//}
 
 #endif // #define _AQ_PROCESS_FLIGHT_CONTROL_PLUS_MODE_H_

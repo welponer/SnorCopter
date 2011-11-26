@@ -35,26 +35,31 @@
 //#define AeroQuad_Wii        // Arduino 2009 with Wii Sensors and AeroQuad Shield v1.x
 //#define AeroQuad_Paris_v3   // Define along with either AeroQuad_Wii to include specific changes for MultiWiiCopter Paris v3.0 board
 //#define AeroQuadMega_v1     // Arduino Mega with AeroQuad Shield v1.7 and below
-#define AeroQuadMega_v2     // Arduino Mega with AeroQuad Shield v2.x
+//#define AeroQuadMega_v2     // Arduino Mega with AeroQuad Shield v2.x
+//#define AeroQuadMega_v21    // Arduino Mega with AeroQuad Shield v2.1
+#define AutonavShield     // For the AutoNav shield build by blue23 on the forum, @see http://aeroquad.com/showthread.php?4106-New-Shield-available-Mega-AutoNav-Shield&highlight=autonav
 //#define AeroQuadMega_Wii    // Arduino Mega with Wii Sensors and AeroQuad Shield v2.x
 //#define ArduCopter          // ArduPilot Mega (APM) with Oilpan Sensor Board
 //#define AeroQuadMega_CHR6DM // Clean Arduino Mega with CHR6DM as IMU/heading ref.
 //#define APM_OP_CHR6DM       // ArduPilot Mega with CHR6DM as IMU/heading ref., Oilpan for barometer (just uncomment AltitudeHold for baro), and voltage divider
 
+
 /****************************************************************************
  *********************** Define Flight Configuration ************************
  ****************************************************************************/
 // Use only one of the following definitions
-//#define quadXConfig
+#define quadXConfig
 //#define quadPlusConfig
 //#define hexPlusConfig
-//#define hexXConfig      // not flight tested, take real care
+//#define hexXConfig      // EXPERIMENTAL: not completely re-tested
 //#define triConfig
 //#define quadY4Config
 //#define hexY6Config
-//#define octoX8Congig
-#define octoPlusCongig  // not yet implemented
-//#define octoXCongig     // EXPERIMENTAL: not completely re-tested
+//#define octoX8Config
+//#define octoPlusConfig  // EXPERIMENTAL: not completely re-tested
+//#define octoXConfig     // EXPERIMENTAL: not completely re-tested
+
+//#define OLD_MOTOR_NUMBERING // Uncomment this for old motor numbering setup, FOR QUAD ONLY
 
 //
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -63,7 +68,7 @@
 // Use FlightAngleARG if you do not have a magnetometer, use DCM if you have a magnetometer installed
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //#define FlightAngleMARG // EXPERIMENTAL!  Fly at your own risk! Use this if you have a magnetometer installed and enabled HeadingMagHold above
-#define FlightAngleARG // Use this if you do not have a magnetometer installed
+//#define FlightAngleARG // Use this if you do not have a magnetometer installed
 
 //
 // *******************************************************************************************************************************
@@ -72,7 +77,7 @@
 // *******************************************************************************************************************************
 // You must define one of the next 3 attitude stabilization modes or the software will not build
 // *******************************************************************************************************************************
-//#define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
+#define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
 #define AltitudeHold // Enables BMP085 Barometer (experimental, use at your own risk)
 //#define RateModeOnly // Use this if you only have a gyro sensor, this will disable any attitude modes.
 
@@ -80,9 +85,9 @@
 // *******************************************************************************************************************************
 // Battery Monitor Options
 // *******************************************************************************************************************************
-#define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
-#define BattMonitorAlarmVoltage 10.3  // this have to be defined if BattMonitor is defined. default alarm voltage is 10 volt
-#define BattMonitorAutoDescent  // if you want the craft to auto descent when the battery reach the alarm voltage
+//#define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
+//#define BattMonitorAlarmVoltage 10.3  // this have to be defined if BattMonitor is defined. default alarm voltage is 10 volt
+//#define BattMonitorAutoDescent  // if you want the craft to auto descent when the battery reach the alarm voltage
 
 //
 // *******************************************************************************************************************************
@@ -464,7 +469,151 @@
     measureAccelSum();
     measureGyroSum();
   }
+#endif
 
+#ifdef AeroQuadMega_v21
+  #include <Device_I2C.h>
+
+  // Gyroscope declaration
+  #include <Gyroscope_ITG3200.h>
+
+  // Accelerometer declaration
+  #include <Accelerometer_BMA180.h>
+
+  // Receiver Declaration
+  #define RECEIVER_MEGA
+
+  // Motor declaration
+  #define MOTOR_PWM_Timer
+
+  // heading mag hold declaration
+  #ifdef HeadingMagHold
+    #define SPARKFUN_9DOF
+    #define HMC5883L
+  #endif
+
+  // Altitude declaration
+  #ifdef AltitudeHold
+    #define BMP085
+  #endif
+
+  // Battery Monitor declaration
+  #ifdef BattMonitor
+    struct BatteryData batteryData[] = {
+      BM_DEFINE_BATTERY_V(0, BattMonitorAlarmVoltage*1.1, BattMonitorAlarmVoltage, ((5.0 / 1024.0) * (15.0 + 7.5) / 7.5), 0.82)};
+  #endif
+
+  #ifdef OSD
+    #define MAX7456_OSD
+  #endif  
+
+  /**
+   * Put AeroQuadMega_v2 specific intialization need here
+   */
+  void initPlatform() {
+
+    pinMode(LED2PIN, OUTPUT);
+    digitalWrite(LED2PIN, LOW);
+    pinMode(LED3PIN, OUTPUT);
+    digitalWrite(LED3PIN, LOW);
+
+    // pins set to INPUT for camera stabilization so won't interfere with new camera class
+    pinMode(33, INPUT); // disable SERVO 1, jumper D12 for roll
+    pinMode(34, INPUT); // disable SERVO 2, jumper D11 for pitch
+    pinMode(35, INPUT); // disable SERVO 3, jumper D13 for yaw
+    pinMode(43, OUTPUT); // LED 1
+    pinMode(44, OUTPUT); // LED 2
+    pinMode(45, OUTPUT); // LED 3
+    pinMode(46, OUTPUT); // LED 4
+    digitalWrite(43, HIGH); // LED 1 on
+    digitalWrite(44, HIGH); // LED 2 on
+    digitalWrite(45, HIGH); // LED 3 on
+    digitalWrite(46, HIGH); // LED 4 on
+
+    Wire.begin();
+    TWBR = 12;
+  }
+
+  /**
+   * Measure critical sensors
+   */
+  void measureCriticalSensors() {
+    measureAccelSum();
+    measureGyroSum();
+  }
+#endif
+
+#ifdef AutonavShield
+  #include <Device_I2C.h>
+
+  // Gyroscope declaration
+  #include <Gyroscope_ITG3200.h>
+
+  // Accelerometer declaration
+  #include <Accelerometer_BMA180.h>
+
+  // Receiver Declaration
+  #define RECEIVER_MEGA
+
+  // Motor declaration
+  #define MOTOR_PWM_Timer
+
+  // heading mag hold declaration
+  #ifdef HeadingMagHold
+    #define SPARKFUN_9DOF
+    #define HMC5883L
+  #endif
+
+  // Altitude declaration
+  #ifdef AltitudeHold
+    #define BMP085
+  #endif
+
+  // Battery Monitor declaration
+//  #ifdef BattMonitor
+//    struct BatteryData batteryData[] = {
+//      BM_DEFINE_BATTERY_V(0, BattMonitorAlarmVoltage*1.1, BattMonitorAlarmVoltage, ((5.0 / 1024.0) * (15.0 + 7.5) / 7.5), 0.82)};
+//  #endif
+  #undef BatteryMonitor // unsuported
+
+  #ifdef OSD
+    #define MAX7456_OSD
+  #endif  
+
+  /**
+   * Put AeroQuadMega_v2 specific intialization need here
+   */
+  void initPlatform() {
+
+    pinMode(LED2PIN, OUTPUT);
+    digitalWrite(LED2PIN, LOW);
+    pinMode(LED3PIN, OUTPUT);
+    digitalWrite(LED3PIN, LOW);
+
+    // pins set to INPUT for camera stabilization so won't interfere with new camera class
+    pinMode(33, INPUT); // disable SERVO 1, jumper D12 for roll
+    pinMode(34, INPUT); // disable SERVO 2, jumper D11 for pitch
+    pinMode(35, INPUT); // disable SERVO 3, jumper D13 for yaw
+    pinMode(43, OUTPUT); // LED 1
+    pinMode(44, OUTPUT); // LED 2
+    pinMode(45, OUTPUT); // LED 3
+    pinMode(46, OUTPUT); // LED 4
+    digitalWrite(43, HIGH); // LED 1 on
+    digitalWrite(44, HIGH); // LED 2 on
+    digitalWrite(45, HIGH); // LED 3 on
+    digitalWrite(46, HIGH); // LED 4 on
+
+    Wire.begin();
+    TWBR = 12;
+  }
+
+  /**
+   * Measure critical sensors
+   */
+  void measureCriticalSensors() {
+    measureAccelSum();
+    measureGyroSum();
+  }
 #endif
 
 #ifdef ArduCopter
@@ -860,6 +1009,8 @@
 //********************************************************
 #if defined (HMC5843)
   #include <Magnetometer_HMC5843.h>
+#elif defined (HMC5883L)  
+  #include <Magnetometer_HMC5883L.h>
 #elif defined (COMPASS_CHR6DM)
 #endif
 
@@ -889,15 +1040,15 @@
 //******** FLIGHT CONFIGURATION DECLARATION **************
 //********************************************************
 #if defined quadXConfig
-  #include "FlightControlQuadXMode.h"
+  #include "FlightControlQuadX.h"
 #elif defined quadPlusConfig
-  #include "FlightControlQuadPlusMode.h"
+  #include "FlightControlQuadPlus.h"
 #elif defined hexPlusConfig
-  #include "FlightControlHexPlusMode.h"
+  #include "FlightControlHexPlus.h"
 #elif defined hexXConfig
-  #include "FlightControlHexXMode.h"
+  #include "FlightControlHexX.h"
 #elif defined triConfig
-  #include "FlightControlTriMode.h"
+  #include "FlightControlTri.h"
 #elif defined quadY4Config
   #include "FlightControlQuadY4.h"
 #elif defined hexY6Config
@@ -906,7 +1057,7 @@
   #include "FlightControlOctoX8.h"
 #elif defined octoXConfig
   #include "FlightControlOctoX.h"
-#elif defined octoPlusCongig
+#elif defined octoPlusConfig
   #include "FlightControlOctoPlus.h"
 #endif
 
@@ -921,6 +1072,24 @@
 #else  
     #undef OSD_SYSTEM_MENU  // can't use menu system without an osd, 
 #endif
+
+//********************************************************
+//****************** SERIAL PORT DECLARATION *************
+//********************************************************
+#if defined (WirelessTelemetry) 
+  #if defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__)
+    #if defined (AutonavShield)
+      #define SERIAL_PORT Serial2
+    #else
+      #define SERIAL_PORT Serial3
+    #endif
+  #else    // force 328p to use the normal port
+    #define SERIAL_PORT Serial
+  #endif
+#else  
+  #define SERIAL_PORT Serial
+#endif  
+
 
 // Include this last as it contains objects from above declarations
 #include "DataStorage.h"
@@ -960,7 +1129,7 @@ void setup() {
      initializeMotors(FOUR_Motors);
   #elif defined(hexPlusConfig) || defined(hexXConfig) || defined (hexY6Config)
      initializeMotors(SIX_Motors);
-  #elif defined (octoX8Congig) || defined (octoXCongig) || defined (octoPlusCongig)
+  #elif defined (octoX8Config) || defined (octoXConfig) || defined (octoPlusConfig)
      initializeMotors(HEIGHT_Motors);
   #endif
 

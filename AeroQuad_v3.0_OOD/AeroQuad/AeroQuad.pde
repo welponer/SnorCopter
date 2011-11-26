@@ -84,7 +84,7 @@
 //#define OpenlogBinaryWrite // Enables fast binary transfer to serial1 and openlog hardware
 
 // High speed sampled gyro & accel sensor
-#define SENSOR_SAMPLED
+//#define SENSOR_SAMPLED
 
 //
 // *******************************************************************************************************************************
@@ -1285,7 +1285,7 @@ void loop () {
   currentTime = micros();
   deltaTime = currentTime - previousTime;
   
-  timer.update();
+  //timer.update();
   
   // High speed sampled sensor
 #ifdef SENSOR_SAMPLED  

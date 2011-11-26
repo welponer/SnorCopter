@@ -45,14 +45,7 @@ public:
   
 public:
 
-  Motors() {
-    motorChannels = 4;
-    motorCommand = (int*)malloc(motorChannels);
-    motorMaxCommand = (int*)malloc(motorChannels);
-    motorMinCommand = (int*)malloc(motorChannels);
-  }
-  
-  Motors(byte number = 8) {
+  Motors(byte number = 4) {
     motorChannels = number;
     motorCommand = (int*)malloc(motorChannels);
     motorMaxCommand = (int*)malloc(motorChannels);

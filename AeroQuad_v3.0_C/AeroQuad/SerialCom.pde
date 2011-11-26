@@ -435,6 +435,10 @@ void sendSerialTelemetry() {
       SERIAL_PRINTLN("v1.8 and greater");
     #elif defined(AeroQuadMega_v2)
       SERIAL_PRINTLN("Mega v2");
+    #elif defined(AeroQuadMega_v21)
+      SERIAL_PRINTLN("Mega v21");
+    #elif defined(AutonavShield)
+      SERIAL_PRINTLN("AutonavShield");
     #elif defined(AeroQuad_Wii)
       SERIAL_PRINTLN("Wii");
     #elif defined(AeroQuadMega_Wii)
