@@ -102,7 +102,6 @@ public:
     for( int i = 0; i < motorChannels; i++) 
       motorCommand[i] = command;
     write();
-    Serial.print("motor command all: "); Serial.println(command);
   }  
 };
 

@@ -24,9 +24,9 @@
 #include "Compass.h"
 #include <WProgram.h>
 
-#define COMPASS_ADDRESS 0x1E
-#define COMPASS_EXPECTED_XY 1264.4f // xy - Gain 2 (0x20): 1090 LSB/Ga * 1.16 Ga - see HMC5883L specs
-#define COMPASS_EXPECTED_Z 1177.2f // z - Gain 2 (0x20): 1090 LSB/Ga * 1.08 Ga    
+#define HMC5883L_ADDRESS 0x1E
+#define HMC5883L_EXPECTED_XY 1264.4f // xy - Gain 2 (0x20): 1090 LSB/Ga * 1.16 Ga - see HMC5883L specs
+#define HMC5883L_EXPECTED_Z 1177.2f // z - Gain 2 (0x20): 1090 LSB/Ga * 1.08 Ga    
 
 class Magnetometer_HMC5883L : public Compass {
 private:
@@ -50,26 +50,24 @@ public:
     
     while (success == false && numAttempts < 5 ) {
       numAttempts++;
-      updateRegisterI2C(COMPASS_ADDRESS, 0x00, 0x11);  // Set positive bias configuration for sensor calibraiton
-      delay(10);
-      updateRegisterI2C(COMPASS_ADDRESS, 0x01, 0x20); // Set +/- 1G gain
-      delay(10);
-      updateRegisterI2C(COMPASS_ADDRESS, 0x02, 0x01);  // Perform single conversion
+      updateRegisterI2C(HMC5883L_ADDRESS, 0x00, 0x11);  // Set positive bias configuration for sensor calibraiton
+      updateRegisterI2C(HMC5883L_ADDRESS, 0x01, 0x20); // Set +/- 1G gain
+      updateRegisterI2C(HMC5883L_ADDRESS, 0x02, 0x01);  // Perform single conversion
       delay(10);
  
       measure(0.0, 0.0);                    // Read calibration data
       delay(10);
-      if ( fabs(measuredMagX) > 500.0 && fabs(measuredMagX) < (COMPASS_EXPECTED_XY + 300) \
-          && fabs(measuredMagY) > 500.0 && fabs(measuredMagY) < (COMPASS_EXPECTED_XY + 300) \
-          && fabs(measuredMagZ) > 500.0 && fabs(measuredMagZ) < (COMPASS_EXPECTED_Z + 300)) {
-        magCalibration[XAXIS] = fabs(COMPASS_EXPECTED_XY / measuredMagX);
-        magCalibration[YAXIS] = fabs(COMPASS_EXPECTED_XY / measuredMagY);
-        magCalibration[ZAXIS] = fabs(COMPASS_EXPECTED_Z / measuredMagZ);    
+      if ( fabs(measuredMagX) > 500.0 && fabs(measuredMagX) < (HMC5883L_EXPECTED_XY + 300) \
+          && fabs(measuredMagY) > 500.0 && fabs(measuredMagY) < (HMC5883L_EXPECTED_XY + 300) \
+          && fabs(measuredMagZ) > 500.0 && fabs(measuredMagZ) < (HMC5883L_EXPECTED_Z + 300)) {
+        magCalibration[XAXIS] = fabs(HMC5883L_EXPECTED_XY / measuredMagX);
+        magCalibration[YAXIS] = fabs(HMC5883L_EXPECTED_XY / measuredMagY);
+        magCalibration[ZAXIS] = fabs(HMC5883L_EXPECTED_Z / measuredMagZ);    
         success = true;
       }
-      updateRegisterI2C(COMPASS_ADDRESS, 0x00, 0x10);  // Set 10hz update rate and normal operaiton
+      updateRegisterI2C(HMC5883L_ADDRESS, 0x00, 0x10);  // Set 10hz update rate and normal operaiton
       delay(50);
-      updateRegisterI2C(COMPASS_ADDRESS, 0x02, 0x00); // Continuous Update mode
+      updateRegisterI2C(HMC5883L_ADDRESS, 0x02, 0x00); // Continuous Update mode
       delay(50);                           // Mode change delay (1/Update Rate) **
     }
     measure(0.0, 0.0);  // Assume 1st measurement at 0 degrees roll and 0 degrees pitch
@@ -82,8 +80,8 @@ public:
     float magY;
     float tmp;
     
-    sendByteI2C(COMPASS_ADDRESS, 0x03);
-    Wire.requestFrom(COMPASS_ADDRESS, 6);
+    sendByteI2C(HMC5883L_ADDRESS, 0x03);
+    Wire.requestFrom(HMC5883L_ADDRESS, 6);
     measuredMagX =  readShortI2C() * magCalibration[XAXIS];
     // xchange Y and Z
     measuredMagZ = -readShortI2C() * magCalibration[ZAXIS];
