@@ -66,9 +66,9 @@ void readSerialCommand() {
       readSerialPID(YAW);
       readSerialPID(HEADING);
       flight->headingHoldConfig = readFloatSerial();
-      heading = 0;
-      relativeHeading = 0;
-      headingHold = 0;
+      flight->heading = 0;
+      flight->relativeHeading = 0;
+      flight->headingHold = 0;
       break;
     case 'E': // Receive roll and pitch auto level PID
       readSerialPID(LEVELROLL);

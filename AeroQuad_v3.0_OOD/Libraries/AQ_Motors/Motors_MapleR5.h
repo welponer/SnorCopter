@@ -23,18 +23,30 @@
 
 #include <WProgram.h>
 #include "Motors.h"
-
+/*
 #define MOTORPIN1 12
 #define MOTORPIN2 11
 #define MOTORPIN3 27
 #define MOTORPIN4 28
 #define MOTORPIN5 2
 #define MOTORPIN6 3
- 
+ */
 class Motors_PWM_MapleR5 : public Motors {  
 public:
   
   Motors_PWM_MapleR5( byte channels = 4) : Motors( channels) {
+    pinNumber[0] = 12;  // roll
+    pinNumber[1] = 11;  // pitch
+    pinNumber[2] = 27;  // yaw
+    pinNumber[3] = 28;  // throttle
+    if( motorChannels >= 6) {
+      pinNumber[4] = 2;  // mode
+      pinNumber[5] = 3;  // aux
+    }
+    if( motorChannels >= 8) {
+      pinNumber[6] = -1;  // aux2
+      pinNumber[7] = -1;  // aux3
+    }    
   }
 
   void initialize() {
@@ -51,17 +63,17 @@ public:
     Timer3.setPrescaleFactor(72);
     Timer3.setOverflow(20000);
 
-    pinMode(MOTORPIN1, PWM);
-    pinMode(MOTORPIN2, PWM);
-    pinMode(MOTORPIN3, PWM);
-    pinMode(MOTORPIN4, PWM);
+    pinMode(pinNumber[0], PWM);
+    pinMode(pinNumber[1], PWM);
+    pinMode(pinNumber[2], PWM);
+    pinMode(pinNumber[3], PWM);
 
     if (motorChannels <= 6) {
       Timer2.setPrescaleFactor(72);
       Timer2.setOverflow(20000);
 
-      pinMode(MOTORPIN5, PWM);
-      pinMode(MOTORPIN6,  PWM);
+      pinMode(pinNumber[4], PWM);
+      pinMode(pinNumber[5], PWM);
     }
     
     commandAllMotors(1000);

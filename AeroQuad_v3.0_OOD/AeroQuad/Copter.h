@@ -41,7 +41,12 @@ public:
   
   byte headingHoldConfig;
   byte headingHoldState;
-  
+  float headingHold; // calculated adjustment for quad to go to heading (PID output)
+  float heading; // measured heading from yaw gyro (process variable)
+  float relativeHeading; // current heading the quad is set to (set point)
+  float setHeading;
+  unsigned long headingTime;
+
   FlightControl(void) {
     armed = OFF;
     safetyCheck = OFF;
@@ -55,6 +60,11 @@ public:
     
     headingHoldConfig = ON;
     headingHoldState = OFF;
+    headingHold = 0;
+    heading = 0;
+    relativeHeading = 0;
+    setHeading = 0;
+    headingTime = micros();
   }
   
   void calculateError(void) {

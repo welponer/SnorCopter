@@ -36,7 +36,7 @@ typedef struct {
   int edgeMask;
   timer_gen_reg_map *timerRegs;
   __io uint32 *timerCCR;
-  int pinNumber;
+//  int pinNumber;
 } PinTiming;
 
 volatile PinTiming pinTiming[8];
@@ -86,10 +86,25 @@ voidFuncPtr timerHandler[] = { timerHandler0, timerHandler1, timerHandler2, time
 class Receiver_MapleR5 : public Receiver {
 private:
   byte receiverChannels;
-
+  int *pinNumber;
+  
 public:  
-  Receiver_MapleR5() {
-    receiverChannels = 4;
+  Receiver_MapleR5(byte channels = 4) : Receiver(){
+    receiverChannels = channels;
+    pinNumber = (int*)malloc( receiverChannels);
+    
+    pinNumber[0] = 5;  // roll
+    pinNumber[1] = 9;  // pitch
+    pinNumber[2] = 14;  // yaw
+    pinNumber[3] = 24;  // throttle
+    if( receiverChannels >= 6) {
+      pinNumber[4] = -1;  // mode
+      pinNumber[5] = -1;  // aux
+    }
+    if( receiverChannels >= 8) {
+      pinNumber[6] = -1;  // aux1
+      pinNumber[7] = -1;  // aux2
+    }
   }
 
   void setTimer(int channel, timer_dev *timerDev, int timerChannel)
@@ -121,17 +136,8 @@ public:
   }
 
   void initialize(void) {    
-    pinTiming[0].pinNumber = 5;  // roll
-    pinTiming[1].pinNumber = 9;  // pitch
-    pinTiming[2].pinNumber = 14;  // yaw
-    pinTiming[3].pinNumber = 24;  // throttle
-    pinTiming[4].pinNumber = -1;  // mode
-    pinTiming[5].pinNumber = -1;  // aux
-    pinTiming[6].pinNumber = -1;  // aux1
-    pinTiming[7].pinNumber = -1;  // aux2
-
-    for (int channel = 0; channel < 8; channel++) {
-	  int pin = pinTiming[channel].pinNumber;
+    for (int channel = 0; channel < receiverChannels; channel++) {
+	  int pin = pinNumber[channel];
 	  if (pin != -1) {
 	    int timerChannel = PIN_MAP[pin].timer_channel; 
 	    timer_dev *timerDev = PIN_MAP[pin].timer_device;

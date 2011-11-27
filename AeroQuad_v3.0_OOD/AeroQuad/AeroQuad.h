@@ -118,12 +118,12 @@ unsigned long frameCounter = 0; // main loop executive frame counter
 //byte headingHoldConfig = ON;
 //float headingScaleFactor;
 //float commandedYaw = 0;
-float headingHold = 0; // calculated adjustment for quad to go to heading (PID output)
-float heading = 0; // measured heading from yaw gyro (process variable)
-float relativeHeading = 0; // current heading the quad is set to (set point)
+//float headingHold = 0; // calculated adjustment for quad to go to heading (PID output)
+//float heading = 0; // measured heading from yaw gyro (process variable)
+//float relativeHeading = 0; // current heading the quad is set to (set point)
 //float absoluteHeading = 0;;
-float setHeading = 0;
-unsigned long headingTime = micros();
+//float setHeading = 0;
+//unsigned long headingTime = micros();
 //byte headingHoldState = OFF;
 
 // batteryMonitor & Altutude Hold

@@ -41,7 +41,9 @@ public:
   int* motorCommand;
   int* motorMaxCommand;
   int* motorMinCommand;
+  int* pinNumber;
   byte motorChannels;
+  int minAcro;
   
 public:
 
@@ -50,11 +52,14 @@ public:
     motorCommand = (int*)malloc(motorChannels);
     motorMaxCommand = (int*)malloc(motorChannels);
     motorMinCommand = (int*)malloc(motorChannels);
+    pinNumber = (int*)malloc(motorChannels);
+    minAcro = 1300;
   }
 	
   virtual void initialize( void) {}
-  virtual void write(void) {}
-  virtual void commandAllMotors(int command) {}
+  
+  virtual void write( void) {}
+  virtual void commandAllMotors( int command) {}
 
   void setMotorCommand( byte motor, int command) {
     motorCommand[motor] = command;

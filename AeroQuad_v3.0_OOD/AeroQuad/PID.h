@@ -43,4 +43,40 @@ void zeroIntegralError() {
 }
 
 
+class controlPID {
+public:
+  float paramP, paramI, paramD;
+  float lastPosition;
+  unsigned int previousTime;
+  float integratedError;
+  float windupGuard; // Thinking about having individual wind up guards for each PID
+  
+  controlPID(float cp, float ci, float cd, float cwg = 1000) {
+    paramP = cp;
+    paramI = ci;
+    paramD = ci;
+    windupGuard = cwg;
+    lastPosition = 0;
+    integratedError = 0;
+    previousTime = micros();
+  }
+  
+  float update(float targetPosition, float currentPosition) {
+  float error;
+  float dTerm;
+  
+  unsigned int currentTime = micros();
+  float deltaTime = (currentTime - previousTime) / 1000000.0;
+  previousTime = currentTime;
+  
+  error = targetPosition - currentPosition;
+  integratedError += error * deltaTime;
+  integratedError = constrain( integratedError, -windupGuard, windupGuard);
+  dTerm = paramD * (currentPosition - lastPosition) / (deltaTime * 100); // dT fix from Honk
+  lastPosition = currentPosition;
+  
+  return (paramP * error) + (paramI * (integratedError)) + dTerm;
+}
 
+
+};
