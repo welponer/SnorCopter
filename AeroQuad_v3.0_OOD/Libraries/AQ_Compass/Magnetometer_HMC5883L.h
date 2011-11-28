@@ -42,7 +42,6 @@ public:
   void initialize() {
     byte numAttempts = 0;
     bool success = false;
-    delay(10);        // Power up delay
    
     magCalibration[XAXIS] = 1.0;
     magCalibration[YAXIS] = 1.0;
@@ -57,6 +56,7 @@ public:
  
       measure(0.0, 0.0);                    // Read calibration data
       delay(10);
+
       if ( fabs(measuredMagX) > 500.0 && fabs(measuredMagX) < (HMC5883L_EXPECTED_XY + 300) \
           && fabs(measuredMagY) > 500.0 && fabs(measuredMagY) < (HMC5883L_EXPECTED_XY + 300) \
           && fabs(measuredMagZ) > 500.0 && fabs(measuredMagZ) < (HMC5883L_EXPECTED_Z + 300)) {
@@ -66,7 +66,6 @@ public:
         success = true;
       }
       updateRegisterI2C(HMC5883L_ADDRESS, 0x00, 0x10);  // Set 10hz update rate and normal operaiton
-      delay(50);
       updateRegisterI2C(HMC5883L_ADDRESS, 0x02, 0x00); // Continuous Update mode
       delay(50);                           // Mode change delay (1/Update Rate) **
     }
