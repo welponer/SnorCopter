@@ -35,26 +35,31 @@
 //#define AeroQuad_Wii        // Arduino 2009 with Wii Sensors and AeroQuad Shield v1.x
 //#define AeroQuad_Paris_v3   // Define along with either AeroQuad_Wii to include specific changes for MultiWiiCopter Paris v3.0 board
 //#define AeroQuadMega_v1     // Arduino Mega with AeroQuad Shield v1.7 and below
-#define AeroQuadMega_v2     // Arduino Mega with AeroQuad Shield v2.x
+#define AeroQuadMega_v2     // Arduino Mega with AeroQuad Shield v2.0
+//#define AeroQuadMega_v21    // Arduino Mega with AeroQuad Shield v2.1
+//#define AutonavShield       // For the AutoNav shield build by blue23 on the forum, @see http://aeroquad.com/showthread.php?4106-New-Shield-available-Mega-AutoNav-Shield&highlight=autonav
 //#define AeroQuadMega_Wii    // Arduino Mega with Wii Sensors and AeroQuad Shield v2.x
 //#define ArduCopter          // ArduPilot Mega (APM) with Oilpan Sensor Board
 //#define AeroQuadMega_CHR6DM // Clean Arduino Mega with CHR6DM as IMU/heading ref.
 //#define APM_OP_CHR6DM       // ArduPilot Mega with CHR6DM as IMU/heading ref., Oilpan for barometer (just uncomment AltitudeHold for baro), and voltage divider
 
+
 /****************************************************************************
  *********************** Define Flight Configuration ************************
  ****************************************************************************/
 // Use only one of the following definitions
-#define quadXConfig
+//#define quadXConfig
 //#define quadPlusConfig
 //#define hexPlusConfig
-//#define hexXConfig      // not flight tested, take real care
+//#define hexXConfig      // EXPERIMENTAL: not completely re-tested
 //#define triConfig
 //#define quadY4Config
-//#define hexY6Config
-//#define octoX8Congig
-//#define octoPlusCongig  // not yet implemented
-//#define octoXCongig
+#define hexY6Config
+//#define octoX8Config
+//#define octoPlusConfig  // EXPERIMENTAL: not completely re-tested
+//#define octoXConfig     // EXPERIMENTAL: not completely re-tested
+
+//#define OLD_MOTOR_NUMBERING // Uncomment this for old motor numbering setup, FOR QUAD ONLY
 
 //
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -80,9 +85,10 @@
 // *******************************************************************************************************************************
 // Battery Monitor Options
 // *******************************************************************************************************************************
-#define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
-#define BattMonitorAlarmVoltage 10.4  // this have to be defined if BattMonitor is defined. default alarm voltage is 10 volt
-#define BattMonitorAutoDescent  // if you want the craft to auto descent when the battery reach the alarm voltage
+//#define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
+//#define BattMonitorAlarmVoltage 10.0  // this have to be defined if BattMonitor is defined. default alarm voltage is 10 volt
+//#define BattMonitorAutoDescent  // if you want the craft to auto descent when the battery reach the alarm voltage
+//#define POWERED_BY_VIN // Uncomment this if your v2.x is powered directly by the vin/gnd of the arduino
 
 //
 // *******************************************************************************************************************************
@@ -131,9 +137,7 @@
 //#define OSD_SYSTEM_MENU
 
 
-#define YAW_DIRECTION 1 // if you want to reverse the yaw correction direction
-//#define YAW_DIRECTION -1
-
+//#define CHANGE_YAW_DIRECTION // if you want to reverse the yaw correction direction
 
 /****************************************************************************
  ****************************************************************************
@@ -412,18 +416,25 @@
 
   // heading mag hold declaration
   #ifdef HeadingMagHold
+//    #define SPARKFUN_5883L_BOB
+//    #define HMC5883L
     #define HMC5843
   #endif
 
   // Altitude declaration
-  #ifdef AltitudeHold
+  #ifdef AltitudeHold    
     #define BMP085
   #endif
 
   // Battery Monitor declaration
   #ifdef BattMonitor
-    struct BatteryData batteryData[] = {
-      BM_DEFINE_BATTERY_V(0, BattMonitorAlarmVoltage*1.1, BattMonitorAlarmVoltage, ((5.0 / 1024.0) * (15.0 + 7.5) / 7.5), 0.82)};
+    #ifdef POWERED_BY_VIN
+      struct BatteryData batteryData[] = {
+        BM_DEFINE_BATTERY_V(0, BattMonitorAlarmVoltage*1.1,BattMonitorAlarmVoltage, ((5.0 / 1024.0) * (15.0 + 7.5) / 7.5), 0.0)};// v2 shield powered via VIN (no diode)
+    #else
+      struct BatteryData batteryData[] = {
+        BM_DEFINE_BATTERY_V(0, BattMonitorAlarmVoltage*1.1,BattMonitorAlarmVoltage, ((5.0 / 1024.0) * (15.0 + 7.5) / 7.5),0.82)}; // v2 shield powered via power jack
+    #endif
   #endif
 
   #ifdef OSD
@@ -464,7 +475,156 @@
     measureAccelSum();
     measureGyroSum();
   }
+#endif
 
+#ifdef AeroQuadMega_v21
+  #include <Device_I2C.h>
+
+  // Gyroscope declaration
+  #include <Gyroscope_ITG3200.h>
+
+  // Accelerometer declaration
+  #include <Accelerometer_BMA180.h>
+
+  // Receiver Declaration
+  #define RECEIVER_MEGA
+
+  // Motor declaration
+  #define MOTOR_PWM_Timer
+
+  // heading mag hold declaration
+  #ifdef HeadingMagHold
+    #define SPARKFUN_9DOF
+    #define HMC5883L
+  #endif
+
+  // Altitude declaration
+  #ifdef AltitudeHold
+    #define BMP085
+  #endif
+
+  // Battery Monitor declaration
+  #ifdef BattMonitor
+    #ifdef POWERED_BY_VIN
+      struct BatteryData batteryData[] = {
+        BM_DEFINE_BATTERY_V(0, BattMonitorAlarmVoltage*1.1,BattMonitorAlarmVoltage, ((5.0 / 1024.0) * (15.0 + 7.5) / 7.5), 0.0)};// v2 shield powered via VIN (no diode)
+    #else
+      struct BatteryData batteryData[] = {
+        BM_DEFINE_BATTERY_V(0, BattMonitorAlarmVoltage*1.1,BattMonitorAlarmVoltage, ((5.0 / 1024.0) * (15.0 + 7.5) / 7.5),0.82)}; // v2 shield powered via power jack
+    #endif
+  #endif
+
+  #ifdef OSD
+    #define MAX7456_OSD
+  #endif  
+
+  /**
+   * Put AeroQuadMega_v2 specific intialization need here
+   */
+  void initPlatform() {
+
+    pinMode(LED2PIN, OUTPUT);
+    digitalWrite(LED2PIN, LOW);
+    pinMode(LED3PIN, OUTPUT);
+    digitalWrite(LED3PIN, LOW);
+
+    // pins set to INPUT for camera stabilization so won't interfere with new camera class
+    pinMode(33, INPUT); // disable SERVO 1, jumper D12 for roll
+    pinMode(34, INPUT); // disable SERVO 2, jumper D11 for pitch
+    pinMode(35, INPUT); // disable SERVO 3, jumper D13 for yaw
+    pinMode(43, OUTPUT); // LED 1
+    pinMode(44, OUTPUT); // LED 2
+    pinMode(45, OUTPUT); // LED 3
+    pinMode(46, OUTPUT); // LED 4
+    digitalWrite(43, HIGH); // LED 1 on
+    digitalWrite(44, HIGH); // LED 2 on
+    digitalWrite(45, HIGH); // LED 3 on
+    digitalWrite(46, HIGH); // LED 4 on
+
+    Wire.begin();
+    TWBR = 12;
+  }
+
+  /**
+   * Measure critical sensors
+   */
+  void measureCriticalSensors() {
+    measureAccelSum();
+    measureGyroSum();
+  }
+#endif
+
+#ifdef AutonavShield
+  #include <Device_I2C.h>
+
+  // Gyroscope declaration
+  #include <Gyroscope_ITG3200.h>
+
+  // Accelerometer declaration
+  #include <Accelerometer_BMA180.h>
+
+  // Receiver Declaration
+  #define RECEIVER_MEGA
+
+  // Motor declaration
+  #define MOTOR_PWM_Timer
+
+  // heading mag hold declaration
+  #ifdef HeadingMagHold
+    #define SPARKFUN_9DOF
+    #define HMC5883L
+  #endif
+
+  // Altitude declaration
+  #ifdef AltitudeHold
+    #define BMP085
+  #endif
+
+  // Battery Monitor declaration
+  #undef BatteryMonitor // unsuported
+  #undef BattMonitorAlarmVoltage
+  #undef BattMonitorAutoDescent
+  #undef POWERED_BY_VIN
+
+
+  #ifdef OSD
+    #define MAX7456_OSD
+  #endif  
+
+  /**
+   * Put AeroQuadMega_v2 specific intialization need here
+   */
+  void initPlatform() {
+
+    pinMode(LED2PIN, OUTPUT);
+    digitalWrite(LED2PIN, LOW);
+    pinMode(LED3PIN, OUTPUT);
+    digitalWrite(LED3PIN, LOW);
+
+    // pins set to INPUT for camera stabilization so won't interfere with new camera class
+    pinMode(33, INPUT); // disable SERVO 1, jumper D12 for roll
+    pinMode(34, INPUT); // disable SERVO 2, jumper D11 for pitch
+    pinMode(35, INPUT); // disable SERVO 3, jumper D13 for yaw
+    pinMode(43, OUTPUT); // LED 1
+    pinMode(44, OUTPUT); // LED 2
+    pinMode(45, OUTPUT); // LED 3
+    pinMode(46, OUTPUT); // LED 4
+    digitalWrite(43, HIGH); // LED 1 on
+    digitalWrite(44, HIGH); // LED 2 on
+    digitalWrite(45, HIGH); // LED 3 on
+    digitalWrite(46, HIGH); // LED 4 on
+
+    Wire.begin();
+    TWBR = 12;
+  }
+
+  /**
+   * Measure critical sensors
+   */
+  void measureCriticalSensors() {
+    measureAccelSum();
+    measureGyroSum();
+  }
 #endif
 
 #ifdef ArduCopter
@@ -860,6 +1020,8 @@
 //********************************************************
 #if defined (HMC5843)
   #include <Magnetometer_HMC5843.h>
+#elif defined (HMC5883L)  
+  #include <Magnetometer_HMC5883L.h>
 #elif defined (COMPASS_CHR6DM)
 #endif
 
@@ -889,15 +1051,15 @@
 //******** FLIGHT CONFIGURATION DECLARATION **************
 //********************************************************
 #if defined quadXConfig
-  #include "FlightControlQuadXMode.h"
+  #include "FlightControlQuadX.h"
 #elif defined quadPlusConfig
-  #include "FlightControlQuadPlusMode.h"
+  #include "FlightControlQuadPlus.h"
 #elif defined hexPlusConfig
-  #include "FlightControlHexPlusMode.h"
+  #include "FlightControlHexPlus.h"
 #elif defined hexXConfig
-  #include "FlightControlHexXMode.h"
+  #include "FlightControlHexX.h"
 #elif defined triConfig
-  #include "FlightControlTriMode.h"
+  #include "FlightControlTri.h"
 #elif defined quadY4Config
   #include "FlightControlQuadY4.h"
 #elif defined hexY6Config
@@ -921,6 +1083,24 @@
 #else  
     #undef OSD_SYSTEM_MENU  // can't use menu system without an osd, 
 #endif
+
+//********************************************************
+//****************** SERIAL PORT DECLARATION *************
+//********************************************************
+#if defined (WirelessTelemetry) 
+  #if defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__)
+    #if defined (AutonavShield)
+      #define SERIAL_PORT Serial2
+    #else
+      #define SERIAL_PORT Serial3
+    #endif
+  #else    // force 328p to use the normal port
+    #define SERIAL_PORT Serial
+  #endif
+#else  
+  #define SERIAL_PORT Serial
+#endif  
+
 
 // Include this last as it contains objects from above declarations
 #include "DataStorage.h"
@@ -946,6 +1126,10 @@ void setup() {
   digitalWrite(8, LOW);
 #endif
 
+  #ifdef CHANGE_YAW_DIRECTION
+    YAW_DIRECTION = -1;
+  #endif
+
   // Read user values from EEPROM
   readEEPROM(); // defined in DataStorage.h
   if (readFloat(SOFTWARE_VERSION_ADR) != SOFTWARE_VERSION) { // If we detect the wrong soft version, we init all parameters
@@ -960,7 +1144,7 @@ void setup() {
      initializeMotors(FOUR_Motors);
   #elif defined(hexPlusConfig) || defined(hexXConfig) || defined (hexY6Config)
      initializeMotors(SIX_Motors);
-  #elif defined (octoX8Congig) || defined (octoXCongig) || defined (octoXPlusCongig)
+  #elif defined (octoX8Config) || defined (octoXConfig) || defined (octoPlusConfig)
      initializeMotors(HEIGHT_Motors);
   #endif
 

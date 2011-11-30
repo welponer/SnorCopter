@@ -28,6 +28,7 @@
 
 #define BAUD 115200
 //#define BAUD 111111 // use this to be compatible with USB and XBee connections
+//#define BAUD 57600
 #define LEDPIN 13
 #define ON 1
 #define OFF 0
@@ -43,7 +44,7 @@
   #define PIANO_SW1 42
   #define PIANO_SW2 43
 #endif
-#ifdef AeroQuadMega_v2  
+#if defined (AeroQuadMega_v2) || defined (AeroQuadMega_v21) || defined (AutonavShield)  
   #define LED2PIN 4
   #define LED3PIN 31
 #else
@@ -106,10 +107,6 @@ float aref; // Read in from EEPROM
 
 // Auto level setup
 float levelAdjust[2] = {0.0,0.0};
-//int levelAdjust[2] = {0,0};
-  // Scale to convert 1000-2000 PWM to +/- 45 degrees
-//float mLevelTransmitter = 0.09;
-//float bLevelTransmitter = -135;
 
 #if defined(AeroQuadMega_CHR6DM) || defined(APM_OP_CHR6DM)
   float CHR_RollAngle;
@@ -134,11 +131,11 @@ int batteyMonitorThrottleCorrection = 0;
 #if defined (BattMonitor)
   int batteryMonitorStartThrottle = 0;
   unsigned long batteryMonitorStartTime = 0;
-  #define BATTERY_MONITOR_THROTTLE_TARGET 1100
+  #define BATTERY_MONITOR_THROTTLE_TARGET 1450
   #define BATTERY_MONITOR_GOIN_DOWN_TIME 60000  // 1 minutes
   #if defined BattMonitorAutoDescent
     int batteryMonitorAlarmCounter = 0;
-    #define BATTERY_MONITOR_MAX_ALARM_COUNT 20
+    #define BATTERY_MONITOR_MAX_ALARM_COUNT 50
   #endif
 #endif
 
@@ -209,28 +206,14 @@ unsigned long fastTelemetryTime = 0;
 
 // jihlein: wireless telemetry defines
 /**************************************************************/
-/********************** Wireless Telem Port *******************/
+/********** Serial comminucation definition *******************/
 /**************************************************************/
-#if defined WirelessTelemetry && (defined(AeroQuadMega_v1)     || \
-                                  defined(AeroQuadMega_v2)     || \
-                                  defined(AeroQuadMega_Wii)    || \
-                                  defined(ArduCopter)          || \
-                                  defined(AeroQuadMega_CHR6DM) || \
-                                  defined(APM_OP_CHR6DM))
-  #define SERIAL_PRINT      Serial3.print
-  #define SERIAL_PRINTLN    Serial3.println
-  #define SERIAL_AVAILABLE  Serial3.available
-  #define SERIAL_READ       Serial3.read
-  #define SERIAL_FLUSH      Serial3.flush
-  #define SERIAL_BEGIN      Serial3.begin
-#else
-  #define SERIAL_PRINT      Serial.print
-  #define SERIAL_PRINTLN    Serial.println
-  #define SERIAL_AVAILABLE  Serial.available
-  #define SERIAL_READ       Serial.read
-  #define SERIAL_FLUSH      Serial.flush
-  #define SERIAL_BEGIN      Serial.begin
-#endif
+#define SERIAL_PRINT      SERIAL_PORT.print
+#define SERIAL_PRINTLN    SERIAL_PORT.println
+#define SERIAL_AVAILABLE  SERIAL_PORT.available
+#define SERIAL_READ       SERIAL_PORT.read
+#define SERIAL_FLUSH      SERIAL_PORT.flush
+#define SERIAL_BEGIN      SERIAL_PORT.begin
 
 /**************************************************************/
 /********************** Debug Parameters **********************/
@@ -332,27 +315,6 @@ void initReceiverFromEEPROM();
 // defined in FlightCommand.pde
 void readPilotCommands(); 
 //////////////////////////////////////////////////////
-
-// defined in FlightControl.pde Flight control needs
-int motorAxisCommandRoll = 0;
-int motorAxisCommandPitch = 0;
-int motorAxisCommandYaw = 0;
-
-#if defined quadXConfig || defined quadPlusConfig || defined triConfig || defined quadY4Config
-  int motorMaxCommand[4] = {0,0,0,0};
-  int motorMinCommand[4] = {0,0,0,0};
-  int motorConfiguratorCommand[4] = {0,0,0,0};
-#elif defined hexXConfig || defined hexPlusConfig || defined hexY6Config
-  int motorMaxCommand[6] = {0,0,0,0,0,0};
-  int motorMinCommand[6] = {0,0,0,0,0,0};
-  int motorConfiguratorCommand[6] = {0,0,0,0,0,0};
-#elif defined (octoX8Congig) || defined (octoXCongig) || defined (octoPlusCongig) 
-  int motorMaxCommand[8] = {0,0,0,0,0,0,0,0};
-  int motorMinCommand[8] = {0,0,0,0,0,0,0,0};
-  int motorConfiguratorCommand[8] = {0,0,0,0,0,0,0,0};
-#endif
-
-
 
 void calculateFlightError();
 void processHeading();

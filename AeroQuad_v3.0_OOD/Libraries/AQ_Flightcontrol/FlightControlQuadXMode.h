@@ -46,6 +46,7 @@ void applyMotorCommand() {
   motors->setMotorCommand(REAR_RIGHT,  (throttle - throttleCorrection) + motorAxisCommandPitch + motorAxisCommandRoll + (YAW_DIRECTION * motorAxisCommandYaw));
 }
 
+/*
 void processMinMaxCommand() {
   int delta;
   
@@ -111,7 +112,7 @@ void processHardManuevers() {
     } 
 }
 
-
+*/
 
 #endif // #define _AQ_PROCESS_FLIGHT_CONTROL_X_MODE_H_
 

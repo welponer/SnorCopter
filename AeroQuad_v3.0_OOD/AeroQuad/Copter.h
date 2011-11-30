@@ -90,20 +90,20 @@ public:
     applyMotorCommand();
   } 
 
-  processMinMaxCommand();
-
+  if (receiverCommand[THROTTLE] <= MAXCHECK) { // if the throttle is about the max, we used true PID values! PATCH for max throttle bug
+    processMinMaxCommand();
+  }
+  
   // Allows quad to do acrobatics by lowering power to opposite motors during hard manuevers
   if (flightMode == ACRO) {
-    processHardManuevers();
+     processHardManuevers();
   }
-/* 
+
   // Apply limits to motor commands
   for (byte motor = 0; motor < motors->motorChannels; motor++) {
     motors->setMotorCommand(motor, constrain(motors->getMotorCommand(motor), motorMinCommand[motor], motorMaxCommand[motor]));
   }
-*/
-  motors->constrainMotors();
-  
+
   // If throttle in minimum position, don't apply yaw
   if (receiver->getData(THROTTLE) < MINCHECK) {
     for (byte motor = 0; motor < motors->motorChannels; motor++) {
@@ -216,18 +216,26 @@ public:
   }
   
   virtual void applyMotorCommand(void) {}
-  virtual void processMinMaxCommand(void) {}
-  virtual void processHardManuevers(void) {}
+  void processMinMaxCommand(void) {}
+  void processHardManuevers(void) {}
 };
 
 
 class FlightControlX4 : public FlightControl {
 public:
+  int motorMaxCommand[4];
+  int motorMinCommand[4];
+  
   #include <FlightControlQuadXMode.h>
 };
 
 class FlightControlY6 : public FlightControl {
 public:
+  int motorMaxCommand[6];
+  int motorMinCommand[6];
+  FlightControlY6(void) {
+  
+  }
   #include <FlightControlHexY6.h>
 };
 

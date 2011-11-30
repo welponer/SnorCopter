@@ -39,8 +39,7 @@
 class Motors {
 public:
   int* motorCommand;
-  int* motorMaxCommand;
-  int* motorMinCommand;
+  
   int* pinNumber;
   byte motorChannels;
   int minAcro;
@@ -50,8 +49,6 @@ public:
   Motors(byte number = 4) {
     motorChannels = number;
     motorCommand = (int*)malloc(motorChannels);
-    motorMaxCommand = (int*)malloc(motorChannels);
-    motorMinCommand = (int*)malloc(motorChannels);
     pinNumber = (int*)malloc(motorChannels);
     minAcro = 1300;
   }

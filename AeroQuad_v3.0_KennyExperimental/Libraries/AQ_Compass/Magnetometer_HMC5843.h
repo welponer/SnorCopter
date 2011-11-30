@@ -54,18 +54,16 @@ void initializeMagnetometer() {
  
     updateRegisterI2C(COMPASS_ADDRESS, 0x00, 0x11);  // Set positive bias configuration for sensor calibraiton
     delay(50);
-   
     updateRegisterI2C(COMPASS_ADDRESS, 0x01, 0x20); // Set +/- 1G gain
     delay(10);
-
     updateRegisterI2C(COMPASS_ADDRESS, 0x02, 0x01);  // Perform single conversion
     delay(10);
    
     measureMagnetometer(0.0, 0.0);                    // Read calibration data
     delay(10);
    
-    if ( fabs(measuredMagX) > 500.0 && fabs(measuredMagX) < 1000.0 \
-        && fabs(measuredMagY) > 500.0 && fabs(measuredMagY) < 1000.0 \
+    if ( fabs(measuredMagX) > 500.0 && fabs(measuredMagX) < 1000.0 
+        && fabs(measuredMagY) > 500.0 && fabs(measuredMagY) < 1000.0 
         && fabs(measuredMagZ) > 500.0 && fabs(measuredMagZ) < 1000.0) {
       magCalibration[XAXIS] = fabs(715.0 / measuredMagX);
       magCalibration[YAXIS] = fabs(715.0 / measuredMagY);
@@ -108,11 +106,11 @@ void measureMagnetometer(float roll, float pitch) {
   float cosPitch = cos(pitch);
   float sinPitch = sin(pitch);
 
-  magX = (float)measuredMagX * cosPitch + \
-         (float)measuredMagY * sinRoll * sinPitch + \
+  magX = (float)measuredMagX * cosPitch + 
+         (float)measuredMagY * sinRoll * sinPitch + 
          (float)measuredMagZ * cosRoll * sinPitch;
            
-  magY = (float)measuredMagY * cosRoll - \
+  magY = (float)measuredMagY * cosRoll - 
          (float)measuredMagZ * sinRoll;
 
   tmp  = sqrt(magX * magX + magY * magY);

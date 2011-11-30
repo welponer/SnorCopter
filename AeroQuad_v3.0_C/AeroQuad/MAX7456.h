@@ -377,7 +377,7 @@ void displayVoltage() {
 
   char buf[12];
   snprintf(buf,7,"%c%2d.%1dV",(osdBatMinMax) ? '\23' : '\20', currentValue/10,currentValue%10);
-  writeChars( buf, 6, ((batteryData[osdBatNo].status!=BATTERY_MONITOR_OK))?1:0, VOLTAGE_ROW+osdBatNo, VOLTAGE_COL );
+  writeChars( buf, 6, (batteryData[osdBatNo].voltage<=batteryData[osdBatNo].vAlarm)?1:0, VOLTAGE_ROW+osdBatNo, VOLTAGE_COL );
 
   if (batteryData[osdBatNo].cPin != NOPIN) {
     // current sensor installed
@@ -398,7 +398,7 @@ void displayVoltage() {
   }
   
   #if defined (BattMonitorAutoDescent)
-    if (batteryStatus == BATTERY_MONITOR_ALARM) {
+    if (batteryAlarm && armed) {
       notifyOSD(OSD_CENTER|OSD_CRIT|OSD_BLINK, "BAT. CRITICAL - DESCENTING");
     }
   #endif
@@ -772,3 +772,4 @@ void initializeOSD() {
 }
 
 #endif  // #define _AQ_OSD_MAX7456_H_
+
