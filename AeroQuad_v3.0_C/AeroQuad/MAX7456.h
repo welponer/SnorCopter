@@ -350,18 +350,13 @@ void detectVideoStandard() {
 
 #include <BatteryMonitorTypes.h>
 
-byte    osdBatTimer  = 0;
-byte    osdBatNo     = 0;
-boolean osdBatMinMax = false;
+byte    osdBatCounter = 0;
 
 void displayVoltage() {
 
   int currentValue;
-  // restrict update frequency
-  if (osdBatTimer++<5) {
-    return;
-  }
-  osdBatTimer=0;
+  byte    osdBatNo     = osdBatCounter % numberOfBatteries;
+  boolean osdBatMinMax = osdBatCounter / numberOfBatteries / 4;
 
   // only show min/max values when not armed
   if (armed == true) {
@@ -377,9 +372,12 @@ void displayVoltage() {
 
   char buf[12];
   snprintf(buf,7,"%c%2d.%1dV",(osdBatMinMax) ? '\23' : '\20', currentValue/10,currentValue%10);
-  writeChars( buf, 6, (batteryData[osdBatNo].voltage<=batteryData[osdBatNo].vAlarm)?1:0, VOLTAGE_ROW+osdBatNo, VOLTAGE_COL );
 
-  if (batteryData[osdBatNo].cPin != NOPIN) {
+  // Following blink only symbol on warning and all on alarm
+  writeChars( buf,   1, batteryIsWarning(osdBatNo)?1:0, VOLTAGE_ROW + osdBatNo, VOLTAGE_COL );
+  writeChars( buf+1, 5, batteryIsAlarm(osdBatNo)?1:0,   VOLTAGE_ROW + osdBatNo, VOLTAGE_COL + 1 );
+
+  if (batteryData[osdBatNo].cPin != BM_NOPIN) {
     // current sensor installed
     if (osdBatMinMax) {
       currentValue = batteryData[osdBatNo].maxCurrent*10.0;
@@ -391,10 +389,9 @@ void displayVoltage() {
     writeChars( buf, 11, 0, VOLTAGE_ROW+osdBatNo, VOLTAGE_COL+6 );
   }
 
-  osdBatNo++;
-  if (osdBatNo >= numberOfBatteries) {
-    osdBatNo = 0;
-    osdBatMinMax = !osdBatMinMax;
+  osdBatCounter++;
+  if (osdBatCounter >= numberOfBatteries * 8) {
+    osdBatCounter = 0;
   }
   
   #if defined (BattMonitorAutoDescent)
@@ -772,4 +769,5 @@ void initializeOSD() {
 }
 
 #endif  // #define _AQ_OSD_MAX7456_H_
+
 

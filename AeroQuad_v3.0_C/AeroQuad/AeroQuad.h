@@ -133,6 +133,7 @@ int batteyMonitorThrottleCorrection = 0;
   unsigned long batteryMonitorStartTime = 0;
   #define BATTERY_MONITOR_THROTTLE_TARGET 1450
   #define BATTERY_MONITOR_GOIN_DOWN_TIME 60000  // 1 minutes
+  
   #if defined BattMonitorAutoDescent
     int batteryMonitorAlarmCounter = 0;
     #define BATTERY_MONITOR_MAX_ALARM_COUNT 50

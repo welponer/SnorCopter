@@ -188,15 +188,23 @@ void processAltitudeHold()
     else {
       #ifdef AltitudeHold
         if (altitudeHoldState == ON) {
-          altitudeToHoldTarget -= 0.2;
+          altitudeToHoldTarget -= 0.005;
         }
         else {
       #endif
           if (batteryMonitorStartThrottle == 0) {  // init battery monitor throttle correction!
             batteryMonitorStartTime = millis();
-            batteryMonitorStartThrottle = throttle; 
+            if (throttle < BATTERY_MONITOR_THROTTLE_TARGET) {
+              batteryMonitorStartThrottle = BATTERY_MONITOR_THROTTLE_TARGET;
+            }
+            else {
+              batteryMonitorStartThrottle = throttle; 
+            }
           }
-          const int batteryMonitorThrottle = map(millis()-batteryMonitorStartTime,0,BATTERY_MONITOR_GOIN_DOWN_TIME,batteryMonitorStartThrottle,BATTERY_MONITOR_THROTTLE_TARGET);
+          int batteryMonitorThrottle = map(millis()-batteryMonitorStartTime, 0, BATTERY_MONITOR_GOIN_DOWN_TIME, batteryMonitorStartThrottle, 1450/*BATTERY_MONITOR_THROTTLE_TARGET*/);
+          if (batteryMonitorThrottle < BATTERY_MONITOR_THROTTLE_TARGET) {
+            batteryMonitorThrottle = BATTERY_MONITOR_THROTTLE_TARGET;
+          }
           if (throttle < batteryMonitorThrottle) {
             batteyMonitorThrottleCorrection = 0;
           }
@@ -231,6 +239,33 @@ void processHardManuevers() {
     for (int motor = 0; motor < LASTMOTOR; motor++) {
       motorMinCommand[motor] = minAcro;
       motorMaxCommand[motor] = MAXCOMMAND;
+    }
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////// processMinMaxCommand ////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+void processMinMaxCommand()
+{
+  for (byte motor = 0; motor < LASTMOTOR; motor++)
+  {
+    motorMinCommand[motor] = MINTHROTTLE;
+    motorMaxCommand[motor] = MAXCOMMAND;
+  }
+
+  int maxMotor = motorCommand[0];
+  
+  for (byte motor=1; motor < LASTMOTOR; motor++) {
+    if (motorCommand[motor] > maxMotor) {
+      maxMotor = motorCommand[motor];
+    }
+  }
+    
+  for (byte motor = 0; motor < LASTMOTOR; motor++) {
+    if (maxMotor > MAXCHECK) {
+      motorCommand[motor] =  motorCommand[motor] - (maxMotor - MAXCHECK);
     }
   }
 }
