@@ -34,12 +34,12 @@ void calculateFlightError()
   if (flightMode == STABLE) {
     float rollAttitudeCmd = updatePID((receiverCommand[ROLL] - receiverZero[ROLL]) * ATTITUDE_SCALING, kinematicsAngle[ROLL], &PID[LEVELROLL]);
     float pitchAttitudeCmd = updatePID((receiverCommand[PITCH] - receiverZero[PITCH]) * ATTITUDE_SCALING, -kinematicsAngle[PITCH], &PID[LEVELPITCH]);
-    motorAxisCommandRoll = updatePID(rollAttitudeCmd, correctedRateVector[ROLL], &PID[LEVELGYROROLL]);
-    motorAxisCommandPitch = updatePID(pitchAttitudeCmd, -correctedRateVector[PITCH], &PID[LEVELGYROPITCH]);
+    motorAxisCommandRoll = updatePID(rollAttitudeCmd, gyroRate[ROLL], &PID[LEVELGYROROLL]);
+    motorAxisCommandPitch = updatePID(pitchAttitudeCmd, -gyroRate[PITCH], &PID[LEVELGYROPITCH]);
   }
   else {
-    motorAxisCommandRoll = updatePID(getReceiverSIData(ROLL), correctedRateVector[ROLL], &PID[ROLL]);
-    motorAxisCommandPitch = updatePID(getReceiverSIData(PITCH), -correctedRateVector[PITCH], &PID[PITCH]);
+    motorAxisCommandRoll = updatePID(getReceiverSIData(ROLL), gyroRate[ROLL], &PID[ROLL]);
+    motorAxisCommandPitch = updatePID(getReceiverSIData(PITCH), -gyroRate[PITCH], &PID[PITCH]);
   }
 }
 

@@ -108,11 +108,11 @@ public:
 
   void applyMotorCommand() {
     const int throttleCorrection = abs(motorAxisCommandYaw*2/4);
-    motor->motorCommand[0] = (throttle - throttleCorrection) - motorAxisCommandPitch - (YAW_DIRECTION * motorAxisCommandYaw);
+ /*   motor->motorCommand[0] = (throttle - throttleCorrection) - motorAxisCommandPitch - (YAW_DIRECTION * motorAxisCommandYaw);
     motor->motorCommand[1] = (throttle - throttleCorrection) + motorAxisCommandPitch - (YAW_DIRECTION * motorAxisCommandYaw);
     motor->motorCommand[2] = (throttle - throttleCorrection) - motorAxisCommandRoll  + (YAW_DIRECTION * motorAxisCommandYaw);
     motor->motorCommand[3] = (throttle - throttleCorrection) + motorAxisCommandRoll  + (YAW_DIRECTION * motorAxisCommandYaw);
-  }
+ */ }
  
 };
 
@@ -127,13 +127,13 @@ public:
   }
   void applyMotorCommand() {
     const int throttleCorrection = abs(motorAxisCommandYaw*3/6);
-    motor->motorCommand[0] = (throttle - throttleCorrection)                        + (motorAxisCommandPitch*4/3) - (YAW_DIRECTION * motorAxisCommandYaw);
+  /*  motor->motorCommand[0] = (throttle - throttleCorrection)                        + (motorAxisCommandPitch*4/3) - (YAW_DIRECTION * motorAxisCommandYaw);
     motor->motorCommand[1] = (throttle - throttleCorrection) - motorAxisCommandRoll - (motorAxisCommandPitch*2/3) + (YAW_DIRECTION * motorAxisCommandYaw);  
     motor->motorCommand[2] = (throttle - throttleCorrection) + motorAxisCommandRoll - (motorAxisCommandPitch*2/3) - (YAW_DIRECTION * motorAxisCommandYaw);
     motor->motorCommand[3] = (throttle - throttleCorrection)                        + (motorAxisCommandPitch*4/3) + (YAW_DIRECTION * motorAxisCommandYaw);
     motor->motorCommand[4] = (throttle - throttleCorrection) - motorAxisCommandRoll - (motorAxisCommandPitch*2/3) - (YAW_DIRECTION * motorAxisCommandYaw);
     motor->motorCommand[5] = (throttle - throttleCorrection) + motorAxisCommandRoll - (motorAxisCommandPitch*2/3) + (YAW_DIRECTION * motorAxisCommandYaw);
-  }
+ */ }
 
 };
 

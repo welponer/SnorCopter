@@ -24,7 +24,7 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include "Arduino.h."
+//#include "Arduino.h."
 #include "pins_arduino.h"
 
 // Flight Software Version
@@ -78,7 +78,7 @@ float smoothHeading;
 // Flight Mode
 #define ACRO 0
 #define STABLE 1
-byte flightMode;
+int8_t flightMode;
 unsigned long frameCounter = 0; // main loop executive frame counter
 int minAcro; // Read in from EEPROM, defines min throttle during flips
 
@@ -101,7 +101,7 @@ float levelAdjust[2] = {0.0,0.0};
 #endif
 
 // Heading hold
-byte headingHoldConfig;
+int8_t headingHoldConfig;
 //float headingScaleFactor;
 float commandedYaw = 0;
 float headingHold = 0; // calculated adjustment for quad to go to heading (PID output)

@@ -126,9 +126,9 @@ void margUpdate(float gx, float gy, float gz, float ax, float ay, float az, floa
   ezInt = ezInt + ezAcc*kiAcc + ezMag*kiMag;
     	
   // adjusted gyroscope measurements
-  gx = gx + exAcc*kpAcc + exMag*kpMag + exInt;
-  gy = gy + eyAcc*kpAcc + eyMag*kpMag + eyInt;
-  gz = gz + ezAcc*kpAcc + ezMag*kpMag + ezInt;
+  correctedRateVector[ROLL] = gx = gx + exAcc*kpAcc + exMag*kpMag + exInt;
+  correctedRateVector[PITCH] = gy = gy + eyAcc*kpAcc + eyMag*kpMag + eyInt;
+  correctedRateVector[YAW] = gz = gz + ezAcc*kpAcc + ezMag*kpMag + ezInt;
     	
   // integrate quaternion rate and normalise
   q0i = (-q1*gx - q2*gy - q3*gz) * halfT;

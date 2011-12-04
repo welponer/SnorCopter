@@ -24,8 +24,12 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include "Arduino.h."
-#include "pins_arduino.h"
+#if defined(ARDUINO) && ARDUINO >= 100
+  #include <Arduino.h>
+ #else
+  #include <WProgram.h>
+#endif
+//#include "pins_arduino.h"
 
 // Flight Software Version
 #define SOFTWARE_VERSION 3.0
@@ -78,7 +82,7 @@ float smoothHeading;
 // Flight Mode
 #define ACRO 0
 #define STABLE 1
-int8_t flightMode;
+byte flightMode;
 unsigned long frameCounter = 0; // main loop executive frame counter
 int minAcro; // Read in from EEPROM, defines min throttle during flips
 

@@ -108,11 +108,10 @@ void argUpdate(float gx, float gy, float gz, float ax, float ay, float az, float
   }
   previousEz = ez;
 	
-    	
   // adjusted gyroscope measurements
-  gx = gx + Kp*ex + exInt;
-  gy = gy + Kp*ey + eyInt;
-  gz = gz + Kp*ez + ezInt;
+  correctedRateVector[ROLL] = gx = gx + Kp*ex + exInt;
+  correctedRateVector[PITCH] = gy = gy + Kp*ey + eyInt;
+  correctedRateVector[YAW] = gz = gz + Kp*ez + ezInt;
     
   // integrate quaternion rate and normalise
   q0i = (-q1*gx - q2*gy - q3*gz) * halfT;

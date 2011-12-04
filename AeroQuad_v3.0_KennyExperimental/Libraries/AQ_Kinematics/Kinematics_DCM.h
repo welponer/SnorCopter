@@ -240,10 +240,6 @@ void calculateKinematics(float rollRate,            float pitchRate,      float 
   earthAxisAccels(longitudinalAccel, lateralAccel, verticalAccel, oneG);
 }
   
-float getGyroUnbias(byte axis) {
-  return correctedRateVector[axis];
-}
-  
 void calibrateKinematics() {};
   
 
