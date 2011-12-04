@@ -18,9 +18,13 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>. 
 */
 
+#ifndef _AQ_GLOBAL_HEADER_DEFINITION_H_
+#define _AQ_GLOBAL_HEADER_DEFINITION_H_
+
+
 #include <stdlib.h>
 #include <math.h>
-#include "WProgram.h"
+#include "Arduino.h."
 #include "pins_arduino.h"
 
 // Flight Software Version
@@ -29,28 +33,11 @@
 #define BAUD 115200
 //#define BAUD 111111 // use this to be compatible with USB and XBee connections
 //#define BAUD 57600
-#define LEDPIN 13
+
+
+
 #define ON 1
 #define OFF 0
-
-#if defined(APM_OP_CHR6DM) || defined(ArduCopter) 
-  #define LED_Red 35
-  #define LED_Yellow 36
-  #define LED_Green 37
-  #define RELE_pin 47
-  #define SW1_pin 41
-  #define SW2_pin 40
-  #define BUZZER 9
-  #define PIANO_SW1 42
-  #define PIANO_SW2 43
-#endif
-#if defined (AeroQuadMega_v2) || defined (AeroQuadMega_v21) || defined (AutonavShield)  
-  #define LED2PIN 4
-  #define LED3PIN 31
-#else
-  #define LED2PIN 12
-  #define LED3PIN 12
-#endif
 
 // PID Variables
 struct PIDdata {
@@ -336,21 +323,6 @@ void fastTelemetry();
 void comma();
 //////////////////////////////////////////////////////
 
-#if defined(AeroQuadMega_CHR6DM) || defined(APM_OP_CHR6DM)
-  float findMode(float *data, int arraySize); // defined in Sensors.pde
-#else
-  int findMode(int *data, int arraySize); // defined in Sensors.pde
-#endif
 
-// FUNCTION: return the number of bytes currently free in RAM      
-//extern int  __bss_end; // used by freemem 
-//extern int  *__brkval; // used by freemem
-//int freemem(){
-//    int free_memory;
-//    if((int)__brkval == 0)
-//        free_memory = ((int)&free_memory) - ((int)&__bss_end);
-//    else
-//        free_memory = ((int)&free_memory) - ((int)__brkval);
-//    return free_memory;
-//}
+#endif // _AQ_GLOBAL_HEADER_DEFINITION_H_
 
