@@ -21,7 +21,7 @@
 #ifndef _AEROQUAD_ACCELEROMETER_H_
 #define _AEROQUAD_ACCELEROMETER_H_
 
-#include <WProgram.h>
+#include "Arduino.h"
 #include <Axis.h>
 
 #define SAMPLECOUNT 400.0

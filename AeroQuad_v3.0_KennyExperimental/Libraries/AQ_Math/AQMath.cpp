@@ -136,8 +136,6 @@ void vectorCrossProduct(float vectorC[3], float vectorA[3], float vectorB[3])
 
 void vectorScale(int length, float scaledVector[], float inputVector[], float scalar)
 {
-  //int i;
-
   for (int i = 0; i < length; i++)
   {
    scaledVector[i] = inputVector[i] * scalar;
@@ -154,8 +152,6 @@ void vectorScale(int length, float scaledVector[], float inputVector[], float sc
 
 void vectorAdd(int length, float vectorC[], float vectorA[], float vectorB[])
 {
-  //int i;
-
   for(int i = 0; i < length; i++)
   {
      vectorC[i] = vectorA[i] + vectorB[i];
@@ -172,8 +168,6 @@ void vectorAdd(int length, float vectorC[], float vectorA[], float vectorB[])
 
 void vectorSubtract(int length, float vectorC[], float vectorA[], float vectorB[])
 {
-  //int i;
-
   for(int i = 0; i < length; i++)
   {
      vectorC[i] = vectorA[i] - vectorB[i];
@@ -190,8 +184,6 @@ void vectorSubtract(int length, float vectorC[], float vectorA[], float vectorB[
 
 void matrixMultiply(int aRows, int aCols_bRows, int bCols, float matrixC[], float matrixA[], float matrixB[])
 {
-  //int i, j, k;
-
   for (int i = 0; i < aRows * bCols; i++)
   {
     matrixC[i] = 0.0;
@@ -219,8 +211,6 @@ void matrixMultiply(int aRows, int aCols_bRows, int bCols, float matrixC[], floa
 
 void matrixAdd(int rows, int cols, float matrixC[], float matrixA[], float matrixB[])
 {
-  //int i;
-
   for (int i = 0; i < rows * cols; i++)
   {
     matrixC[i] = matrixA[i] + matrixB[i];
@@ -237,8 +227,6 @@ void matrixAdd(int rows, int cols, float matrixC[], float matrixA[], float matri
 
 void matrixSubtract(int rows, int cols, float matrixC[], float matrixA[], float matrixB[])
 {
-  //int i;
-
   for (int i = 0; i < rows * cols; i++)
   {
     matrixC[i] = matrixA[i] - matrixB[i];
@@ -256,8 +244,6 @@ void matrixSubtract(int rows, int cols, float matrixC[], float matrixA[], float 
 
 void matrixScale(int rows, int cols, float matrixC[], float scaler, float matrixA[])
 {
-  //int i;
-
   for (int i = 0; i < rows * cols; i++)
   {
     matrixC[i] = scaler * matrixA[i];
@@ -274,7 +260,6 @@ void matrixScale(int rows, int cols, float matrixC[], float scaler, float matrix
 
 void matrixTranspose3x3(float matrixC[9], float matrixA[9])
 {
-
   matrixC[0] = matrixA[0];
   matrixC[1] = matrixA[3];
   matrixC[2] = matrixA[6];

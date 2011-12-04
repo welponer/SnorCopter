@@ -120,10 +120,6 @@ void margUpdate(float gx, float gy, float gz, float ax, float ay, float az, floa
   eyMag = (mz*wx - mx*wz);
   ezMag = (mx*wy - my*wx);
     
-//  ex = (ay*vz - az*vy) + (my*wz - mz*wy);
-//  ey = (az*vx - ax*vz) + (mz*wx - mx*wz);
-//  ez = (ax*vy - ay*vx) + (mx*wy - my*wx);
-    	
   // integral error scaled integral gain
   exInt = exInt + exAcc*kiAcc + exMag*kiMag;
   eyInt = eyInt + eyAcc*kiAcc + eyMag*kiMag;
@@ -144,15 +140,6 @@ void margUpdate(float gx, float gy, float gz, float ax, float ay, float az, floa
   q2 += q2i;
   q3 += q3i;
 
-/*
-    // Original code found to hold a bug
-    // integrate quaternion rate and normalise
-    q0 = q0 + (-q1*gx - q2*gy - q3*gz) * halfT;
-    q1 = q1 + ( q0*gx + q2*gz - q3*gy) * halfT;
-    q2 = q2 + ( q0*gy - q1*gz + q3*gx) * halfT;
-    q3 = q3 + ( q0*gz + q1*gy - q2*gx) * halfT;  
-*/    
-    	
   // normalise quaternion
   norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
   q0 = q0 / norm;

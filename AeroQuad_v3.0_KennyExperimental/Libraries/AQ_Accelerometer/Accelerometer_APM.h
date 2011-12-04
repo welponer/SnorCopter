@@ -56,7 +56,7 @@ void computeAccelBias() {
   
   for (int samples = 0; samples < SAMPLECOUNT; samples++) {
     measureAccelSum();
-    delay(6);
+    delay(10);
   }
 
   for (byte axis = 0; axis < 3; axis++) {

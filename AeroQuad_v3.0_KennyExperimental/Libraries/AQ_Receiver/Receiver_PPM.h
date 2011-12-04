@@ -27,7 +27,7 @@
   #define PPM_PIN_INTERRUPT          attachInterrupt(4, rxInt, RISING);  //PIN 19, also used for Spektrum satellite option
 #endif
 
-#include <WProgram.h>
+#include "Arduino.h"
 #include "Receiver.h"
 
 #include "pins_arduino.h"

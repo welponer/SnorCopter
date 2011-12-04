@@ -218,7 +218,7 @@
   Copter copterSpecific;
   Copter* copter = &copterSpecific; 
 
-  FlightControlX4 flightControlSpecific;
+  FlightControlX4 flightControlSpecific(motors);
   FlightControl* flight = &flightControlSpecific;
 
 
@@ -1125,6 +1125,7 @@
 //********************************************************
 //******** FLIGHT CONFIGURATION DECLARATION **************
 //********************************************************
+/*
 #if defined quadXConfig
   #include <FlightControlQuadXMode.h>
 #elif defined quadPlusConfig
@@ -1142,7 +1143,7 @@
 #elif defined octoX8Congig
   #include <FlightControlOctoX8.h>
 #endif
-
+*/
 
 #ifdef MAX7456_OSD
   #include "OSD.h"

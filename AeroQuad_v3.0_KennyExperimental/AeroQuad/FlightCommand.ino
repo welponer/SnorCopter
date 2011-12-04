@@ -30,19 +30,18 @@ void readPilotCommands() {
     // Disarm motors (left stick lower left corner)
     if (receiverCommand[YAW] < MINCHECK && armed == ON) {
       armed = OFF;
+      digitalWrite(LED_Red,LOW);
       #ifdef OSD
         notifyOSD(OSD_CENTER|OSD_WARN, "MOTORS UNARMED");
       #endif
       commandAllMotors(MINCOMMAND);
-      #if defined(APM_OP_CHR6DM) || defined(ArduCopter) 
-        digitalWrite(LED_Red, LOW);
-      #endif
       #if defined BattMonitorAutoDescent
         batteryMonitorAlarmCounter = 0;
         batteryMonitorStartThrottle = 0;
         batteyMonitorThrottleCorrection = 0.0;
       #endif
     }    
+    
     // Zero Gyro and Accel sensors (left stick lower left, right stick lower right corner)
     if ((receiverCommand[YAW] < MINCHECK) && (receiverCommand[ROLL] > MAXCHECK) && (receiverCommand[PITCH] < MINCHECK)) {
       calibrateGyro();
@@ -51,25 +50,25 @@ void readPilotCommands() {
       calibrateKinematics();
       zeroIntegralError();
       pulseMotors(3);
-      
-      // ledCW() is currently a private method in BatteryMonitor.h, fix and agree on this behavior in next revision
-      //#if defined(BattMonitor) && defined(ArduCopter)
-      //  ledCW(); ledCW(); ledCW();
-      //#endif
     }   
+    
     // Arm motors (left stick lower right corner)
     if (receiverCommand[YAW] > MAXCHECK && armed == OFF && safetyCheck == ON) {
       zeroIntegralError();
       armed = ON;
+      digitalWrite(LED_Red,HIGH);
       #ifdef OSD
         notifyOSD(OSD_CENTER|OSD_WARN, "!MOTORS ARMED!");
       #endif  
+      
       for (byte motor = 0; motor < LASTMOTOR; motor++) {
         motorCommand[motor] = MINTHROTTLE;
       }
     }
     // Prevents accidental arming of motor output if no transmitter command received
-    if (receiverCommand[YAW] > MINCHECK) safetyCheck = ON; 
+    if (receiverCommand[YAW] > MINCHECK) {
+      safetyCheck = ON; 
+    }
   }
   
   #ifdef RateModeOnly
@@ -77,33 +76,12 @@ void readPilotCommands() {
   #else
     // Check Mode switch for Acro or Stable
     if (receiverCommand[MODE] > 1500) {
-      if (flightMode == ACRO) {
-        #if defined(AeroQuad_v18) || defined(AeroQuadMega_v2)
-          digitalWrite(LED2PIN, HIGH);
-        #endif
-        zeroIntegralError();
-      }
       flightMode = STABLE;
    }
     else {
-      #if defined(AeroQuad_v18) || defined(AeroQuadMega_v2)
-        if (flightMode == STABLE)
-          digitalWrite(LED2PIN, LOW);
-      #endif
       flightMode = ACRO;
     }
   #endif  
-  
-  #if defined(APM_OP_CHR6DM) || defined(ArduCopter) 
-    if (flightMode == ACRO) {
-      digitalWrite(LED_Yellow, HIGH);
-      digitalWrite(LED_Green, LOW);
-    }
-   else if (flightMode == STABLE) {
-      digitalWrite(LED_Green, HIGH);
-      digitalWrite(LED_Yellow, LOW); 
-   }
-  #endif
   
   #ifdef AltitudeHold
    if (receiverCommand[AUX] < 1750) {

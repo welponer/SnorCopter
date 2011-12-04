@@ -22,7 +22,7 @@
 #ifndef _AEROQUAD_MOTORS_PWM_H_
 #define _AEROQUAD_MOTORS_PWM_H_
 
-#include <WProgram.h>
+#include "Arduino.h"
 #include "Motors.h"
 
 #if defined (__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)

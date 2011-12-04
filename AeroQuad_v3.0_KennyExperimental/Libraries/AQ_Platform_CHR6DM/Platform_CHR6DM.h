@@ -28,7 +28,7 @@
 #ifndef _AEROQUAD_PLATFORM_CHR6DM_H_
 #define _AEROQUAD_PLATFORM_CHR6DM_H_
 
-#include <WProgram.h>
+#include "Arduino.h"
 
 #define DEFAULT_TIMEOUT 1000
 

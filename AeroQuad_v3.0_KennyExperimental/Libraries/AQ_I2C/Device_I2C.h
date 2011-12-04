@@ -23,7 +23,7 @@
 
 // I2C functions
 #include <Wire.h>
-#include <WProgram.h>
+#include "Arduino.h"
 
 void sendByteI2C(int deviceAddress, byte dataValue);
 byte readByteI2C(int deviceAddress);

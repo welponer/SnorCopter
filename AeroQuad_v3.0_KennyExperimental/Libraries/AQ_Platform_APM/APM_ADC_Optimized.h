@@ -26,7 +26,6 @@
 
 #include <inttypes.h>
 #include <avr/interrupt.h>
-#include "WConstants.h"
 
 //#define SPI_MEASURE
 #define ADC_SPI_LASTCHANNEL 6

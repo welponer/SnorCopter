@@ -22,7 +22,7 @@
 #ifndef _AEROQUAD_MOTORS_H_
 #define _AEROQUAD_MOTORS_H_
 
-#include <WProgram.h>
+#include "Arduino.h"
 
 #define MOTOR1 0
 #define MOTOR2 1

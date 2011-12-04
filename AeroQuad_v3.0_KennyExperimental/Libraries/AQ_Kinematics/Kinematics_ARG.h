@@ -89,10 +89,6 @@ void argUpdate(float gx, float gy, float gz, float ax, float ay, float az, float
   ey = (vz*ax - vx*az);
   ez = (vx*ay - vy*ax);
     
-//  ex = (ay*vz - az*vy);
-//  ey = (az*vx - ax*vz);
-//  ez = (ax*vy - ay*vx);
-    	
   // integral error scaled integral gain
   exInt = exInt + ex*Ki;
   if (isSwitched(previousEx,ex)) {
@@ -128,14 +124,6 @@ void argUpdate(float gx, float gy, float gz, float ax, float ay, float az, float
   q2 += q2i;
   q3 += q3i;
     
-/*
-  // Original code below, but found to hold a bug    	
-  // integrate quaternion rate and normalise
-  q0 = q0 + (-q1*gx - q2*gy - q3*gz) * halfT;
-  q1 = q1 + ( q0*gx + q2*gz - q3*gy) * halfT;
-  q2 = q2 + ( q0*gy - q1*gz + q3*gx) * halfT;
-  q3 = q3 + ( q0*gz + q1*gy - q2*gx) * halfT;  
-*/  	
   // normalise quaternion
   norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
   q0 = q0 / norm;

@@ -22,7 +22,7 @@
 #ifndef _AEROQUAD_COMPASS_H_
 #define _AEROQUAD_COMPASS_H_
 
-#include <WProgram.h>
+#include "Arduino.h"
 
 float hdgX = 0.0;
 float hdgY = 0.0;

@@ -23,7 +23,7 @@
 
 #define DATASIZE 25
 
-#include "WProgram.h"
+#include "Arduino.h"
 
 #define G_2_MPS2(g) (g * 9.80665)
 #define MPS2_2_G(m) (m * 0.10197162)

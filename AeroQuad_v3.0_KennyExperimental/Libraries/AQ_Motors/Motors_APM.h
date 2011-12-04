@@ -22,7 +22,7 @@
 #ifndef _AEROQUAD_MOTORS_APM_H_
 #define _AEROQUAD_MOTORS_APM_H_
 
-#include <WProgram.h>
+#include "Arduino.h"
 #include <APM_RC.h>
 #include "Motors.h"
 

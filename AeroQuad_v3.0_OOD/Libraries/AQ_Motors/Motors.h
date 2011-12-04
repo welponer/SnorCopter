@@ -70,22 +70,9 @@ public:
   
   }
   
-  void setMaxCommand( byte motor, int maxCommand) {
-    motorMaxCommand[motor] = maxCommand;
-  }
-  
-  void setMinCommand( byte motor, int minCommand) {
-    motorMinCommand[motor] = minCommand;
-  }
-  
-  void constrainMotors( void) {
-    for (byte motor = 0; motor < motorChannels; motor++) {
-      motorCommand[motor] = constrain(motorCommand[motor], motorMinCommand[motor], motorMaxCommand[motor]);
-    }
-  }
-  
 };
 
 
 
 #endif
+

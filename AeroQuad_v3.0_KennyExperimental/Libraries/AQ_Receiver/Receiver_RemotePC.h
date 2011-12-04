@@ -21,7 +21,7 @@
 #ifndef _AEROQUAD_RECEIVER_REMOTE_PC_H_
 #define _AEROQUAD_RECEIVER_REMOTE_PC_H_
 
-#include <WProgram.h>
+#include "Arduino.h"
 #include "Receiver.h"
 
 void initializeReceiver(int nbChannel) {

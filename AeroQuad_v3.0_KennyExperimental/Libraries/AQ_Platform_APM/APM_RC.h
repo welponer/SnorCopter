@@ -24,7 +24,7 @@
 #if defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__)
 
 #include <avr/interrupt.h>
-#include "WProgram.h"
+#include "Arduino.h"
 
 #define NUM_CHANNELS 8
 #define MIN_PULSEWIDTH 900

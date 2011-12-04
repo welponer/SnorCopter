@@ -52,7 +52,7 @@
 //    LEFT          6  PH3             11  PB3                      8  PH5
 //*/
 
-#include <WProgram.h>
+#include "Arduino.h"
 
 #include "Motors.h"
 

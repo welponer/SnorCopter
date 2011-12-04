@@ -26,7 +26,6 @@
 
 #include <inttypes.h>
 #include <avr/interrupt.h>
-#include "WConstants.h"
 
 #define bit_set(p,m) ((p) |= (1<<m)) 
 #define bit_clear(p,m) ((p) &= ~(1<<m))

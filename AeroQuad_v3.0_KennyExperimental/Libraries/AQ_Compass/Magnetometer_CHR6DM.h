@@ -23,7 +23,7 @@
 #define _AEROQUAD_MAGNETOMETER_CHR6DM_H_
 
 #include "Compass.h"
-#include <WProgram.h>
+#include "Arduino.h"
 #include <Platform_CHR6DM.h>
 
 CHR6DM *compassChr6dm;

@@ -58,9 +58,9 @@ void measureGyro() {
   // orientation.  See TBD for details.  If your shield is not installed in this
   // orientation, this is where you make the changes.
   int gyroADC[3];
-  gyroADC[ROLL]  = ((Wire.receive() << 8) | Wire.receive())  - gyroZero[ROLL];
-  gyroADC[PITCH] = gyroZero[PITCH] - ((Wire.receive() << 8) | Wire.receive());
-  gyroADC[YAW]   = gyroZero[YAW] - ((Wire.receive() << 8) | Wire.receive());
+  gyroADC[ROLL]  = ((Wire.read() << 8) | Wire.read())  - gyroZero[ROLL];
+  gyroADC[PITCH] = gyroZero[PITCH] - ((Wire.read() << 8) | Wire.read());
+  gyroADC[YAW]   = gyroZero[YAW] - ((Wire.read() << 8) | Wire.read());
 
   for (byte axis = 0; axis <= YAW; axis++) {
     gyroRate[axis] = filterSmooth(gyroADC[axis] * gyroScaleFactor, gyroRate[axis], gyroSmoothFactor);
@@ -79,7 +79,7 @@ void measureGyroSum() {
   Wire.requestFrom(gyroAddress, ITG3200_BUFFER_SIZE);
   
   for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
-    gyroSample[axis] += (Wire.receive() << 8) | Wire.receive();
+    gyroSample[axis] += (Wire.read() << 8) | Wire.read();
   }
   gyroSampleCount++;
 }

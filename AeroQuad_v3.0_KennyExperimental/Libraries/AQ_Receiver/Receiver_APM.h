@@ -21,7 +21,7 @@
 #ifndef _AEROQUAD_RECEIVER_APM_H_
 #define _AEROQUAD_RECEIVER_APM_H_
 
-#include <WProgram.h>
+#include "Arduino.h"
 #include "Receiver.h"
 #include <APM_RC.h>
 

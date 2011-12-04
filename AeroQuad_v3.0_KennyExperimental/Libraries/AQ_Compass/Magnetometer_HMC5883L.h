@@ -24,7 +24,7 @@
 
 #include "Compass.h"
 
-#include <WProgram.h>
+#include "Arduino.h"
 
 #define COMPASS_ADDRESS 0x1E
 
@@ -93,16 +93,16 @@ void measureMagnetometer(float roll, float pitch) {
     // JI - 11/24/11 - SparkFun DOF on v2p1 Shield Configuration
     // JI - 11/24/11 - 5883L X axis points aft
     // JI - 11/24/11 - 5883L Sensor Orientation 3
-    rawMag[XAXIS] = -((Wire.receive() << 8) | Wire.receive());
-	rawMag[ZAXIS] = -((Wire.receive() << 8) | Wire.receive());
-    rawMag[YAXIS] =  ((Wire.receive() << 8) | Wire.receive());
+    rawMag[XAXIS] = -((Wire.read() << 8) | Wire.read());
+	rawMag[ZAXIS] = -((Wire.read() << 8) | Wire.read());
+    rawMag[YAXIS] =  ((Wire.read() << 8) | Wire.read());
   #elif defined(SPARKFUN_5883L_BOB)
     // JI - 11/24/11 - Sparkfun 5883L Breakout Board Upside Down on v2p0 shield
     // JI - 11/24/11 - 5883L is upside down, X axis points forward
     // JI - 11/24/11 - 5883L Sensor Orientation 5
-    rawMag[XAXIS] = ((Wire.receive() << 8) | Wire.receive());
-	rawMag[ZAXIS] = ((Wire.receive() << 8) | Wire.receive());
-    rawMag[YAXIS] = ((Wire.receive() << 8) | Wire.receive());
+    rawMag[XAXIS] = ((Wire.read() << 8) | Wire.read());
+	rawMag[ZAXIS] = ((Wire.read() << 8) | Wire.read());
+    rawMag[YAXIS] = ((Wire.read() << 8) | Wire.read());
   #else
     //!! Define 5883L Orientation !!
   #endif

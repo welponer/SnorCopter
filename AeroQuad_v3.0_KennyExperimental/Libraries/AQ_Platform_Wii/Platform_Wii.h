@@ -21,7 +21,7 @@
 #ifndef _AEROQUAD_PLATFORM_WII_H_
 #define _AEROQUAD_PLATFORM_WII_H_
 
-#include <WProgram.h>
+#include "Arduino.h"
 
 short wiiAccelADC[3];
 short wiiGyroADC[3];
@@ -53,7 +53,7 @@ void readWiiSensors()
     Wire.requestFrom(0x52,6);
  
     for(byte i = 0; i < 6; i++) 
-      buffer[i] = Wire.receive();
+      buffer[i] = Wire.read();
 		
     if ((buffer[5] & 0x02) == 0x02 && (buffer[5]&0x01) == 0) { //If WiiMP
       wiiGyroADC[ROLL]  = (((buffer[5]>>2)<<8) +  buffer[2]);  // Configured for Paris MultiWii Board

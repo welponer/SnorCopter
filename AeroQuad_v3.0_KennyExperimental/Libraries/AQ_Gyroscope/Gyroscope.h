@@ -21,7 +21,7 @@
 #ifndef _AEROQUAD_GYROSCOPE_H_
 #define _AEROQUAD_GYROSCOPE_H_
 
-#include <WProgram.h>
+#include "Arduino.h"
 #include <Axis.h>
 
 float gyroRate[3] = {0.0,0.0,0.0};

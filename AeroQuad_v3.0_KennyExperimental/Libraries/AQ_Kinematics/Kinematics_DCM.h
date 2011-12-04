@@ -107,22 +107,21 @@ void driftCorrection(float ax, float ay, float az, float oneG, float magX, float
   float accelVector[3];
   float accelWeight;
   float errorRollPitch[3];
-//#ifdef HeadingMagHold  // not know here
-  float errorCourse;
-  float errorYaw[3];
-  float scaledOmegaP[3];
-//#endif  
+  #ifdef HeadingMagHold
+    float errorCourse;
+    float errorYaw[3];
+    float scaledOmegaP[3];
+  #endif  
   float scaledOmegaI[3];
   
   //  Roll and Pitch Compensation
-  
   accelVector[XAXIS] = ax;
   accelVector[YAXIS] = ay;
   accelVector[ZAXIS] = az;
 
   // Calculate the magnitude of the accelerometer vector
-  accelMagnitude = (sqrt(accelVector[XAXIS] * accelVector[XAXIS] + \
-                         accelVector[YAXIS] * accelVector[YAXIS] + \
+  accelMagnitude = (sqrt(accelVector[XAXIS] * accelVector[XAXIS] + 
+                         accelVector[YAXIS] * accelVector[YAXIS] + 
                          accelVector[ZAXIS] * accelVector[ZAXIS])) / oneG;
                          
   // Weight for accelerometer info (<0.75G = 0.0, 1G = 1.0 , >1.25G = 0.0)
@@ -138,8 +137,7 @@ void driftCorrection(float ax, float ay, float az, float oneG, float magX, float
   vectorAdd(3, omegaI, omegaI, scaledOmegaI);
   
   //  Yaw Compensation
-  
-//  #ifdef HeadingMagHold  // not know here
+  #ifdef HeadingMagHold  
     errorCourse = (dcmMatrix[0] * magY) - (dcmMatrix[3] * magX);
     vectorScale(3, errorYaw, &dcmMatrix[6], errorCourse);
   
@@ -148,10 +146,10 @@ void driftCorrection(float ax, float ay, float az, float oneG, float magX, float
   
     vectorScale(3, &scaledOmegaI[0] ,&errorYaw[0], kiYaw);
     vectorAdd(3, omegaI, omegaI, scaledOmegaI);
-//  #else
-//    omegaP[YAW] = 0.0;
-//    omegaI[YAW] = 0.0;
-//  #endif
+  #else
+    omegaP[YAW] = 0.0;
+    omegaI[YAW] = 0.0;
+  #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -218,20 +216,6 @@ void initializeKinematics(float hdgX, float hdgY)
   dcmMatrix[7] =  0;
   dcmMatrix[8] =  1;
 
-    // Original from John
-//    kpRollPitch = 1.6;
-//    kiRollPitch = 0.005;
-    
-//    kpYaw = -1.6;
-//    kiYaw = -0.005;
-/*    
-    // released in 2.2
-    kpRollPitch = 1.0;
-    kiRollPitch = 0.002;
-    
-    kpYaw = -1.0;
-    kiYaw = -0.002;
-*/
   kpRollPitch = 0.1;        // alternate 0.05;
   kiRollPitch = 0.0002;     // alternate 0.0001;
     

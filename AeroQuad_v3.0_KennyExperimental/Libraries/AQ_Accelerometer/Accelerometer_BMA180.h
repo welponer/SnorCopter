@@ -78,24 +78,24 @@ void initializeAccel() {
 void measureAccel() {
 
   Wire.beginTransmission(ACCEL_ADDRESS);
-  Wire.send(ACCEL_READ_ROLL_ADDRESS);
+  Wire.write(ACCEL_READ_ROLL_ADDRESS);
   Wire.endTransmission();
   Wire.requestFrom(ACCEL_ADDRESS, 6);
   
   for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
-    meterPerSec[axis] = ((Wire.receive()|(Wire.receive() << 8)) >> 2) * accelScaleFactor[axis] + runTimeAccelBias[axis];
+    meterPerSec[axis] = ((Wire.read()|(Wire.read() << 8)) >> 2) * accelScaleFactor[axis] + runTimeAccelBias[axis];
   }  
 }
 
 void measureAccelSum() {
 
   Wire.beginTransmission(ACCEL_ADDRESS);
-  Wire.send(ACCEL_READ_ROLL_ADDRESS);
+  Wire.write(ACCEL_READ_ROLL_ADDRESS);
   Wire.endTransmission();
   Wire.requestFrom(ACCEL_ADDRESS, 6);
   
   for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
-    accelSample[axis] += ((Wire.receive()|(Wire.receive() << 8)) >> 2);
+    accelSample[axis] += ((Wire.read()|(Wire.read() << 8)) >> 2);
   }
   accelSampleCount++;  
 }
