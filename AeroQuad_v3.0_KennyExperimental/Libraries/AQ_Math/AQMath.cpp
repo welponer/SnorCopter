@@ -40,6 +40,7 @@ float filterSmoothWithTime(float currentData, float previousData, float smoothFa
   return currentData; //if smoothFactor == 1.0, do not calculate, just bypass!
 }
 
+/*
 // ***********************************************************************
 // *********************** Median Filter Class ***************************
 // ***********************************************************************
@@ -90,6 +91,7 @@ const float MedianFilter::filter(float newData)
   }
   return data[(DATASIZE)>>1]; // return data value in middle of sorted array
 } 
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Vector Dot Product

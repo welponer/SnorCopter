@@ -44,12 +44,12 @@ void measureAccel() {
   Wire.requestFrom(ACCEL_ADDRESS, 6);
 
   #ifdef SPARKFUN_9DOF
-    meterPerSec[YAXIS] = ((Wire.read()|(Wire.read() << 8))) * accelScaleFactor[YAXIS] + runTimeAccelBias[YAXIS];
-	meterPerSec[XAXIS] = ((Wire.read()|(Wire.read() << 8))) * accelScaleFactor[XAXIS] + runTimeAccelBias[XAXIS];
-	meterPerSec[ZAXIS] = ((Wire.read()|(Wire.read() << 8))) * accelScaleFactor[ZAXIS] + runTimeAccelBias[ZAXIS];
+    meterPerSec[YAXIS] = readReverseShortI2C() * accelScaleFactor[YAXIS] + runTimeAccelBias[YAXIS];
+	meterPerSec[XAXIS] = readReverseShortI2C() * accelScaleFactor[XAXIS] + runTimeAccelBias[XAXIS];
+	meterPerSec[ZAXIS] = readReverseShortI2C() * accelScaleFactor[ZAXIS] + runTimeAccelBias[ZAXIS];
   #else
     for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
-      meterPerSec[axis] = ((Wire.read()|(Wire.read() << 8))) * accelScaleFactor[axis] + runTimeAccelBias[axis];
+      meterPerSec[axis] = readReverseShortI2C() * accelScaleFactor[axis] + runTimeAccelBias[axis];
     }
   #endif  
 }
@@ -59,12 +59,12 @@ void measureAccelSum() {
   sendByteI2C(ACCEL_ADDRESS, 0x32);
   Wire.requestFrom(ACCEL_ADDRESS, 6);
   #ifdef SPARKFUN_9DOF
-    accelSample[YAXIS] += ((Wire.read()|(Wire.read() << 8)));
-	accelSample[XAXIS] += ((Wire.read()|(Wire.read() << 8)));
-	accelSample[ZAXIS] += ((Wire.read()|(Wire.read() << 8)));
+    accelSample[YAXIS] += readReverseShortI2C();
+	accelSample[XAXIS] += readReverseShortI2C();
+	accelSample[ZAXIS] += readReverseShortI2C();
   #else
     for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
-      accelSample[axis] += ((Wire.read()|(Wire.read() << 8)));
+      accelSample[axis] += readReverseShortI2C();
     }
   #endif
   accelSampleCount++;

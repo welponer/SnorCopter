@@ -23,7 +23,11 @@
 
 // I2C functions
 #include <Wire.h>
-#include "Arduino.h"
+#if defined(ARDUINO) && ARDUINO >= 100
+  #include <Arduino.h>
+ #else
+  #include <WProgram.h>
+#endif
 
 void sendByteI2C(int deviceAddress, byte dataValue);
 byte readByteI2C(int deviceAddress);
@@ -32,5 +36,10 @@ int readWordWaitI2C(int deviceAddress);
 int readReverseWordI2C(int deviceAddress);
 byte readWhoI2C(int deviceAddress);
 void updateRegisterI2C(int deviceAddress, byte dataAddress, byte dataValue);
+
+int readShortI2C();
+int readShortI2C(int deviceAddress);
+int readReverseShortI2C();
+int readReverseShortI2C(int deviceAddress);
 
 #endif

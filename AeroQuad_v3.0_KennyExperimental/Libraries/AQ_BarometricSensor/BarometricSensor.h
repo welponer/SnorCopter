@@ -21,7 +21,7 @@
 #ifndef _AQ_BAROMETRIC_SENSOR_
 #define _AQ_BAROMETRIC_SENSOR_
 
-#include "Arduino.h"
+//#include "Arduino.h"
 
 double baroAltitude = 0.0; 
 double baroRawAltitude = 0.0;

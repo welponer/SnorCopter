@@ -225,8 +225,10 @@ void readEEPROM() {
   #endif*/
 }
 
-void writeEEPROM(){
+void writeEEPROM() {
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmegaUNO__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
   cli(); // Needed so that APM sensor data doesn't overflow
+#endif
   writePID(ROLL, ROLL_PID_GAIN_ADR);
   writePID(PITCH, PITCH_PID_GAIN_ADR);
   writePID(LEVELROLL, LEVELROLL_PID_GAIN_ADR);
@@ -291,8 +293,9 @@ void writeEEPROM(){
   writeFloat(servoMaxRoll, SERVOMAXROLL_ADR);
   writeFloat(servoMaxYaw, SERVOMAXYAW_ADR);
   #endif*/
-  
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmegaUNO__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
   sei(); // Restart interrupts
+#endif
 }
 
 void initSensorsZeroFromEEPROM() {

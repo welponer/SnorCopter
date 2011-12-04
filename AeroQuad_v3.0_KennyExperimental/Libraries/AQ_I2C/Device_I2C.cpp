@@ -21,6 +21,8 @@
 // I2C functions
 #include "Device_I2C.h"
 
+#if defined(ARDUINO) && ARDUINO >= 100
+
 void sendByteI2C(int deviceAddress, byte dataValue) 
 {
   Wire.beginTransmission(deviceAddress);
@@ -38,6 +40,16 @@ int readWordI2C(int deviceAddress)
 {
   Wire.requestFrom(deviceAddress, 2);
   return (Wire.read() << 8) | Wire.read();
+}
+
+int readReverseShortI2C()  __attribute__ ((noinline));
+int readReverseShortI2C() {
+  return (signed short)( Wire.read() | (Wire.read() << 8));
+}
+
+int readReverseShortI2C(int deviceAddress) {
+  Wire.requestFrom(deviceAddress, 2);
+  return readReverseShortI2C();
 }
 
 int readWordWaitI2C(int deviceAddress) 
@@ -78,3 +90,90 @@ void updateRegisterI2C(int deviceAddress, byte dataAddress, byte dataValue)
   Wire.endTransmission();
 }  
 
+#else
+  
+void sendByteI2C(int deviceAddress, byte dataValue) 
+{
+  Wire.beginTransmission(deviceAddress);
+  Wire.send(dataValue);
+  Wire.endTransmission();
+}
+
+byte readByteI2C(int deviceAddress) 
+{
+    Wire.requestFrom(deviceAddress, 1);
+    return Wire.receive();
+}
+
+int readWordI2C(int deviceAddress) 
+{
+  Wire.requestFrom(deviceAddress, 2);
+  return (Wire.receive() << 8) | Wire.receive();
+}
+
+int readWordI2C()  __attribute__ ((noinline));
+int readWordI2C() {
+  return (Wire.receive() << 8) | Wire.receive();
+}
+
+
+int readReverseShortI2C()  __attribute__ ((noinline));
+int readReverseShortI2C() {
+  return (signed short)( Wire.receive() | (Wire.receive() << 8));
+}
+
+int readReverseShortI2C(int deviceAddress) {
+  Wire.requestFrom(deviceAddress, 2);
+  return readReverseShortI2C();
+}
+
+int readWordWaitI2C(int deviceAddress) 
+{
+  unsigned char msb, lsb;
+  Wire.requestFrom(deviceAddress, 2); // request two bytes
+  while(!Wire.available()); // wait until data available
+  msb = Wire.receive();
+  while(!Wire.available()); // wait until data available
+  lsb = Wire.receive();
+  return (((int)msb<<8) | ((int)lsb));
+}
+
+int readReverseWordI2C(int deviceAddress) 
+{
+  byte lowerByte;
+  Wire.requestFrom(deviceAddress, 2);
+  lowerByte = Wire.receive();
+  return (Wire.receive() << 8) | lowerByte;
+}
+
+byte readWhoI2C(int deviceAddress) 
+{
+  // read the ID of the I2C device
+  Wire.beginTransmission(deviceAddress);
+  Wire.send(0x00);
+  Wire.endTransmission();
+  delay(100);
+  Wire.requestFrom(deviceAddress, 1);
+  return Wire.receive();
+}
+
+void updateRegisterI2C(int deviceAddress, byte dataAddress, byte dataValue) 
+{
+  Wire.beginTransmission(deviceAddress);
+  Wire.send(dataAddress);
+  Wire.send(dataValue);
+  Wire.endTransmission();
+}  
+ 
+#endif
+
+
+int readShortI2C()  __attribute__ ((noinline));
+int readShortI2C() {
+  return (signed short)readWordI2C();
+}
+
+int readShortI2C(int deviceAddress) {
+  Wire.requestFrom(deviceAddress, 2);
+  return readShortI2C();
+}

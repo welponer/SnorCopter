@@ -44,7 +44,7 @@ long temperature = 0;
 long rawPressure = 0, rawTemperature = 0;
 byte select = 0, pressureCount = 0;
 float pressureFactor = 1/5.255;
-  
+
 void requestRawPressure() {
   updateRegisterI2C(BMP085_I2C_ADDRESS, 0xF4, 0x34+(overSamplingSetting<<6));
 }

@@ -23,7 +23,11 @@
 
 #define DATASIZE 25
 
-#include <Arduino.h>
+#if defined(ARDUINO) && ARDUINO >= 100
+  #include <Arduino.h>
+ #else
+  #include <WProgram.h>
+#endif
 
 #define G_2_MPS2(g) (g * 9.80665)
 #define MPS2_2_G(m) (m * 0.10197162)
@@ -32,6 +36,7 @@
 float filterSmooth(float currentData, float previousData, float smoothFactor);
 float filterSmoothWithTime(float currentData, float previousData, float smoothFactor, float dT_scaledAroundOne);
 
+/*
 // ***********************************************************************
 // *********************** Median Filter Class ***************************
 // ***********************************************************************
@@ -49,6 +54,7 @@ public:
   
   const float filter(float newData);
 };
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Vector Dot Product

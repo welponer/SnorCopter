@@ -58,9 +58,9 @@ void measureGyro() {
   // orientation.  See TBD for details.  If your shield is not installed in this
   // orientation, this is where you make the changes.
   int gyroADC[3];
-  gyroADC[ROLL]  = ((Wire.read() << 8) | Wire.read())  - gyroZero[ROLL];
-  gyroADC[PITCH] = gyroZero[PITCH] - ((Wire.read() << 8) | Wire.read());
-  gyroADC[YAW]   = gyroZero[YAW] - ((Wire.read() << 8) | Wire.read());
+  gyroADC[ROLL]  = readShortI2C() - gyroZero[ROLL];
+  gyroADC[PITCH] = gyroZero[PITCH] - readShortI2C() ;
+  gyroADC[YAW]   = gyroZero[YAW] - readShortI2C() ;
 
   for (byte axis = 0; axis <= YAW; axis++) {
     gyroRate[axis] = filterSmooth(gyroADC[axis] * gyroScaleFactor, gyroRate[axis], gyroSmoothFactor);
@@ -79,7 +79,7 @@ void measureGyroSum() {
   Wire.requestFrom(gyroAddress, ITG3200_BUFFER_SIZE);
   
   for (byte axis = XAXIS; axis < LASTAXIS; axis++) {
-    gyroSample[axis] += (Wire.read() << 8) | Wire.read();
+    gyroSample[axis] += readShortI2C();
   }
   gyroSampleCount++;
 }
@@ -113,7 +113,7 @@ void calibrateGyro() {
     
   for (byte axis = 0; axis < 3; axis++) {
     for (int i=0; i<FINDZERO; i++) {
-      sendByteI2C(gyroAddress, (axis * 2) + ITG3200_LOW_PASS_FILTER_VALUE);
+      sendByteI2C(gyroAddress, (axis * 2) + ITG3200_MEMORY_ADDRESS);
       findZero[i] = readWordI2C(gyroAddress);
       delay(10);
     }
