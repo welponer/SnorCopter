@@ -102,8 +102,7 @@ SIGNAL(PCINT2_vect) {
   MegaPcIntISR();
 }
 
-// #ifdef AeroQuadMega_v1 is undefined in libraries,  @todo Kenny find another solution for this!
-#if defined (__AVR_ATmega1280__) 
+#ifdef OLD_RECEIVER_PIN_ORDER
   // arduino pins 67, 65, 64, 66, 63, 62
   static byte receiverPin[6] = {5, 3, 2, 4, 1, 0}; // bit number of PORTK used for ROLL, PITCH, YAW, THROTTLE, MODE, AUX
 #else

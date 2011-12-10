@@ -43,24 +43,6 @@
 #define ON 1
 #define OFF 0
 
-// PID Variables
-struct PIDdata {
-  float P, I, D;
-  float lastPosition;
-  // AKA experiments with PID
-  float previousPIDTime;
-  float integratedError;
-  float windupGuard; // Thinking about having individual wind up guards for each PID
-} PID[10];
-// This struct above declares the variable PID[] to hold each of the PID values for various functions
-// The following constants are declared in AeroQuad.h
-// ROLL = 0, PITCH = 1, YAW = 2 (used for Arcobatic Mode, gyros only)
-// ROLLLEVEL = 3, PITCHLEVEL = 4, LEVELGYROROLL = 6, LEVELGYROPITCH = 7 (used for Stable Mode, accels + gyros)
-// HEADING = 5 (used for heading hold)
-// ALTITUDE = 8 (used for altitude hold)
-// ZDAMPENING = 9 (used in altitude hold to dampen vertical accelerations)
-float windupGuard; // Read in from EEPROM
-
 // PID types
 #define NOTYPE 0
 #define TYPEPI 1
@@ -106,12 +88,10 @@ float levelAdjust[2] = {0.0,0.0};
 
 // Heading hold
 byte headingHoldConfig;
-//float headingScaleFactor;
 float commandedYaw = 0;
 float headingHold = 0; // calculated adjustment for quad to go to heading (PID output)
 float heading = 0; // measured heading from yaw gyro (process variable)
 float relativeHeading = 0; // current heading the quad is set to (set point)
-//float absoluteHeading = 0;;
 float setHeading = 0;
 unsigned long headingTime = micros();
 byte headingHoldState = OFF;
@@ -120,10 +100,14 @@ byte headingHoldState = OFF;
 int throttle = 1000;
 int batteyMonitorThrottleCorrection = 0;
 #if defined (BattMonitor)
+  #define BattMonitorAlarmVoltage 10.0  // required by battery monitor macro, this is overriden by readEEPROM()
+  float batteryMonitorAlarmVoltage = 10.0;
   int batteryMonitorStartThrottle = 0;
+  int batteryMonitorThrottleTarget = 1450;
   unsigned long batteryMonitorStartTime = 0;
-  #define BATTERY_MONITOR_THROTTLE_TARGET 1450
-  #define BATTERY_MONITOR_GOIN_DOWN_TIME 60000  // 1 minutes
+  unsigned long batteryMonitorGoinDownTime = 60000; 
+  //#define BATTERY_MONITOR_THROTTLE_TARGET 1450
+  //#define BATTERY_MONITOR_GOIN_DOWN_TIME 60000  // 1 minutes
   
   #if defined BattMonitorAutoDescent
     int batteryMonitorAlarmCounter = 0;
@@ -134,8 +118,10 @@ int batteyMonitorThrottleCorrection = 0;
 // Altitude Hold
 #ifdef AltitudeHold
   #define ALTPANIC 2 // special state that allows immediate turn off of Altitude hold if large throttle changesa are made at the TX
-  #define ALTBUMP 90 // amount of stick movement to cause an altitude bump (up or down)
-  #define PANICSTICK_MOVEMENT 250 // 80 if althold on and throttle commanded to move by a gross amount, set PANIC
+  //#define ALTBUMP 90 // amount of stick movement to cause an altitude bump (up or down)
+  //#define PANICSTICK_MOVEMENT 250 // 80 if althold on and throttle commanded to move by a gross amount, set PANIC
+  int altitudeHoldBump = 90;
+  int altitudeHoldPanicStickMovement = 250;
 
   float altitudeToHoldTarget = 0.0;
   int altitudeHoldThrottle = 1000;
@@ -259,7 +245,6 @@ typedef struct {
   float AREF_ADR;
   float FLIGHTMODE_ADR;
   float HEADINGHOLD_ADR;
-  float MINACRO_ADR;
   float ACCEL_1G_ADR;
 //  float ALTITUDE_PGAIN_ADR;
   float ALTITUDE_MAX_THROTTLE_ADR;
@@ -267,6 +252,8 @@ typedef struct {
   float ALTITUDE_SMOOTH_ADR;
 //  float ZDAMP_PGAIN_ADR;
   float ALTITUDE_WINDUP_ADR;
+  float ALTITUDE_BUMP_ADR;
+  float ALTITUDE_PANIC_ADR;
   float SERVOMINPITCH_ADR;
   float SERVOMINROLL_ADR;
   float GYRO_ROLL_ZERO_ADR;
@@ -283,6 +270,10 @@ typedef struct {
   float XAXIS_MAG_BIAS_ADR;
   float YAXIS_MAG_BIAS_ADR;
   float ZAXIS_MAG_BIAS_ADR;
+  // Battery Monitor
+  float BATT_ALARM_VOLTAGE_ADR;
+  float BATT_THROTTLE_TARGET_ADR;
+  float BATT_DOWN_TIME_ADR;
 } t_NVR_Data;  
 
 

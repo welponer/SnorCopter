@@ -21,6 +21,9 @@
 // Special thanks for 1k space optimization update from Ala42
 // http://aeroquad.com/showthread.php?1369-The-big-enhancement-addition-to-2.0-code&p=13359&viewfull=1#post13359
 
+#ifndef _AQ_DATA_STORAGE_H_
+#define _AQ_DATA_STORAGE_H_
+
 // Utilities for writing and reading from the EEPROM
 float nvrReadFloat(int address) {
   union floatStore {
@@ -100,7 +103,10 @@ void initializeEEPROM() {
     minThrottleAdjust = -50.0;
     maxThrottleAdjust = 50.0; //we don't want it to be able to take over totally
     baroSmoothFactor = 0.1;
+    altitudeHoldBump = 90;
+    altitudeHoldPanicStickMovement = 250;
   #endif
+  
   // Accel Cal
   accelScaleFactor[XAXIS] = 1.0;
   runTimeAccelBias[XAXIS] = 0.0;
@@ -118,8 +124,9 @@ void initializeEEPROM() {
 
   // AKA - added so that each PID has its own windupGuard, will need to be removed once each PID's range is established and put in the eeprom
   for (byte i = ROLL; i <= ZDAMPENING; i++ ) {
-    if (i != ALTITUDE)
-        PID[i].windupGuard = windupGuard;
+    if (i != ALTITUDE) {
+      PID[i].windupGuard = windupGuard;
+    }
   }
     
   receiverXmitFactor = 1.0;
@@ -138,23 +145,14 @@ void initializeEEPROM() {
   smoothHeading = 1.0;
   flightMode = ACRO;
   headingHoldConfig = ON;
-  minAcro = 1300;
   aref = 5.0; // Use 3.0 if using a v1.7 shield or use 2.8 for an AeroQuad Shield < v1.7
   
-  /*#ifdef Camera
-    mCameraPitch = 11.11;   // scale angle to servo....  caculated as +/- 90 (ie 180) degrees maped to 1000-2000 
-    mCameraRoll = 11.11;        
-    mCameraYaw = 11.11;
-    centerPitch = 1500;       // (bCamera) Center of stabilisation in mode 1,  point here in mode 2  
-    centerRoll = 1500;        // 1000 - 2000 nornaly centered 1500
-    centerYaw = 1500;  
-    servoMinPitch = 1000;     // don't drive the servo past here  
-    servoMinRoll = 1000;
-    servoMinYaw = 1000;
-    servoMaxPitch = 2000;
-    servoMaxRoll = 2000;
-    servoMaxYaw = 2000;
-  #endif*/
+  // Battery Monitor
+  #ifdef BattMonitor
+    batteryMonitorAlarmVoltage = 10.0;
+    batteryMonitorThrottleTarget = 1450;
+    batteryMonitorGoinDownTime = 60000;
+  #endif
 }
 
 void readEEPROM() {
@@ -175,6 +173,8 @@ void readEEPROM() {
   maxThrottleAdjust = readFloat(ALTITUDE_MAX_THROTTLE_ADR);
   #ifdef AltitudeHold    
     baroSmoothFactor = readFloat(ALTITUDE_SMOOTH_ADR);
+    altitudeHoldBump = readFloat(ALTITUDE_BUMP_ADR);
+    altitudeHoldPanicStickMovement = readFloat(ALTITUDE_PANIC_ADR);
   #endif
   readPID(ZDAMPENING, ZDAMP_PID_GAIN_ADR);
 
@@ -192,13 +192,20 @@ void readEEPROM() {
     magBias[YAXIS] = readFloat(YAXIS_MAG_BIAS_ADR);
     magBias[ZAXIS] = readFloat(ZAXIS_MAG_BIAS_ADR);
   #endif
-
+  
+  // Battery Monitor
+  #ifdef BattMonitor
+    batteryMonitorAlarmVoltage = readFloat(BATT_ALARM_VOLTAGE_ADR);
+    batteryMonitorThrottleTarget = readFloat(BATT_THROTTLE_TARGET_ADR);
+    batteryMonitorGoinDownTime = readFloat(BATT_DOWN_TIME_ADR);
+  #endif
+  
   windupGuard = readFloat(WINDUPGUARD_ADR);
-
   // AKA - added so that each PID has its own windupGuard, will need to be removed once each PID's range is established and put in the eeprom
   for (byte i = ROLL; i <= ZDAMPENING; i++ ) {
-    if (i != ALTITUDE)
-        PID[i].windupGuard = windupGuard;
+    if (i != ALTITUDE) {
+      PID[i].windupGuard = windupGuard;
+    }
   }
     
   timeConstant = readFloat(FILTERTERM_ADR);
@@ -206,23 +213,7 @@ void readEEPROM() {
   aref = readFloat(AREF_ADR);
   flightMode = readFloat(FLIGHTMODE_ADR);
   headingHoldConfig = readFloat(HEADINGHOLD_ADR);
-  minAcro = readFloat(MINACRO_ADR);
   accelOneG = readFloat(ACCEL_1G_ADR);
-  
-  /*#ifdef Camera
-  mCameraPitch = readFloat(MCAMERAPITCH_ADR);
-  mCameraRoll = readFloat(MCAMERAROLL_ADR);
-  mCameraYaw = readFloat(MCAMERAYAW_ADR);
-  centerPitch = readFloat(CENTERPITCH_ADR);
-  centerRoll = readFloat(CENTERROLL_ADR);
-  centerYaw = readFloat(CENTERYAW_ADR);
-  servoMinPitch = readFloat(SERVOMINPITCH_ADR);
-  servoMinRoll = readFloat(SERVOMINROLL_ADR);
-  servoMinYaw = readFloat(SERVOMINYAW_ADR);
-  servoMaxPitch = readFloat(SERVOMAXPITCH_ADR);
-  servoMaxRoll = readFloat(SERVOMAXROLL_ADR);
-  servoMaxYaw = readFloat(SERVOMAXYAW_ADR);
-  #endif*/
 }
 
 void writeEEPROM() {
@@ -243,6 +234,8 @@ void writeEEPROM() {
   writeFloat(maxThrottleAdjust, ALTITUDE_MAX_THROTTLE_ADR);
   #ifdef AltitudeHold    
     writeFloat(baroSmoothFactor, ALTITUDE_SMOOTH_ADR);
+    writeFloat(altitudeHoldBump, ALTITUDE_BUMP_ADR);
+    writeFloat(altitudeHoldPanicStickMovement, ALTITUDE_PANIC_ADR);
   #else
     writeFloat(0.1, ALTITUDE_SMOOTH_ADR);
   #endif
@@ -275,24 +268,16 @@ void writeEEPROM() {
   writeFloat(aref, AREF_ADR);
   writeFloat(flightMode, FLIGHTMODE_ADR);
   writeFloat(headingHoldConfig, HEADINGHOLD_ADR);
-  writeFloat(minAcro, MINACRO_ADR);
   writeFloat(accelOneG, ACCEL_1G_ADR);
   writeFloat(SOFTWARE_VERSION, SOFTWARE_VERSION_ADR);
-    
-  /*#ifdef Camera
-  writeFloat(mCameraPitch, MCAMERAPITCH_ADR);
-  writeFloat(mCameraRoll, MCAMERAROLL_ADR);
-  writeFloat(mCameraYaw, MCAMERAYAW_ADR);
-  writeFloat(centerPitch, CENTERPITCH_ADR);
-  writeFloat(centerRoll, CENTERROLL_ADR);
-  writeFloat(centerYaw, CENTERYAW_ADR);
-  writeFloat(servoMinPitch, SERVOMINPITCH_ADR);
-  writeFloat(servoMinRoll, SERVOMINROLL_ADR);
-  writeFloat(servoMinYaw, SERVOMINYAW_ADR);
-  writeFloat(servoMaxPitch, SERVOMAXPITCH_ADR);
-  writeFloat(servoMaxRoll, SERVOMAXROLL_ADR);
-  writeFloat(servoMaxYaw, SERVOMAXYAW_ADR);
-  #endif*/
+  
+  // Battery Monitor
+  #ifdef BattMonitor
+    writeFloat(batteryMonitorAlarmVoltage, BATT_ALARM_VOLTAGE_ADR);
+    writeFloat(batteryMonitorThrottleTarget, BATT_THROTTLE_TARGET_ADR);
+    writeFloat(batteryMonitorGoinDownTime, BATT_DOWN_TIME_ADR);
+  #endif
+  
 #if defined(__AVR_ATmega328P__) || defined(__AVR_ATmegaUNO__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
   sei(); // Restart interrupts
 #endif
@@ -337,4 +322,6 @@ void initReceiverFromEEPROM() {
     receiverSmoothFactor[channel] = readFloat(RECEIVER_DATA[channel].smooth_factor);
   }
 }
+
+#endif // _AQ_DATA_STORAGE_H_
 

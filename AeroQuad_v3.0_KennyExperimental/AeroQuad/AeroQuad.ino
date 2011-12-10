@@ -20,7 +20,8 @@
 
 /****************************************************************************
    Before flight, select the different user options for your AeroQuad below
-   If you need additional assitance go to http://AeroQuad.com/forum
+   If you need additional assitance go to http://www.aeroquad.com/forum.php
+   or talk to us live on IRC #aeroquad
 *****************************************************************************/
 
 /****************************************************************************
@@ -63,7 +64,16 @@
 //#define octoPlusConfig  // EXPERIMENTAL: not completely re-tested
 //#define octoXConfig     // EXPERIMENTAL: not completely re-tested
 
-//#define OLD_MOTOR_NUMBERING // Uncomment this for old motor numbering setup, FOR QUAD ONLY
+//#define CHANGE_YAW_DIRECTION // if you want to reverse the yaw correction direction
+
+//
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// In the 3.0 code the motor numbering has changed to simplify motor configuration.
+// Please refer to the .h files in ..\Libraries\AQ_FlightControlProcessor to see the new numbering for your flight model
+// Also check the http://www.aeroquad.com/showwiki.php "Build Instructions" for more detail on the 3.0 motor changes 
+// the OLD_MOTOR_NUMBERING is compatible  with the 2.x versions of the AeroQuad code and will not need re-ordering to work
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//#define OLD_MOTOR_NUMBERING // Uncomment this for old motor numbering setup, FOR QUAD +/X MODE ONLY
 
 //
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -79,18 +89,16 @@
 // Optional Sensors
 // Warning:  If you enable HeadingHold or AltitudeHold and do not have the correct sensors connected, the flight software may hang
 // *******************************************************************************************************************************
-// You must define one of the next 3 attitude stabilization modes or the software will not build
-// *******************************************************************************************************************************
-//#define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
+#define HeadingMagHold // Enables Magnetometer, gets automatically selected if CHR6DM is defined
 #define AltitudeHold // Enables BMP085 Barometer (experimental, use at your own risk)
 //#define RateModeOnly // Use this if you only have a gyro sensor, this will disable any attitude modes.
 
 //
 // *******************************************************************************************************************************
 // Battery Monitor Options
+// For more information on how to setup Battery Monitor please refer to http://aeroquad.com/showwiki.php?title=BatteryMonitor+h
 // *******************************************************************************************************************************
 #define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
-#define BattMonitorAlarmVoltage 10.0  // this have to be defined if BattMonitor is defined. default alarm voltage is 10 volt
 #define BattMonitorAutoDescent  // if you want the craft to auto descent when the battery reach the alarm voltage
 #define POWERED_BY_VIN // Uncomment this if your v2.x is powered directly by the vin/gnd of the arduino
 
@@ -107,7 +115,8 @@
 
 //
 // *******************************************************************************************************************************
-// Optional telemetry (most for debug purpose)
+// Optional telemetry (for debug or ground station tracking purposes)
+// For more information on how to setup Telemetry please refer to http://aeroquad.com/showwiki.php?title=Xbee+Installation
 // *******************************************************************************************************************************
 //#define WirelessTelemetry  // Enables Wireless telemetry on Serial3  // Wireless telemetry enable
 //#define BinaryWrite // Enables fast binary transfer of flight data to Configurator
@@ -116,7 +125,7 @@
 
 //
 // *******************************************************************************************************************************
-// Define how many channels that are connected from your R/C receiver
+// Define how many channels are connected from your R/C receiver
 // Please note that the flight software currently only supports 6 channels, additional channels will be supported in the future
 // Additionally 8 receiver channels are only available when not using the Arduino Uno
 // *******************************************************************************************************************************
@@ -135,13 +144,15 @@
 // *******************************************************************************************************************************
 //#define CameraControl
 
+
+//
+// *******************************************************************************************************************************
 // On screen display implementation using MAX7456 chip. See OSD.h for more info and configuration.
+// For more information on how to setup OSD please refer to http://aeroquad.com/showwiki.php?title=On-Screen-Display
+// *******************************************************************************************************************************
 //#define OSD
 // Menu system, currently only usable with OSD
 //#define OSD_SYSTEM_MENU
-
-
-//#define CHANGE_YAW_DIRECTION // if you want to reverse the yaw correction direction
 
 /****************************************************************************
  ****************************************************************************
@@ -393,6 +404,7 @@
   #include <Accelerometer_ADXL500.h>
 
   // Reveiver declaration
+  #define OLD_RECEIVER_PIN_ORDER
   #define RECEIVER_MEGA
 
   // Motor declaration
@@ -1244,6 +1256,11 @@ void setup() {
   // Battery Monitor
   #ifdef BattMonitor
     initializeBatteryMonitor(sizeof(batteryData) / sizeof(struct BatteryData));
+    // batteryMonitorAlarmVoltage updated in readEEPROM()
+    for (int i = 0; i < numberOfBatteries;i++) {
+      batteryData[i].vAlarm = batteryMonitorAlarmVoltage;
+      batteryData[i].vWarning = batteryMonitorAlarmVoltage;
+    }
   #endif
 
   // Camera stabilization setup

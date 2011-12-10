@@ -157,13 +157,13 @@ void processAltitudeHold()
     if (altitudeHoldState == ON) {
       int altitudeHoldThrottleCorrection = updatePID(altitudeToHoldTarget, getBaroAltitude(), &PID[ALTITUDE]);
       altitudeHoldThrottleCorrection = constrain(altitudeHoldThrottleCorrection, minThrottleAdjust, maxThrottleAdjust);
-      if (abs(altitudeHoldThrottle - receiverCommand[THROTTLE]) > PANICSTICK_MOVEMENT) {
+      if (abs(altitudeHoldThrottle - receiverCommand[THROTTLE]) > altitudeHoldPanicStickMovement) {
         altitudeHoldState = ALTPANIC; // too rapid of stick movement so PANIC out of ALTHOLD
       } else {
-        if (receiverCommand[THROTTLE] > (altitudeHoldThrottle + ALTBUMP)) { // AKA changed to use holdThrottle + ALTBUMP - (was MAXCHECK) above 1900
+        if (receiverCommand[THROTTLE] > (altitudeHoldThrottle + altitudeHoldBump)) { // AKA changed to use holdThrottle + ALTBUMP - (was MAXCHECK) above 1900
           altitudeToHoldTarget += 0.01;
         }
-        if (receiverCommand[THROTTLE] < (altitudeHoldThrottle - ALTBUMP)) { // AKA change to use holdThorrle - ALTBUMP - (was MINCHECK) below 1100
+        if (receiverCommand[THROTTLE] < (altitudeHoldThrottle - altitudeHoldBump)) { // AKA change to use holdThorrle - ALTBUMP - (was MINCHECK) below 1100
           altitudeToHoldTarget -= 0.01;
         }
       }
@@ -194,16 +194,16 @@ void processAltitudeHold()
       #endif
           if (batteryMonitorStartThrottle == 0) {  // init battery monitor throttle correction!
             batteryMonitorStartTime = millis();
-            if (throttle < BATTERY_MONITOR_THROTTLE_TARGET) {
-              batteryMonitorStartThrottle = BATTERY_MONITOR_THROTTLE_TARGET;
+            if (throttle < batteryMonitorThrottleTarget) {
+              batteryMonitorStartThrottle = batteryMonitorThrottleTarget;
             }
             else {
               batteryMonitorStartThrottle = throttle; 
             }
           }
-          int batteryMonitorThrottle = map(millis()-batteryMonitorStartTime, 0, BATTERY_MONITOR_GOIN_DOWN_TIME, batteryMonitorStartThrottle, 1450/*BATTERY_MONITOR_THROTTLE_TARGET*/);
-          if (batteryMonitorThrottle < BATTERY_MONITOR_THROTTLE_TARGET) {
-            batteryMonitorThrottle = BATTERY_MONITOR_THROTTLE_TARGET;
+          int batteryMonitorThrottle = map(millis()-batteryMonitorStartTime, 0, batteryMonitorGoinDownTime, batteryMonitorStartThrottle, batteryMonitorThrottleTarget);
+          if (batteryMonitorThrottle < batteryMonitorThrottleTarget) {
+            batteryMonitorThrottle = batteryMonitorThrottleTarget;
           }
           if (throttle < batteryMonitorThrottle) {
             batteyMonitorThrottleCorrection = 0;

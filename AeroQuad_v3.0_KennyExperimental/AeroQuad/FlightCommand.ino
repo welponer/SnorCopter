@@ -21,20 +21,25 @@
 // FlightCommand.pde is responsible for decoding transmitter stick combinations
 // for setting up AeroQuad modes such as motor arming and disarming
 
+#ifndef _AQ_FLIGHT_COMMAND_READER_
+#define _AQ_FLIGHT_COMMAND_READER_
+
 void readPilotCommands() {
-  readReceiver();
-  // Read quad configuration commands from transmitter when throttle down
+  
+  readReceiver(); // Read quad configuration commands from transmitter when throttle down
   if (receiverCommand[THROTTLE] < MINCHECK) {
     zeroIntegralError();
 
     // Disarm motors (left stick lower left corner)
     if (receiverCommand[YAW] < MINCHECK && armed == ON) {
-      armed = OFF;
+      commandAllMotors(MINCOMMAND);
       digitalWrite(LED_Red,LOW);
+      armed = OFF;
+            
       #ifdef OSD
         notifyOSD(OSD_CENTER|OSD_WARN, "MOTORS UNARMED");
       #endif
-      commandAllMotors(MINCOMMAND);
+      
       #if defined BattMonitorAutoDescent
         batteryMonitorAlarmCounter = 0;
         batteryMonitorStartThrottle = 0;
@@ -55,15 +60,17 @@ void readPilotCommands() {
     // Arm motors (left stick lower right corner)
     if (receiverCommand[YAW] > MAXCHECK && armed == OFF && safetyCheck == ON) {
       zeroIntegralError();
-      armed = ON;
+      for (byte motor = 0; motor < LASTMOTOR; motor++) {
+        motorCommand[motor] = MINTHROTTLE;
+      }
       digitalWrite(LED_Red,HIGH);
+      armed = ON;
+    
       #ifdef OSD
         notifyOSD(OSD_CENTER|OSD_WARN, "!MOTORS ARMED!");
       #endif  
       
-      for (byte motor = 0; motor < LASTMOTOR; motor++) {
-        motorCommand[motor] = MINTHROTTLE;
-      }
+      
     }
     // Prevents accidental arming of motor output if no transmitter command received
     if (receiverCommand[YAW] > MINCHECK) {
@@ -104,6 +111,6 @@ void readPilotCommands() {
   #endif
 }
 
-
+#endif // _AQ_FLIGHT_COMMAND_READER_
 
 
