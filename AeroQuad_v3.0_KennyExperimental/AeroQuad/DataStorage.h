@@ -99,10 +99,12 @@ void initializeEEPROM() {
   PID[ZDAMPENING].I = 0.0;
   PID[ZDAMPENING].D = 0.0;
   
-  #ifdef AltitudeHold    
+  #if defined AltitudeHoldBaro || defined AltitudeHoldRangeFinder
     minThrottleAdjust = -50.0;
     maxThrottleAdjust = 50.0; //we don't want it to be able to take over totally
-    baroSmoothFactor = 0.1;
+    #if defined AltitudeHoldBaro
+      baroSmoothFactor = 0.1;
+    #endif
     altitudeHoldBump = 90;
     altitudeHoldPanicStickMovement = 250;
   #endif
@@ -171,8 +173,10 @@ void readEEPROM() {
   PID[ALTITUDE].windupGuard = readFloat(ALTITUDE_WINDUP_ADR);
   minThrottleAdjust = readFloat(ALTITUDE_MIN_THROTTLE_ADR);
   maxThrottleAdjust = readFloat(ALTITUDE_MAX_THROTTLE_ADR);
-  #ifdef AltitudeHold    
-    baroSmoothFactor = readFloat(ALTITUDE_SMOOTH_ADR);
+  #if defined AltitudeHoldBaro || defined AltitudeHoldRangeFinder
+    #if defined AltitudeHoldBaro
+      baroSmoothFactor = readFloat(ALTITUDE_SMOOTH_ADR);
+    #endif  
     altitudeHoldBump = readFloat(ALTITUDE_BUMP_ADR);
     altitudeHoldPanicStickMovement = readFloat(ALTITUDE_PANIC_ADR);
   #endif
@@ -232,8 +236,12 @@ void writeEEPROM() {
   writeFloat(PID[ALTITUDE].windupGuard, ALTITUDE_WINDUP_ADR);
   writeFloat(minThrottleAdjust, ALTITUDE_MIN_THROTTLE_ADR);
   writeFloat(maxThrottleAdjust, ALTITUDE_MAX_THROTTLE_ADR);
-  #ifdef AltitudeHold    
-    writeFloat(baroSmoothFactor, ALTITUDE_SMOOTH_ADR);
+  #if defined AltitudeHoldBaro || defined AltitudeHoldRangeFinder
+    #if defined AltitudeHoldBaro
+      writeFloat(baroSmoothFactor, ALTITUDE_SMOOTH_ADR);
+    #else
+      writeFloat(0, ALTITUDE_SMOOTH_ADR);
+    #endif
     writeFloat(altitudeHoldBump, ALTITUDE_BUMP_ADR);
     writeFloat(altitudeHoldPanicStickMovement, ALTITUDE_PANIC_ADR);
   #else

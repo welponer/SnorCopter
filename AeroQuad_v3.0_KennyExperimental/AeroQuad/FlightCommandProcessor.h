@@ -90,11 +90,11 @@ void readPilotCommands() {
     }
   #endif  
   
-  #ifdef AltitudeHold
+  #if defined AltitudeHoldBaro || defined AltitudeHoldRangeFinder
    if (receiverCommand[AUX] < 1750) {
      if (altitudeHoldState != ALTPANIC ) {  // check for special condition with manditory override of Altitude hold
        if (isStoreAltitudeNeeded) {
-         altitudeToHoldTarget = getBaroAltitude();
+         altitudeToHoldTarget = getAltitudeFromSensors();
          altitudeHoldThrottle = receiverCommand[THROTTLE];
          PID[ALTITUDE].integratedError = 0;
          PID[ALTITUDE].lastPosition = altitudeToHoldTarget;  // add to initialize hold position on switch turn on.

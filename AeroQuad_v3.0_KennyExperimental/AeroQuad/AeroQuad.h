@@ -34,9 +34,9 @@
 // Flight Software Version
 #define SOFTWARE_VERSION 3.0
 
-#define BAUD 115200
+//#define BAUD 115200
 //#define BAUD 111111 // use this to be compatible with USB and XBee connections
-//#define BAUD 57600
+#define BAUD 57600
 
 
 
@@ -116,7 +116,7 @@ int batteyMonitorThrottleCorrection = 0;
 #endif
 
 // Altitude Hold
-#ifdef AltitudeHold
+#if defined AltitudeHoldBaro || defined AltitudeHoldRangeFinder
   #define ALTPANIC 2 // special state that allows immediate turn off of Altitude hold if large throttle changesa are made at the TX
   //#define ALTBUMP 90 // amount of stick movement to cause an altitude bump (up or down)
   //#define PANICSTICK_MOVEMENT 250 // 80 if althold on and throttle commanded to move by a gross amount, set PANIC
@@ -317,7 +317,6 @@ void sendBinaryuslong(unsigned long);
 void fastTelemetry();
 void comma();
 //////////////////////////////////////////////////////
-
 
 #endif // _AQ_GLOBAL_HEADER_DEFINITION_H_
 

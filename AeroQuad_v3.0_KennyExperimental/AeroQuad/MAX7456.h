@@ -405,7 +405,7 @@ void displayVoltage() {
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////// AltitudeHold Display /////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-#ifdef AltitudeHold
+#if defined AltitudeHoldBaro || defined AltitudeHoldRangeFinder
 
 int lastAltitude     = 12345;     // bogus initial values to force update
 int lastHoldAltitude = 12345;
@@ -413,10 +413,10 @@ byte lastHoldState   = 6;
 
 void displayAltitude() {
   #ifdef feet
-    int currentAltitude = getBaroAltitude()*3.281;
+    int currentAltitude = getAltitudeFromSensors()*3.281;
     int currentHoldAltitude = altitudeToHoldTarget*3.281;
   #else // metric
-    int currentAltitude = getBaroAltitude()*10.0; // 0.1m accuracy!!
+    int currentAltitude = getAltitudeFromSensors()*10.0; // 0.1m accuracy!!
     int currentHoldAltitude = altitudeToHoldTarget*10.0;
   #endif
   char buf[7];
@@ -691,7 +691,7 @@ void updateOSD() {
   #endif
 
   if (OSDsched&0x02) {
-    #ifdef AltitudeHold
+    #if defined AltitudeHoldBaro || defined AltitudeHoldRangeFinder
       displayAltitude();
     #endif
     #ifdef HeadingMagHold

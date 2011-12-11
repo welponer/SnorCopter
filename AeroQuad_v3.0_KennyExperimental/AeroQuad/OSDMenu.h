@@ -361,7 +361,7 @@ void menuEeprom(byte mode, byte action) {
 #ifdef HeadingMagHold
             initializeMagnetometer();
 #endif
-#ifdef AltitudeHold
+#if defined AltitudeHoldBaro
             initializeBaro();
 #endif
             notifyOSD(OSD_NOCLEAR, "EEPROM reinitialized");
